@@ -7,6 +7,6 @@ import com.noir.job.payload.SignUpRequest;
 public interface AuthService {
     AuthResponse signup(SignUpRequest req) throws Exception;
 
-    AuthResponse login(LoginRequest req);
+    AuthResponse login(LoginRequest req) throws Exception;
 
 }

@@ -17,7 +17,5 @@ public class SignUpRequest {
     private String password;
     @NotNull(message = "role is mandatory")
     private UserRole role;
-
     private String phone;
-
 }

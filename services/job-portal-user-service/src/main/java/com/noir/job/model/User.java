@@ -41,7 +41,7 @@ public class User {
     private String profileImage;
     @CreationTimestamp
     @Column(nullable= false, updatable = false)
-    private LocalDateTime createAt;
+    private LocalDateTime createdAt;
     @Column(nullable= false)
     @UpdateTimestamp
     private LocalDateTime updatedAt;

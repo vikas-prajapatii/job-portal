@@ -8,11 +8,11 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>job-portal-user-service</artifactId>
-	<name>job-portal-user-service</name>
-	<description>User service - Auth, profile and User Management for job portal</description>
-
+	<artifactId>job-portal-company-service</artifactId>
+	<name>job-portal-company-service</name>
+	<description>Service for managing company profiles, subscription and documents</description>
 	<dependencies>
+
 		<dependency>
 			<groupId>com.noir.job</groupId>
 			<artifactId>job-portal-common</artifactId>
@@ -47,33 +47,7 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-impl</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-jackson</artifactId>
-		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>

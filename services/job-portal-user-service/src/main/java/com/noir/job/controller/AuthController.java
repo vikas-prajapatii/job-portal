@@ -1,6 +1,7 @@
 package com.noir.job.controller;
 
 import com.noir.job.payload.AuthResponse;
+import com.noir.job.payload.LoginRequest;
 import com.noir.job.payload.SignUpRequest;
 import com.noir.job.service.AuthService;
 import jakarta.validation.Valid;
@@ -22,5 +23,12 @@ public class AuthController {
             @RequestBody @Valid SignUpRequest req
             ) throws Exception {
         return  ResponseEntity.ok(authService.signup(req));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(
+            @RequestBody @Valid LoginRequest req
+    ) throws Exception {
+        return  ResponseEntity.ok(authService.login(req));
     }
 }

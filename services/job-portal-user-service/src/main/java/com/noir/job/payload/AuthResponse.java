@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class AuthResponse {
-    private String Jwt;
+    private String jwt;
     private String title;
     private String message;
-    private UserResponse user;;
+    private UserResponse user;
 }
