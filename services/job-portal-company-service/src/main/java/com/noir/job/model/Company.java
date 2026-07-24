@@ -51,6 +51,7 @@ public class Company{
     private Long ownerId;
     private boolean isVerified = false;
     @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
     private List<SocialLink> socialLinks = new ArrayList<>();
     private boolean active = true;
     @CreationTimestamp

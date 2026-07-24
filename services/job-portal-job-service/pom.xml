@@ -8,9 +8,10 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>job-portal-company-service</artifactId>
-	<name>job-portal-company-service</name>
-	<description>ServiSce for managing company profiles, subscription and documents</description>
+	<artifactId>job-portal-job-service</artifactId>
+	<name>job-portal-job-service</name>
+	<description>Service for mangaging job posting and filtering </description>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.noir.job</groupId>
@@ -24,7 +25,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -47,6 +47,7 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

@@ -16,6 +16,8 @@
     <modules>
             <module>job-portal-user-service</module>
             <module>job-portal-company-service</module>
+            <module>job-portal-job-service</module>
+
     </modules>
 
 </project>
