@@ -1,5 +1,6 @@
 package com.noir.job.dto;
 
+import com.noir.job.domain.SkillCategory;
 import lombok.*;
 
 @Data
@@ -9,4 +10,7 @@ import lombok.*;
 public class JobSkillResponse {
     private Long id;
     private String name;
+    private String slug;
+    private SkillCategory category;
+    private boolean active;
 }

@@ -1,5 +1,4 @@
 package com.noir.job.service.serviceimpl;
-
 import com.noir.job.domain.UserStatus;
 import com.noir.job.dto.response.UserResponse;
 import com.noir.job.mapper.UserMapper;
@@ -11,11 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserServiceImpl implements UserService {
@@ -28,7 +25,6 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
-
     @Override
     public User getUserById(Long id) throws Exception {
         User user = userRepository.findById(id).orElseThrow(
@@ -36,12 +32,10 @@ public class UserServiceImpl implements UserService {
         );
         return user;
     }
-
     @Override
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-
     @Override
     public UserResponse updateProfile(String email, UpdateUserRequest req) throws Exception {
         User user = getUserByEmail(email);
@@ -57,7 +51,6 @@ public class UserServiceImpl implements UserService {
         return UserMapper.toDTO(userRepository.save(user));
 
     }
-
     @Override
     public UserResponse suspendUser(Long id) throws Exception {
         User user = getUserById(id);
@@ -65,7 +58,6 @@ public class UserServiceImpl implements UserService {
         user.setSuspendedAt(LocalDateTime.now());
         return UserMapper.toDTO(userRepository.save(user));
     }
-
     @Override
     public UserResponse activateUser(Long id) throws Exception {
         User user = getUserById(id);
@@ -73,7 +65,6 @@ public class UserServiceImpl implements UserService {
         user.setSuspendedAt(null);
         return UserMapper.toDTO(userRepository.save(user));
     }
-
     @Override
     public UserResponse deleteUser(Long id) throws Exception {
         User user = getUserById(id);
