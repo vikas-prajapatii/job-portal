@@ -37,10 +37,28 @@ public class Job {
    @Column(nullable = false)
    private String responsibilities;
    private String benefits;
+
+   @ManyToOne
+   private JobCategory category;
+   @ManyToMany
+   @JoinTable(
+       name = "job_skill_relations",
+       joinColumns = @JoinColumn(name = "job_id"),
+       inverseJoinColumns = @JoinColumn(name = "skill_id")
+   )
+   private Set<JobSkill> skills;
+   @ManyToMany
+   @JoinTable(
+       name = "job_tag_relations",
+       joinColumns = @JoinColumn(name = "job_id"),
+       inverseJoinColumns = @JoinColumn(name = "tag_id")
+   )
+   private Set<JobTags> tags;
+
  @Builder.Default
  private Boolean active = true;
     private Long companyId;
-    @Column(nullable = false)
+    @Column(name = "category_id", insertable = false, updatable = false)
     private Long categoryId;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -88,9 +106,7 @@ public class Job {
     @Column(nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime updatedAt;
-
     private LocalDate publishedAt;
     private LocalDate closedAt;
-
 
 }

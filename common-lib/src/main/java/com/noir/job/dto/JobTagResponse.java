@@ -6,7 +6,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Getter
+@Setter
 public class JobTagResponse {
     private Long id;
     private String name;
+    private String slug;
 }

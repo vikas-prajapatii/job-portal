@@ -6,12 +6,18 @@ import com.noir.job.dto.JobRequest;
 import com.noir.job.dto.JobResponse;
 import com.noir.job.mapper.JobMapper;
 import com.noir.job.model.Job;
+import com.noir.job.model.JobCategory;
+import com.noir.job.model.JobSkill;
+import com.noir.job.model.JobTags;
 import com.noir.job.model.embeddable.JobLocation;
 import com.noir.job.model.embeddable.SalaryRange;
 import com.noir.job.payload.JobSearchRequest;
 import com.noir.job.repository.JobRepository;
 import com.noir.job.repository.JobSpecification;
+import com.noir.job.service.JobCategoryService;
 import com.noir.job.service.JobService;
+import com.noir.job.service.JobSkillService;
+import com.noir.job.service.JobTagService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -24,7 +30,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -35,12 +43,19 @@ import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 public class JobServiceImpl implements JobService {
 
     private final JobRepository jobRepository;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
+    private final JobCategoryService jobCategoryService;
+    private final JobSkillService jobSkillService;
+    private final JobTagService jobTagService;
     @Override
-    public JobResponse createJob(Long employerId, JobRequest req) {
+    public JobResponse createJob(Long employerId, JobRequest req) throws Exception {
+        JobCategory category = jobCategoryService.getCategoryEntityById(req.getCategoryId());
+        Set<JobSkill> skills = req.getSkillIds() != null?
+                jobSkillService.getSkillsByIds(req.getSkillIds())
+                : Collections.emptySet();
+
+        Set<JobTags> tags = req.getTagIds() != null?
+                jobTagService.getTagsByIds(req.getTagIds())
+                : Collections.emptySet();
         int companyId = 1;
         Job job = Job.builder()
                 .title(req.getTitle())
@@ -51,12 +66,17 @@ public class JobServiceImpl implements JobService {
                 .location(buildLocation(req))
                 .salaryRange(buildSalaryRange(req))
                 .jobType(req.getJobType())
+                .category(category)
+                .skills(skills)
+                .tags(tags)
                 .workMode(req.getWorkMode())
                 .employerId(employerId)
                 .experienceLevel(req.getExperienceLevel())
                 .openings(req.getOpenings() != null? req.getOpenings() : 1)
                 .applicationDeadline(req.getApplicationDeadline())
                 .expiresAt(req.getExpiresAt())
+                .active(true)
+                .status(JobStatus.DRAFT)
                 .build();
         Job savedJob = jobRepository.save(job);
         return convertToResponse(savedJob);
@@ -94,14 +114,31 @@ public class JobServiceImpl implements JobService {
                ()->new Exception("Job not found")
        );
        assertEmployer(job,employerId);
+
+
+        JobCategory category = jobCategoryService.getCategoryEntityById(req.getCategoryId());
+        Set<JobSkill> skills = req.getSkillIds() != null?
+                jobSkillService.getSkillsByIds(req.getSkillIds())
+                : Collections.emptySet();
+
+        Set<JobTags> tags = req.getTagIds() != null?
+                jobTagService.getTagsByIds(req.getTagIds())
+                : Collections.emptySet();
+
+
        job.setTitle(req.getTitle());
        job.setDescription(req.getDescription());
        job.setRequirements(req.getRequirements());
        job.setResponsibilities(req.getResponsibilities());
        job.setBenefits(req.getBenefits());
+
+       job.setCategory(category);
+       job.setSkills(skills);
+       job.setTags(tags);
        job.setLocation(buildLocation(req));
        job.setSalaryRange(buildSalaryRange(req));
        job.setJobType(req.getJobType());
+
        job.setWorkMode(req.getWorkMode());
        job.setExperienceLevel(req.getExperienceLevel());
        job.setOpenings(req.getOpenings());
@@ -160,7 +197,6 @@ public class JobServiceImpl implements JobService {
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
     }
-
     private JobResponse convertToResponse(Job savedJob) {
         CompanyResponse response = CompanyResponse.builder()
                 .id(savedJob.getCompanyId())

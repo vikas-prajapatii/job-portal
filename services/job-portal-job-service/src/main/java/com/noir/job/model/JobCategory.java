@@ -31,9 +31,11 @@ public class JobCategory {
     @ManyToOne(fetch = FetchType.LAZY)
     private JobCategory parent;
 
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<JobCategory> subcategories = new ArrayList<>();
 
+    @Builder.Default
     private boolean active = true;
     @CreationTimestamp
     @Column(nullable = false,updatable = false)

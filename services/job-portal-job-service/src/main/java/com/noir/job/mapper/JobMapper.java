@@ -2,9 +2,11 @@ package com.noir.job.mapper;
 
 import com.noir.job.dto.*;
 import com.noir.job.model.Job;
+import com.noir.job.model.JobTags;
 import com.noir.job.model.embeddable.JobLocation;
 import com.noir.job.model.embeddable.SalaryRange;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,8 +22,14 @@ public class JobMapper {
     public static JobResponse toResponse(Job job, CompanyResponse companyResponse) {
         JobLocation location = job.getLocation();
         SalaryRange salary = job.getSalaryRange();
+        Set<JobSkillResponse> skills = job.getSkills() == null?
+                Collections.emptySet()
+                :job.getSkills().stream().map(JobSkillMapper::toJobSkillResponse).collect(Collectors.toSet());
 
-        return builder()
+        Set<JobTagResponse> tags = job.getTags() == null?
+                Collections.emptySet(): job.getTags().stream().map(JobTagMapper::toResponse)
+                                        .collect(Collectors.toSet());
+        return JobResponse.builder()
                 .id(job.getId())
                 .title(job.getTitle())
                 .description(job.getDescription())
@@ -29,6 +37,9 @@ public class JobMapper {
                 .responsibilities(job.getResponsibilities())
                 .benefits(job.getBenefits())
                 .company(companyResponse)
+                .skills(skills)
+                .tags(tags)
+                .category(JobCategoryMapper.toJobCategoryResponse(job.getCategory(),false))
                 .employerId(job.getEmployerId())
                 .address(location != null ? location.getAddress(): null)
                 .city(location != null ? location.getCity(): null)
@@ -142,4 +153,6 @@ public class JobMapper {
         job.setApplicationDeadline(req.getApplicationDeadline());
         job.setExpiresAt(req.getExpiresAt());
     }
+
+
 }

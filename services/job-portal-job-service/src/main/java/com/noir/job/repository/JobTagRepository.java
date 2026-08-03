@@ -1,12 +1,9 @@
 package com.noir.job.repository;
 
-import com.noir.job.model.JobSkill;
+import com.noir.job.model.JobTags;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
-public interface JobSkillRepository extends JpaRepository<JobSkill,Long> {
-    List<JobSkill> findByActiveTrue();
+public interface JobTagRepository extends JpaRepository<JobTags, Long> {
     boolean existsByName(String name);
     boolean existsBySlug(String slug);
 }

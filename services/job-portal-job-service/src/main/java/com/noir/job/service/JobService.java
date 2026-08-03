@@ -7,7 +7,7 @@ import com.noir.job.payload.JobSearchRequest;
 import java.util.List;
 
 public interface JobService {
-    JobResponse createJob(Long employerId, JobRequest req);
+    JobResponse createJob(Long employerId, JobRequest req) throws Exception;
     JobResponse getJobById(Long id) throws Exception;
     List<JobResponse> getJobs(JobSearchRequest request);
     List<JobResponse> getJobByCompany(Long companyId);

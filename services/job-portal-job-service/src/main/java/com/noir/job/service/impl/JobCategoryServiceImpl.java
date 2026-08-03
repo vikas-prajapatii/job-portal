@@ -7,15 +7,17 @@ import com.noir.job.repository.JobCategoryRepository;
 import com.noir.job.service.JobCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
+@Transactional
 public class JobCategoryServiceImpl implements JobCategoryService {
     private final JobCategoryRepository jobCategoryRepository;
+    
     @Override
     public JobCategoryResponse createCategory(JobCategoryRequest req) throws Exception {
         if(jobCategoryRepository.existsByName(req.getName())) {
@@ -43,6 +45,7 @@ public class JobCategoryServiceImpl implements JobCategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<JobCategoryResponse> getAllCategory() {
         return jobCategoryRepository.findByActiveTrue().stream()
                 .map(c -> JobCategoryMapper.toJobCategoryResponse(c,false))
@@ -50,6 +53,7 @@ public class JobCategoryServiceImpl implements JobCategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public JobCategoryResponse getCategoryById(Long id) throws Exception {
         JobCategory jobCategory = getCategoryEntityById(id);
 
@@ -59,8 +63,8 @@ public class JobCategoryServiceImpl implements JobCategoryService {
     @Override
     public JobCategoryResponse updateCategory(Long id, JobCategoryRequest req) throws Exception {
         JobCategory category = getCategoryEntityById(id);
-        if(!category.getName().equals(req.getName())
-        && jobCategoryRepository.existsByName(category.getName())) {
+        if(!category.getName().equalsIgnoreCase(req.getName())
+        && jobCategoryRepository.existsByName(req.getName())) {
            throw new Exception("category name already exists, choose different name.");
         }
 
@@ -90,6 +94,7 @@ public class JobCategoryServiceImpl implements JobCategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public JobCategory getCategoryEntityById(Long id) throws Exception {
         return jobCategoryRepository.findById(id).orElseThrow(
                 ()-> new Exception("category id not found.")

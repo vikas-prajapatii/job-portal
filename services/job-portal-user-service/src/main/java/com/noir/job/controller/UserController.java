@@ -34,14 +34,11 @@ public class UserController {
 
 
 
-    @PutMapping("api/users/{userId}")
-    public ResponseEntity<UserResponse> getUserById(
-            @RequestHeader("X-User-Email") String email,
-            @RequestBody UpdateUserRequest req, @PathVariable Long userId)
+    @GetMapping("api/users/{userId}")
+    public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId)
             throws Exception{
         User user = userService.getUserById(userId);
-
-        return ResponseEntity.ok(userService.updateProfile(email, req));
+        return ResponseEntity.ok(UserMapper.toDTO(user));
     }
 
 
@@ -60,5 +57,9 @@ public class UserController {
             @PathVariable Long userId) throws Exception{
         return ResponseEntity.ok(userService.activateUser(userId));
     }
-
+    @DeleteMapping("/api/users/{userId}")
+    public ResponseEntity<UserResponse> deleteUser(
+            @PathVariable Long userId) throws Exception{
+        return ResponseEntity.ok(userService.deleteUser(userId));
+    }
 }

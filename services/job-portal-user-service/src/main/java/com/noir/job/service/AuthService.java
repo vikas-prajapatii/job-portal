@@ -8,5 +8,4 @@ public interface AuthService {
     AuthResponse signup(SignUpRequest req) throws Exception;
 
     AuthResponse login(LoginRequest req) throws Exception;
-
 }

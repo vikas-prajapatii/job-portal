@@ -50,7 +50,6 @@ public class AuthServiceImpl implements AuthService {
                 .lastLogin(LocalDateTime.now())
                 .build();
           User savedUser =  userRepository.save(user);
-
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 user.getEmail(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -61,7 +60,6 @@ public class AuthServiceImpl implements AuthService {
           response.setJwt(jwt);
           response.setUser(UserMapper.toDTO(savedUser));
           return response;
-
     }
 
     @Override
@@ -69,7 +67,6 @@ public class AuthServiceImpl implements AuthService {
         Authentication authentication = authenticate(
                 req.getEmail(), req.getPassword()
         );
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
         User user = userRepository.findByEmail(req.getEmail());
         String jwt = jwtProvider.generateToken(authentication,user.getId());
@@ -85,9 +82,9 @@ public class AuthServiceImpl implements AuthService {
 
     private Authentication authenticate(String email,String password) throws Exception {
         UserDetails userDetails = customUserDetailService.loadUserByUsername(email);
-//        if(userDetails==null) {
-//            throw new Exception("user not found with email"+ email);
-//        }
+        if(userDetails==null) {
+            throw new Exception("user not found with email"+ email);
+        }
         if(!passwordEncoder.matches(password,userDetails.getPassword())) {
             throw new Exception("password doesn't match");
         }

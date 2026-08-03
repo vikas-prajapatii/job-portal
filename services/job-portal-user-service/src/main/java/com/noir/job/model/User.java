@@ -30,12 +30,10 @@ public class User {
     @Column(nullable= false)
     @Enumerated(EnumType.STRING)
     private UserRole role = UserRole.ROLE_JOB_SEEKER;
-
     private String phone;
     @Enumerated(EnumType.STRING)
     @Column(nullable= false)
     private UserStatus status = UserStatus.ACTIVE;
-
     private String profileImage;
     @CreationTimestamp
     @Column(nullable= false, updatable = false)
@@ -43,13 +41,7 @@ public class User {
     @Column(nullable= false)
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-
     private LocalDateTime lastLogin;
-
     private LocalDateTime suspendedAt;
-
     private LocalDateTime deletedAt;
-
-
 }

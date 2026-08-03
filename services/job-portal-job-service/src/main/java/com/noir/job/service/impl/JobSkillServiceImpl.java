@@ -84,11 +84,11 @@ public class JobSkillServiceImpl implements JobSkillService {
         String base = name.toLowerCase()
                 .replaceAll("[^a-zA-Z0-9]", "").trim()
                 .replaceAll("[\\s-]", "-");
-        if(!jobSkillRepository.existBySlug(base)){
+        if(!jobSkillRepository.existsBySlug(base)){
             return base;
         }
         int counter = 1;
-        while (jobSkillRepository.existBySlug(base+"-"+counter)){
+        while (jobSkillRepository.existsBySlug(base+"-"+counter)){
             counter++;
         }
         return base+"-"+counter;
