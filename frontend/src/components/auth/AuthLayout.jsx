@@ -1,8 +1,7 @@
-﻿import { Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Sparkles } from "lucide-react"
-
-const AUTH_IMAGE = "https://res.cloudinary.com/dcpesbd8q/image/upload/v1772374334/zosh%20hire/auth_side_image_so2r2w.png"
+import AUTH_IMAGE from "@/assets/noir_hire_poster.jpg"
 
 export default function AuthLayout({ title, description, children, footerText, footerLink, footerLinkText }) {
   return (
@@ -12,7 +11,7 @@ export default function AuthLayout({ title, description, children, footerText, f
       <div className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative overflow-hidden shrink-0">
         <img
           src={AUTH_IMAGE}
-          alt="JobPortal.AI"
+          alt="Noir Job Portal"
           className="w-full h-full object-cover object-center"
         />
         {/* Gradient overlay for readability */}
@@ -25,7 +24,7 @@ export default function AuthLayout({ title, description, children, footerText, f
               <Sparkles className="h-4 w-4 text-white" />
             </div>
             <span className="text-sm font-semibold text-white/90 tracking-wide uppercase">
-              JobPortal.AI
+              Noir Job Portal
             </span>
           </div>
           <h2 className="text-3xl font-bold leading-snug">
@@ -72,10 +71,10 @@ export default function AuthLayout({ title, description, children, footerText, f
                   </div>
                 </div>
                 <h1 className="text-3xl font-bold text-slate-900">
-                  JobPortal<span className="text-brand">.AI</span>
+                  Noir<span className="text-brand"> Hire</span>
                 </h1>
               </Link>
-              <p className="text-sm text-slate-600 mt-2">AI-Powered Career Platform</p>
+              <p className="text-sm text-slate-600 mt-2">AI-Powered Job Portal</p>
             </div>
 
             {/* Auth Card */}
