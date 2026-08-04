@@ -185,13 +185,13 @@ export default function Navbar() {
             alignItems: 'center',
             gap: '12px',
           }}>
-            <Link to="/auth" className="btn btn-secondary" style={{
+            <Link to="/login" className="btn btn-secondary" style={{
               padding: '8px 20px',
               fontSize: '0.9rem',
             }}>
               Sign In
             </Link>
-            <Link to="/auth?mode=signup" className="btn btn-primary" style={{
+            <Link to="/register" className="btn btn-primary" style={{
               padding: '8px 20px',
               fontSize: '0.9rem',
             }}>
