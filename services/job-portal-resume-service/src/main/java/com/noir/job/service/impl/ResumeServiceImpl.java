@@ -2,8 +2,8 @@ package com.noir.job.service.impl;
 
 import com.noir.job.dto.PersonalInfoResponse;
 import com.noir.job.dto.ResumeResponse;
-import com.noir.job.entity.PersonalInfo;
-import com.noir.job.entity.Resume;
+import com.noir.job.model.PersonalInfo;
+import com.noir.job.model.Resume;
 import com.noir.job.mapper.ResumeMapper;
 import com.noir.job.payload.CreateResumeRequest;
 import com.noir.job.repository.ResumeRepository;

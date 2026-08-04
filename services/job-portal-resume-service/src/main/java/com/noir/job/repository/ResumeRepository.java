@@ -1,6 +1,6 @@
 package com.noir.job.repository;
 
-import com.noir.job.entity.Resume;
+import com.noir.job.model.Resume;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

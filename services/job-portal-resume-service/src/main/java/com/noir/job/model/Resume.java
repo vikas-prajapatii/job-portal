@@ -1,4 +1,4 @@
-package com.noir.job.entity;
+package com.noir.job.model;
 
 import com.noir.job.domain.ResumeTemplate;
 import com.noir.job.domain.ResumeVisibility;

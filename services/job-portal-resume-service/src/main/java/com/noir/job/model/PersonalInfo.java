@@ -1,7 +1,6 @@
-package com.noir.job.entity;
+package com.noir.job.model;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Entity;
 import lombok.*;
 
 @Embeddable

@@ -2,7 +2,7 @@ package com.noir.job.service;
 
 import com.noir.job.dto.PersonalInfoResponse;
 import com.noir.job.dto.ResumeResponse;
-import com.noir.job.entity.Resume;
+import com.noir.job.model.Resume;
 import com.noir.job.payload.CreateResumeRequest;
 
 import java.util.List;
