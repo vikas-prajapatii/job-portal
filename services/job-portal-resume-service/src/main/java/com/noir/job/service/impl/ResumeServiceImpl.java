@@ -38,9 +38,8 @@ public class ResumeServiceImpl implements ResumeService {
         Resume resume = Resume.builder()
                 .candidateId(candidateId)
                 .title(req.getTitle())
-                .template(req.getTemplate())
-
-                .visibility(req.getVisibility())
+                .template(req.getTemplate() != null ? req.getTemplate() : com.noir.job.domain.ResumeTemplate.PROFESSIONAL)
+                .visibility(req.getVisibility() != null ? req.getVisibility() : com.noir.job.domain.ResumeVisibility.PRIVATE)
                 .isDefault(Boolean.TRUE.equals(req.getIsDefault()))
                 .isActive(true)
                 .build();
