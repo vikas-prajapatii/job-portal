@@ -30,7 +30,7 @@ public class Company{
     private String description;
     private String coverImageUrl;
     private String website;
-    private int foundedYear;
+    private Integer foundedYear;
     @Enumerated(EnumType.STRING)
     private CompanySize companySize;
     @Column(unique = true)
