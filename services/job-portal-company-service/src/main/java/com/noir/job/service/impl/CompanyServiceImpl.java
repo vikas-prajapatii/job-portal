@@ -50,7 +50,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .website(req.getWebsite())
                 .email(req.getEmail())
                 .phone(req.getPhone())
-                .foundedYear(req.getFoundedYear())
+                .foundedYear(req.getFoundedYear() != null ? req.getFoundedYear() : 2000)
                 .companySize(req.getCompanySize())
                 .companyType(req.getCompanyType())
                 .industryType(req.getIndustryType())
@@ -141,7 +141,7 @@ public class CompanyServiceImpl implements CompanyService {
         company.setWebsite(req.getWebsite());
         company.setEmail(req.getEmail());
         company.setPhone(req.getPhone());
-        company.setFoundedYear(req.getFoundedYear());
+        company.setFoundedYear(req.getFoundedYear() != null ? req.getFoundedYear() : 2000);
         company.setCompanySize(req.getCompanySize());
         company.setCompanyType(req.getCompanyType());
         company.setIndustryType(req.getIndustryType());
