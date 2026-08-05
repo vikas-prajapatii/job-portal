@@ -424,7 +424,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"React\",\n  \"description\": \"State management and web components.\"\n}"
+              "raw": "{\n  \"name\": \"React\",\n  \"description\": \"State management and web components.\",\n  \"category\": \"FRAMEWORK\"\n}"
             },
             "url": {
               "raw": "{{job_url}}/api/skills",
