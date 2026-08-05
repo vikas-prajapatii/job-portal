@@ -1,12 +1,13 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.dto.PersonalInfoResponse;
-import com.noir.job.dto.ResumeResponse;
+import com.noir.job.dto.*;
+import com.noir.job.mapper.WorkExperienceMapper;
 import com.noir.job.model.PersonalInfo;
 import com.noir.job.model.Resume;
 import com.noir.job.mapper.ResumeMapper;
+import com.noir.job.model.WorkExperience;
 import com.noir.job.payload.CreateResumeRequest;
-import com.noir.job.repository.ResumeRepository;
+import com.noir.job.repository.*;
 import com.noir.job.service.ResumeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,11 @@ import static org.hibernate.boot.model.internal.BinderHelper.isDefault;
 @RequiredArgsConstructor
 public class ResumeServiceImpl implements ResumeService {
     private final ResumeRepository resumeRepository;
+    private final WorkExperienceRepository workExperienceRepository;
+    private final EducationRepository educationRepository;
+    private final ResumeSkillRepository resumeSkillRepository;
+    private final ProjectRepository projectRepository;
+    private final LanguageRepository languageRepository;
 
     @Override
     public ResumeResponse createResume(Long candidateId, CreateResumeRequest req) {
@@ -33,6 +39,7 @@ public class ResumeServiceImpl implements ResumeService {
                 .candidateId(candidateId)
                 .title(req.getTitle())
                 .template(req.getTemplate())
+
                 .visibility(req.getVisibility())
                 .isDefault(Boolean.TRUE.equals(req.getIsDefault()))
                 .isActive(true)
@@ -121,24 +128,22 @@ public class ResumeServiceImpl implements ResumeService {
                 .orElseThrow(() -> new Exception("Resume not found with id: " + resumeId));
     }
     private ResumeResponse buildFullResponse(Resume resume) {
-//        List<WorkExperience> workExperiences = workExperienceRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//        List<Education> educations = educationRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//        List<ResumeSkill> skills = skillRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//        List<Project> projects = projectRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//        List<Certification> certifications = certificationRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//        List<Award> awards = awardRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//        List<Language> languages = languageRepository
-//                .findByResume_IdOrderByDisplayOrderAsc(resume.getId());
-//
-//        return ResumeMapper.toResponse(resume, workExperiences, educations, skills,
-//                projects, certifications, awards, languages);
-        return ResumeMapper.toResponse(resume);
+        Long resumeId = resume.getId();
+
+        List<WorkExperienceResponse> workExperiences = workExperienceRepository
+                .findByResume_IdOrderByDisplayOrderAsc(resumeId)
+                .stream().map(WorkExperienceMapper::toWorkExperienceResponse).toList();
+        List<EducationResponse> educationResponses = educationRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
+                .stream()
+                .map(ResumeMapper::toEducationResponse)
+                .toList();
+        List<ResumeSkillResponse> resumeSkillResponses = resumeSkillRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
+                .stream().map(ResumeMapper::toSkillResponse).toList();
+        List<ProjectResponse> projectResponses = projectRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
+                .stream().map(ResumeMapper::toProjectResponse).toList();
+        List<LanguageResponse> languageResponses = languageRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
+                .stream().map(ResumeMapper::toLanguageResponse).toList();
+        return ResumeMapper.toResponse(resume,workExperiences, educationResponses, resumeSkillResponses, projectResponses, languageResponses);
     }
     private void assertOwner(Resume resume, Long candidateId) throws Exception {
         if (!resume.getCandidateId().equals(candidateId)) {

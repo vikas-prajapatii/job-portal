@@ -1,13 +1,9 @@
 package com.noir.job.mapper;
 
-import com.noir.job.dto.EducationResponse;
-import com.noir.job.dto.PersonalInfoResponse;
-import com.noir.job.dto.ResumeResponse;
-import com.noir.job.dto.ResumeSkillResponse;
-import com.noir.job.model.Education;
-import com.noir.job.model.PersonalInfo;
-import com.noir.job.model.Resume;
-import com.noir.job.model.ResumeSkill;
+import com.noir.job.dto.*;
+import com.noir.job.model.*;
+
+import java.util.List;
 
 public class ResumeMapper {
     public static PersonalInfoResponse toPersonalInfoResponse(PersonalInfo personalInfo) {
@@ -26,7 +22,12 @@ public class ResumeMapper {
                 .build();
 
     }
-    public static ResumeResponse toResponse(Resume resume) {
+    public static ResumeResponse toResponse(Resume resume,
+                                            List<WorkExperienceResponse> workExperience,
+                                            List<EducationResponse> educations,
+                                            List<ResumeSkillResponse> skills,
+                                            List<ProjectResponse>projects,
+                                            List<LanguageResponse> languages) {
         if(resume == null)
             return null;
         return ResumeResponse.builder()
@@ -41,6 +42,11 @@ public class ResumeMapper {
                 .completionScore(resume.getCompletionScore())
                 .createdAt(resume.getCreatedAt())
                 .updatedAt(resume.getUpdatedAt())
+                .workExperiences(workExperience)
+                .skills(skills)
+                .projects(projects)
+                .languages(languages)
+                .educations(educations)
                 .build();
 
     }
@@ -69,6 +75,31 @@ public class ResumeMapper {
                 .isCurrentlyStudying(edu.getIsCurrentlyStudying())
                 .description(edu.getDescription())
                 .displayOrder(edu.getDisplayOrder())
+                .build();
+    }
+
+    public static ProjectResponse toProjectResponse(Project project) {
+        if (project == null) return null;
+        return ProjectResponse.builder()
+                .id(project.getId())
+                .title(project.getTitle())
+                .description(project.getDescription())
+                .technologies(project.getTechnologies())
+                .projectUrl(project.getProjectUrl())
+                .sourceCodeUrl(project.getSourceCodeUrl())
+                .startDate(project.getStartDate())
+                .endDate(project.getEndDate())
+                .isOngoing(project.getIsOngoing())
+                .displayOrder(project.getDisplayOrder())
+                .build();
+    }
+    public static LanguageResponse toLanguageResponse(Language lang) {
+        if (lang == null) return null;
+        return LanguageResponse.builder()
+                .id(lang.getId())
+                .languageName(lang.getLanguageName())
+                .proficiency(lang.getProficiency())
+                .displayOrder(lang.getDisplayOrder())
                 .build();
     }
 }

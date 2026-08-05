@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -29,8 +30,9 @@ public class ResumeResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-//    private List<ResumeSkillResponse> skills;
-//    private List<WorkExperienceResponse> workExperiences;
-//    private List<EducationResponse> educations;
-
+    private List<ResumeSkillResponse> skills;
+    private List<WorkExperienceResponse> workExperiences;
+    private List<EducationResponse> educations;
+    private List<ProjectResponse> projects;
+    private List<LanguageResponse> languages;
 }
