@@ -324,7 +324,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Lead React Developer\",\n  \"description\": \"Lead UI development.\",\n  \"requirements\": \"React, Redux, 8+ years of web development experience.\",\n  \"responsibilities\": \"Architect frontend systems and lead engineering team.\",\n  \"location\": \"Remote\",\n  \"salaryMin\": 90000,\n  \"salaryMax\": 130000,\n  \"jobType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"experienceLevel\": \"LEAD\",\n  \"companyId\": 1,\n  \"categoryId\": 1,\n  \"skillIds\": [1],\n  \"tagIds\": [1]\n}"
+              "raw": "{\n  \"title\": \"Lead React Developer\",\n  \"description\": \"Lead UI development.\",\n  \"requirements\": \"React, Redux, 8+ years of web development experience.\",\n  \"responsibilities\": \"Architect frontend systems and lead engineering team.\",\n  \"location\": \"Remote\",\n  \"salaryMin\": 90000,\n  \"salaryMax\": 130000,\n  \"jobType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"experienceLevel\": \"SENIOR\",\n  \"companyId\": 1,\n  \"categoryId\": 1,\n  \"skillIds\": [1],\n  \"tagIds\": [1]\n}"
             },
             "url": {
               "raw": "{{job_url}}/api/jobs/1",
