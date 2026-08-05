@@ -148,7 +148,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Noir Technologies\",\n  \"description\": \"AI product studio.\",\n  \"websiteUrl\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"industry\": \"TECHNOLOGY\"\n}"
+              "raw": "{\n  \"name\": \"Noir Technologies\",\n  \"description\": \"AI product studio.\",\n  \"website\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"industryType\": \"TECHNOLOGY\",\n  \"companySize\": \"SMALL\"\n}"
             },
             "url": {
               "raw": "{{company_url}}/api/companies",
@@ -208,7 +208,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Noir Tech HQ\",\n  \"description\": \"Expanded AI production studio.\",\n  \"websiteUrl\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"industry\": \"TECHNOLOGY\"\n}"
+              "raw": "{\n  \"name\": \"Noir Tech HQ\",\n  \"description\": \"Expanded AI production studio.\",\n  \"website\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"industryType\": \"TECHNOLOGY\",\n  \"companySize\": \"SMALL\"\n}"
             },
             "url": {
               "raw": "{{company_url}}/api/companies/1",
