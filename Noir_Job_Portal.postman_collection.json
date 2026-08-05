@@ -1,0 +1,718 @@
+{
+  "info": {
+    "_postman_id": "8a834c95-9ff0-4a87-ba8e-9db8e3f9479b",
+    "name": "Noir Job Portal",
+    "description": "Postman collection covering all REST endpoints for User (5001), Company (5002), Job (5003), and Resume (5004) services.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Service (Port 5001)",
+      "item": [
+        {
+          "name": "Auth - Signup",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"SecurePassword123\",\n  \"role\": \"ROLE_JOB_SEEKER\"\n}"
+            },
+            "url": {
+              "raw": "{{user_url}}/auth/signup",
+              "host": ["{{user_url}}"],
+              "path": ["auth", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Auth - Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"SecurePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{user_url}}/auth/login",
+              "host": ["{{user_url}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "User - Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Email", "value": "jane.doe@example.com" }
+            ],
+            "url": {
+              "raw": "{{user_url}}/api/users/profile",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "User - Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-User-Email", "value": "jane.doe@example.com" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Smith\",\n  \"phone\": \"+1234567890\",\n  \"profileImage\": \"https://example.com/avatar.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{user_url}}/api/users/profile",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "User - Get By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{user_url}}/api/users/1",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users", "1"]
+            }
+          }
+        },
+        {
+          "name": "User - Get All (Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{user_url}}/api/users",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "User - Suspend (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{user_url}}/api/users/1/suspend",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users", "1", "suspend"]
+            }
+          }
+        },
+        {
+          "name": "User - Activate (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{user_url}}/api/users/1/activated",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users", "1", "activated"]
+            }
+          }
+        },
+        {
+          "name": "User - Delete (Admin)",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{user_url}}/api/users/1",
+              "host": ["{{user_url}}"],
+              "path": ["api", "users", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Company Service (Port 5002)",
+      "item": [
+        {
+          "name": "Company - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Noir Technologies\",\n  \"description\": \"AI product studio.\",\n  \"websiteUrl\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"industry\": \"TECHNOLOGY\"\n}"
+            },
+            "url": {
+              "raw": "{{company_url}}/api/companies",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies"]
+            }
+          }
+        },
+        {
+          "name": "Company - Get By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{company_url}}/api/companies/1",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies", "1"]
+            }
+          }
+        },
+        {
+          "name": "Company - Get My Company",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{company_url}}/api/companies/my",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies", "my"]
+            }
+          }
+        },
+        {
+          "name": "Company - List and Filter",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{company_url}}/api/companies?type=STARTUP&industry=TECHNOLOGY&status=PENDING",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies"],
+              "query": [
+                { "key": "type", "value": "STARTUP" },
+                { "key": "industry", "value": "TECHNOLOGY" },
+                { "key": "status", "value": "PENDING" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Company - Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Noir Tech HQ\",\n  \"description\": \"Expanded AI production studio.\",\n  \"websiteUrl\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"industry\": \"TECHNOLOGY\"\n}"
+            },
+            "url": {
+              "raw": "{{company_url}}/api/companies/1",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies", "1"]
+            }
+          }
+        },
+        {
+          "name": "Company - Verify (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{company_url}}/api/companies/1/verify",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies", "1", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Company - Deactivate (Admin)",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{company_url}}/api/companies/1/deactivate",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies", "1", "deactivate"]
+            }
+          }
+        },
+        {
+          "name": "Company - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{company_url}}/api/companies/1",
+              "host": ["{{company_url}}"],
+              "path": ["api", "companies", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Job Service (Port 5003)",
+      "item": [
+        {
+          "name": "Job - Create",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior React Developer\",\n  \"description\": \"Develop UI layouts.\",\n  \"location\": \"Remote\",\n  \"salaryMin\": 80000,\n  \"salaryMax\": 120000,\n  \"jobType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"experienceLevel\": \"SENIOR\",\n  \"companyId\": 1,\n  \"categoryId\": 1,\n  \"skillIds\": [1],\n  \"tagIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{job_url}}/api/jobs",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs"]
+            }
+          }
+        },
+        {
+          "name": "Job - Get By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/jobs/1",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "1"]
+            }
+          }
+        },
+        {
+          "name": "Job - Filter and Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/jobs?keyword=React&location=Remote",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs"],
+              "query": [
+                { "key": "keyword", "value": "React" },
+                { "key": "location", "value": "Remote" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Job - List By Company",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/jobs/company/1",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "company", "1"]
+            }
+          }
+        },
+        {
+          "name": "Job - Update",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Lead React Developer\",\n  \"description\": \"Lead UI development.\",\n  \"location\": \"Remote\",\n  \"salaryMin\": 90000,\n  \"salaryMax\": 130000,\n  \"jobType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"experienceLevel\": \"LEAD\",\n  \"companyId\": 1,\n  \"categoryId\": 1,\n  \"skillIds\": [1],\n  \"tagIds\": [1]\n}"
+            },
+            "url": {
+              "raw": "{{job_url}}/api/jobs/1",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "1"]
+            }
+          }
+        },
+        {
+          "name": "Job - Publish",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{job_url}}/api/jobs/1/publish",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "1", "publish"]
+            }
+          }
+        },
+        {
+          "name": "Job - Close",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{job_url}}/api/jobs/1/close",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "1", "close"]
+            }
+          }
+        },
+        {
+          "name": "Job - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{job_url}}/api/jobs/1",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "1"]
+            }
+          }
+        },
+        {
+          "name": "Job - Get All (Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/jobs/admin",
+              "host": ["{{job_url}}"],
+              "path": ["api", "jobs", "admin"]
+            }
+          }
+        },
+        {
+          "name": "Metadata - Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Frontend Development\",\n  \"description\": \"Client-side applications.\"\n}"
+            },
+            "url": {
+              "raw": "{{job_url}}/api/categories",
+              "host": ["{{job_url}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Metadata - List Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/categories",
+              "host": ["{{job_url}}"],
+              "path": ["api", "categories"]
+            }
+          }
+        },
+        {
+          "name": "Metadata - Create Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"React\",\n  \"description\": \"State management and web components.\"\n}"
+            },
+            "url": {
+              "raw": "{{job_url}}/api/skills",
+              "host": ["{{job_url}}"],
+              "path": ["api", "skills"]
+            }
+          }
+        },
+        {
+          "name": "Metadata - List Skills",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/skills",
+              "host": ["{{job_url}}"],
+              "path": ["api", "skills"]
+            }
+          }
+        },
+        {
+          "name": "Metadata - Create Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"AI/ML\"\n}"
+            },
+            "url": {
+              "raw": "{{job_url}}/api/job-tags",
+              "host": ["{{job_url}}"],
+              "path": ["api", "job-tags"]
+            }
+          }
+        },
+        {
+          "name": "Metadata - List Tags",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{job_url}}/api/job-tags",
+              "host": ["{{job_url}}"],
+              "path": ["api", "job-tags"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Resume Service (Port 5004)",
+      "item": [
+        {
+          "name": "Resume - Create Shell",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My Technical Resume\",\n  \"template\": \"MODERN\"\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Get Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Resume - List My Resumes",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/my",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "my"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Update Personal Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+123456789\",\n  \"headLine\": \"Senior Fullstack Developer\",\n  \"city\": \"San Francisco\",\n  \"country\": \"USA\",\n  \"githubUrl\": \"https://github.com/example\"\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/personal-info",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "personal-info"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Update Summary",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/summary?summary=Experienced React Developer.",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "summary"],
+              "query": [
+                { "key": "summary", "value": "Experienced React Developer." }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Resume - Set Default",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/set-default",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "set-default"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Delete",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "X-User-Id", "value": "1" }
+            ],
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Add Education",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institutionName\": \"Stanford University\",\n  \"degree\": \"Bachelor of Science\",\n  \"fieldOfStudy\": \"Computer Science\",\n  \"grade\": \"3.9 GPA\",\n  \"startDate\": \"2020-09-01\",\n  \"endDate\": \"2024-06-01\",\n  \"isCurrentlyStudying\": false,\n  \"description\": \"Focus on Systems and AI.\"\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/educations",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "educations"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Get Educations",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/educations",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "educations"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Add Work Experience",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Noir Technologies\",\n  \"role\": \"Software Engineer\",\n  \"startDate\": \"2024-07-01\",\n  \"isCurrent\": true,\n  \"description\": \"Developed Spring Boot microservices and React dashboards.\"\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/work-experiences",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "work-experiences"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Get Work Experiences",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/work-experiences",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "work-experiences"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Add Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"skillName\": \"Java\",\n  \"proficiencyLevel\": \"EXPERT\",\n  \"yearsOfExperience\": 4\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/skills",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "skills"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Add Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Noir Job Portal\",\n  \"description\": \"Designed microservice APIs.\",\n  \"technologies\": \"Java, Spring Boot, React, TailwindCSS\",\n  \"projectUrl\": \"https://noir-job.web.app\",\n  \"sourceCodeUrl\": \"https://github.com/example/job-portal\",\n  \"startDate\": \"2026-01-01\",\n  \"isOngoing\": true\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/projects",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "projects"]
+            }
+          }
+        },
+        {
+          "name": "Resume - Add Language",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-User-Id", "value": "1" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"languageName\": \"English\",\n  \"proficiency\": \"NATIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{resume_url}}/api/resumes/1/languages",
+              "host": ["{{resume_url}}"],
+              "path": ["api", "resumes", "1", "languages"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "user_url", "value": "http://localhost:5001", "type": "string" },
+    { "key": "company_url", "value": "http://localhost:5002", "type": "string" },
+    { "key": "job_url", "value": "http://localhost:5003", "type": "string" },
+    { "key": "resume_url", "value": "http://localhost:5004", "type": "string" }
+  ]
+}
