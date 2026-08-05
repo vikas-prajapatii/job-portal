@@ -187,13 +187,13 @@
           "request": {
             "method": "GET",
             "url": {
-              "raw": "{{company_url}}/api/companies?type=STARTUP&industry=TECHNOLOGY&status=PENDING",
+              "raw": "{{company_url}}/api/companies?type=STARTUP&industry=TECHNOLOGY&status=PENDING_VERIFICATION",
               "host": ["{{company_url}}"],
               "path": ["api", "companies"],
               "query": [
                 { "key": "type", "value": "STARTUP" },
                 { "key": "industry", "value": "TECHNOLOGY" },
-                { "key": "status", "value": "PENDING" }
+                { "key": "status", "value": "PENDING_VERIFICATION" }
               ]
             }
           }
