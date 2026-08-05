@@ -7,6 +7,9 @@ import java.util.List;
 
 public class ResumeMapper {
     public static PersonalInfoResponse toPersonalInfoResponse(PersonalInfo personalInfo) {
+        if (personalInfo == null) {
+            return null;
+        }
         return PersonalInfoResponse.builder()
                 .firstName(personalInfo.getFirstName())
                 .lastName(personalInfo.getLastName())
