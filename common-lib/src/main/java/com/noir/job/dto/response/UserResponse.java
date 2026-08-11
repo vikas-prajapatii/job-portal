@@ -2,9 +2,11 @@ package com.noir.job.dto.response;
 
 import com.noir.job.domain.UserRole;
 import com.noir.job.domain.UserStatus;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+@Builder
 @Data
 public class UserResponse {
   private long id;

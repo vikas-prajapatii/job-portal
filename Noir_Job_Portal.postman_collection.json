@@ -629,7 +629,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"companyName\": \"Noir Technologies\",\n  \"role\": \"Software Engineer\",\n  \"startDate\": \"2024-07-01\",\n  \"isCurrent\": true,\n  \"description\": \"Developed Spring Boot microservices and React dashboards.\"\n}"
+              "raw": "{\n  \"companyName\": \"Noir Technologies\",\n  \"jobTitle\": \"Software Engineer\",\n  \"startDate\": \"2024-07-01\",\n  \"isCurrentJob\": true,\n  \"description\": \"Developed Spring Boot microservices and React dashboards.\",\n  \"technologies\": [\"Java\", \"Spring Boot\", \"React\"]\n}"
             },
             "url": {
               "raw": "{{resume_url}}/api/resumes/1/work-experiences",
@@ -678,7 +678,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Noir Job Portal\",\n  \"description\": \"Designed microservice APIs.\",\n  \"technologies\": \"Java, Spring Boot, React, TailwindCSS\",\n  \"projectUrl\": \"https://noir-job.web.app\",\n  \"sourceCodeUrl\": \"https://github.com/example/job-portal\",\n  \"startDate\": \"2026-01-01\",\n  \"isOngoing\": true\n}"
+              "raw": "{\n  \"title\": \"Noir Job Portal\",\n  \"description\": \"Designed microservice APIs.\",\n  \"technologies\": [\"Java\", \"Spring Boot\", \"React\", \"TailwindCSS\"],\n  \"projectUrl\": \"https://noir-job.web.app\",\n  \"sourceCodeUrl\": \"https://github.com/example/job-portal\",\n  \"startDate\": \"2026-01-01\",\n  \"isOngoing\": true\n}"
             },
             "url": {
               "raw": "{{resume_url}}/api/resumes/1/projects",

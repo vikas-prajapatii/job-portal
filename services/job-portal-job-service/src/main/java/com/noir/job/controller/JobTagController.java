@@ -19,8 +19,6 @@ import java.util.List;
 @RequestMapping("/api/job-tags")
 public class JobTagController {
     private final JobTagService tagService;
-
-
     @PostMapping
     public ResponseEntity<JobTagResponse> createTag(
             @RequestBody @Valid JobTagRequest req) throws Exception {
