@@ -18,7 +18,6 @@ public class ApplicationNoteController {
 
     private final ApplicationNoteService applicationNoteService;
 
-    // Add a note to an application (Employer)
     @PostMapping
     public ResponseEntity<ApplicationNoteResponse> addNote(
             @PathVariable Long applicationId,
@@ -28,7 +27,6 @@ public class ApplicationNoteController {
                 .body(applicationNoteService.addNote(applicationId, employerId, req));
     }
 
-    // Get all notes for an application (Employer)
     @GetMapping
     public ResponseEntity<List<ApplicationNoteResponse>> getNotesByApplication(
             @PathVariable Long applicationId,
@@ -36,7 +34,6 @@ public class ApplicationNoteController {
         return ResponseEntity.ok(applicationNoteService.getNotesByApplication(applicationId, employerId));
     }
 
-    // Delete a note from an application (Employer)
     @DeleteMapping("/{noteId}")
     public ResponseEntity<Void> deleteNote(
             @PathVariable Long applicationId,

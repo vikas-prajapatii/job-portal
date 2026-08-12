@@ -1,11 +1,9 @@
 package com.noir.job.mapper;
 
-import com.noir.job.dto.ApplicationResponse;
-import com.noir.job.dto.CompanyResponse;
-import com.noir.job.dto.CompanySummaryResponse;
-import com.noir.job.dto.JobResponse;
+import com.noir.job.dto.*;
 import com.noir.job.dto.response.UserResponse;
 import com.noir.job.model.Application;
+import com.noir.job.model.ApplicationNote;
 import com.noir.job.payload.CreateApplicationRequest;
 
 public class ApplicationMapper {
@@ -27,11 +25,17 @@ public class ApplicationMapper {
                 .build();
     }
     public static ApplicationResponse toResponse(Application application,
-//
                                                  JobResponse job,
                                                  CompanyResponse company,
-                                                 UserResponse candidate)
-                                                 {
+                                                 UserResponse candidate) {
+        return toResponse(application, null, job, company, candidate);
+    }
+
+    public static ApplicationResponse toResponse(Application application,
+                                                 java.util.List<ApplicationNote> notes,
+                                                 JobResponse job,
+                                                 CompanyResponse company,
+                                                 UserResponse candidate) {
 
         return ApplicationResponse.builder()
                 .id(application.getId())
@@ -40,23 +44,25 @@ public class ApplicationMapper {
                 .job(job)
                 .company(company)
                 .status(application.getStatus())
-
                 .resumeId(application.getResumeId())
                 .coverLetter(application.getCoverLetter())
-
                 .expectedSalary(application.getExpectedSalary())
-
                 .availableFrom(application.getAvailableFrom())
-//                .isRead(application.getIsRead())
                 .isStarred(application.getIsStarred())
-//                .statusHistory(toHistoryResponseList(history))
-
-//                .notes(toNoteResponseList(notes))
+                .notes(notes != null ? notes.stream().map(ApplicationMapper::toNoteResponse).toList() : null)
                 .withdrawnAt(application.getWithdrawnAt())
                 .withdrawnReason(application.getWithdrawnReason())
                 .appliedAt(application.getAppliedAt())
                 .updatedAt(application.getUpdatedAt())
-//                .screening(toScreeningResponse(screening))
+                .build();
+    }
+
+    public static ApplicationNoteResponse toNoteResponse(ApplicationNote note) {
+        return ApplicationNoteResponse.builder()
+                .id(note.getId())
+                .addedByUserId(note.getAddedByUserId())
+                .content(note.getContent())
+                .createdAt(note.getCreatedAt())
                 .build();
     }
 }

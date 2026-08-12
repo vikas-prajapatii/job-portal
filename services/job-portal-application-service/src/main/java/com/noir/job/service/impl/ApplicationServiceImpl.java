@@ -8,10 +8,12 @@ import com.noir.job.dto.JobResponse;
 import com.noir.job.dto.response.UserResponse;
 import com.noir.job.mapper.ApplicationMapper;
 import com.noir.job.model.Application;
+import com.noir.job.model.ApplicationNote;
 import com.noir.job.payload.CompanyApplicationFilterRequest;
 import com.noir.job.payload.CreateApplicationRequest;
 import com.noir.job.payload.UpdateApplicationStatusRequest;
 import com.noir.job.payload.WithdrawApplicationRequest;
+import com.noir.job.repository.ApplicationNoteRepository;
 import com.noir.job.repository.ApplicationRepository;
 import com.noir.job.repository.ApplicationSpecification;
 import com.noir.job.service.ApplicationService;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ApplicationServiceImpl implements ApplicationService {
     private final ApplicationRepository applicationRepository;
+    private final ApplicationNoteRepository applicationNoteRepository;
 
     @Override
     public ApplicationResponse createApplication(Long candidateId, CreateApplicationRequest req) throws Exception {
@@ -144,10 +147,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 
 
     public ApplicationResponse buildFullResponse(Application application) {
+        List<ApplicationNote> notes = applicationNoteRepository.findByApplicationIdOrderByCreatedAtDesc(application.getId());
         JobResponse job = JobResponse.builder().id(application.getId()).build();
         CompanyResponse company = CompanyResponse.builder().id(application.getCompanyId()).build();
         UserResponse candidate = UserResponse.builder().id(application.getCandidateId()).build();
-        return ApplicationMapper.toResponse(application,job,company,candidate);
+        return ApplicationMapper.toResponse(application,notes,job,company,candidate);
     }
     private Sort buildSort(String sortBy) {
         if("AI_SCORE_DESC".equals(sortBy)){
