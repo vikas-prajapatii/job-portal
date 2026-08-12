@@ -14,7 +14,7 @@
 
     <description>Cloud infrastructure module- Discovery, Config, Server, Gateway</description>
     <modules>
-
+            <module>job-portal-service-registry</module>
     </modules>
 
 </project>
