@@ -1,0 +1,22 @@
+server:
+  port: 5006
+
+spring:
+  application:
+    name: job-portal-preferences
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/job-portal-preference
+    username: postgres
+    password: Vi12sh@1234
+    driver-class-name: org.postgresql.Driver
