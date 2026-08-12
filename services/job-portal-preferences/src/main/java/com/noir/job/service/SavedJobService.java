@@ -6,8 +6,8 @@ import com.noir.job.payload.SaveJobRequest;
 import java.util.List;
 
 public interface SavedJobService {
-    SavedJobResponse saveJob(Long candidateId, SaveJobRequest req) ;
-    void unsaveJob(Long candidateId, Long savedJobId) ;
+    SavedJobResponse saveJob(Long candidateId, SaveJobRequest req) throws Exception;
+    void unsaveJob(Long candidateId, Long savedJobId) throws Exception;
 
     List<SavedJobResponse> getMySavedJobs(Long candidateId);
 

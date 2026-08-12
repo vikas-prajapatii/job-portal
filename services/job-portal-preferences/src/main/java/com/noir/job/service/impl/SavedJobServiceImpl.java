@@ -20,9 +20,9 @@ public class SavedJobServiceImpl implements SavedJobService {
 
     @Override
     @Transactional
-    public SavedJobResponse saveJob(Long candidateId, SaveJobRequest req) {
+    public SavedJobResponse saveJob(Long candidateId, SaveJobRequest req) throws Exception {
         if (savedJobRepository.existsByCandidateIdAndJobId(candidateId, req.getJobId())) {
-            throw new IllegalArgumentException("Job is already saved");
+            throw new Exception("Job is already saved");
         }
 
         SavedJob savedJob = SavedJob.builder()
@@ -37,12 +37,11 @@ public class SavedJobServiceImpl implements SavedJobService {
 
     @Override
     @Transactional
-    public void unsaveJob(Long candidateId, Long savedJobId) {
+    public void unsaveJob(Long candidateId, Long savedJobId) throws Exception {
         SavedJob savedJob = savedJobRepository.findById(savedJobId)
-                .orElseThrow(() -> new java.lang.RuntimeException(
-                        "Saved job not found with id: " + savedJobId));
+                .orElseThrow(() -> new Exception("job not found"));
         if (!savedJob.getCandidateId().equals(candidateId)) {
-            throw new java.lang.RuntimeException("Saved job not found with id: " + savedJobId);
+            throw new Exception("job not found");
         }
         savedJobRepository.delete(savedJob);
     }
