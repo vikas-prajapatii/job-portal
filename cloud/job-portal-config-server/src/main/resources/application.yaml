@@ -9,8 +9,7 @@ spring:
           search-paths: config-repo
           clone-on-start: true
           default-label: main
-          username: ${CONFIG_GITHUB_USER:}
-          password: ${CONFIG_GITHUB_TOKEN:}
+
 
 server:
   port: 8888
