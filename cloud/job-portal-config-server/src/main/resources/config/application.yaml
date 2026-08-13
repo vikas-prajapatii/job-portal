@@ -1,5 +1,0 @@
-# Default shared configuration for all microservices
-spring:
-  jackson:
-    serialization:
-      fail-on-empty-beans: false

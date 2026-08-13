@@ -1,13 +1,16 @@
 spring:
   application:
     name: job-portal-config-server
-  profiles:
-    active: native
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:/config
+        git:
+          uri: https://github.com/vikas-prajapatii/job-portal.git
+          search-paths: config-repo
+          clone-on-start: true
+          default-label: main
+          username: ${CONFIG_GITHUB_USER:}
+          password: ${CONFIG_GITHUB_TOKEN:}
 
 server:
   port: 8888
