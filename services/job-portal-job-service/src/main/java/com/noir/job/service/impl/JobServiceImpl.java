@@ -1,5 +1,6 @@
 package com.noir.job.service.impl;
 
+import com.noir.job.client.CompanyClient;
 import com.noir.job.domain.JobStatus;
 import com.noir.job.dto.CompanyResponse;
 import com.noir.job.dto.JobRequest;
@@ -46,6 +47,8 @@ public class JobServiceImpl implements JobService {
     private final JobCategoryService jobCategoryService;
     private final JobSkillService jobSkillService;
     private final JobTagService jobTagService;
+    private final CompanyClient companyClient;
+
     @Override
     public JobResponse createJob(Long employerId, JobRequest req) throws Exception {
         JobCategory category = jobCategoryService.getCategoryEntityById(req.getCategoryId());
@@ -56,7 +59,8 @@ public class JobServiceImpl implements JobService {
         Set<JobTags> tags = req.getTagIds() != null?
                 jobTagService.getTagsByIds(req.getTagIds())
                 : Collections.emptySet();
-        int companyId = 1;
+        CompanyResponse company =  companyClient.getMyCompany(employerId);
+        Long companyId = company.getId();
         Job job = Job.builder()
                 .title(req.getTitle())
                 .description(req.getDescription())
@@ -152,7 +156,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponse publishJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found with id: " + id));
+                () -> new Exception("Job not found with id: " + jobId));
                 assertEmployer(job,employerId);
                 if(job.getStatus() == JobStatus.CLOSED || job.getStatus() == JobStatus.EXPIRED) {
                     throw new Exception("Job is already closed");
@@ -173,7 +177,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void deleteJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found with id: " + id));
+                () -> new Exception("Job not found with id: " + jobId));
         assertEmployer(job,employerId);
         jobRepository.delete(job);
     }
@@ -181,7 +185,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public JobResponse closeJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
-                () -> new Exception("Job not found with id: " + id));
+                () -> new Exception("Job not found with id: " + jobId));
         assertEmployer(job,employerId);
 
         job.setStatus(JobStatus.CLOSED);
@@ -198,9 +202,7 @@ public class JobServiceImpl implements JobService {
                 .collect(Collectors.toList());
     }
     private JobResponse convertToResponse(Job savedJob) {
-        CompanyResponse response = CompanyResponse.builder()
-                .id(savedJob.getCompanyId())
-                .build();
+        CompanyResponse response = companyClient.getCompanyById(savedJob.getCompanyId());
         return JobMapper.toResponse(savedJob, response);
     }
 
