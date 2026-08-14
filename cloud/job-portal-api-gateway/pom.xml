@@ -6,13 +6,12 @@
 		<groupId>com.noir.job</groupId>
 		<artifactId>job-portal-cloud</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>job-portal-api-gateway</artifactId>
-
 	<name>job-portal-api-gateway</name>
-	<description/>
+	<description>API Gateway for Job Portal routing</description>
 
 	<dependencies>
 		<dependency>
@@ -40,7 +39,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 
 	<build>
 		<plugins>
