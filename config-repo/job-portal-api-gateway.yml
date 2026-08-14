@@ -1,0 +1,49 @@
+server:
+  port: 9000
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # User Service
+        - id: user-service
+          uri: lb://JOB-PORTAL-USER-SERVICE
+          predicates:
+            - Path=/api/auth/**, /api/users/**
+
+        # Company Service
+        - id: company-service
+          uri: lb://JOB-PORTAL-COMPANY-SERVICE
+          predicates:
+            - Path=/api/companies/**
+
+        # Job Service
+        - id: job-service
+          uri: lb://JOB-PORTAL-JOB-SERVICE
+          predicates:
+            - Path=/api/jobs/**, /api/categories/**, /api/skills/**
+
+        # Resume Service
+        - id: resume-service
+          uri: lb://JOB-PORTAL-RESUME-SERVICE
+          predicates:
+            - Path=/api/resumes/**
+
+        # Application Service
+        - id: application-service
+          uri: lb://JOB-PORTAL-APPLICATION-SERVICE
+          predicates:
+            - Path=/api/applications/**
+
+        # Preferences Service
+        - id: preferences-service
+          uri: lb://JOB-PORTAL-PREFERENCES-SERVICE
+          predicates:
+            - Path=/api/preferences/**
+
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
