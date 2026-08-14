@@ -1,15 +1,16 @@
 {
   "info": {
-    "_postman_id": "8b945d8b-1e24-4f40-8b6f-87a4192bfa7c",
-    "name": "Noir Job Portal - Gateway Port 5000",
+    "_postman_id": "60c3da82-1b95-4250-a2bc-91061eb96dfc",
+    "name": "Job Portal - Full API Collection (Gateway Port 5000)",
+    "description": "Reconstructed from controller source code in vikas-prajapatii/job-portal. All services are routed through the API Gateway on port 5000.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "1. User Service",
+      "name": "User Service",
       "item": [
         {
-          "name": "Auth - Signup",
+          "name": "Signup",
           "request": {
             "method": "POST",
             "header": [
@@ -18,21 +19,24 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{USER}}/auth/signup",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "auth",
+                "signup"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"firstName\": \"Vikas\",\n  \"lastName\": \"Prajapati\",\n  \"email\": \"vikas.prajapati@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"ROLE_EMPLOYER\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/auth/signup",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "auth", "signup"]
             }
           }
         },
         {
-          "name": "Auth - Login",
+          "name": "Login",
           "request": {
             "method": "POST",
             "header": [
@@ -41,21 +45,24 @@
                 "value": "application/json"
               }
             ],
+            "url": {
+              "raw": "{{USER}}/auth/login",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"email\": \"vikas.prajapati@example.com\",\n  \"password\": \"password123\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/auth/login",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "auth", "login"]
             }
           }
         },
         {
-          "name": "User - Get Profile",
+          "name": "Get My Profile",
           "request": {
             "method": "GET",
             "header": [
@@ -65,35 +72,157 @@
               }
             ],
             "url": {
-              "raw": "http://localhost:5000/api/users/profile",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "users", "profile"]
+              "raw": "{{USER}}/api/users/profile",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "profile"
+              ]
             }
           }
         },
         {
-          "name": "User - Get By ID",
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Email",
+                "value": "vikas.prajapati@example.com"
+              }
+            ],
+            "url": {
+              "raw": "{{USER}}/api/users/profile",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Vikas Prajapati Updated\",\n  \"phone\": \"9999999999\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get User By Id",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/users/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "users", "1"]
+              "raw": "{{USER}}/api/users/1",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{USER}}/api/users",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Suspend User (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{USER}}/api/users/1/suspend",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "1",
+                "suspend"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Activate User (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{USER}}/api/users/1/activated",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "1",
+                "activated"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{USER}}/api/users/1",
+              "host": [
+                "{{USER}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "1"
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "2. Company Service",
+      "name": "Company Service",
       "item": [
         {
-          "name": "Company - Create",
+          "name": "Create Company",
           "request": {
             "method": "POST",
             "header": [
@@ -106,35 +235,42 @@
                 "value": "1"
               }
             ],
+            "url": {
+              "raw": "{{COMPANY}}/api/companies",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"Noir Technologies\",\n  \"description\": \"AI product studio.\",\n  \"website\": \"https://noir.tech\",\n  \"logoUrl\": \"https://noir.tech/logo.png\",\n  \"companyType\": \"STARTUP\",\n  \"companySize\": \"SMALL\",\n  \"industryType\": \"TECHNOLOGY\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/companies",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "companies"]
             }
           }
         },
         {
-          "name": "Company - Get By ID",
+          "name": "Get Company By Id",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/companies/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "companies", "1"]
+              "raw": "{{COMPANY}}/api/companies/1",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies",
+                "1"
+              ]
             }
           }
         },
         {
-          "name": "Company - Get My Company",
+          "name": "Get My Company",
           "request": {
             "method": "GET",
             "header": [
@@ -144,21 +280,149 @@
               }
             ],
             "url": {
-              "raw": "http://localhost:5000/api/companies/my",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "companies", "my"]
+              "raw": "{{COMPANY}}/api/companies/my",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies",
+                "my"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Companies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{COMPANY}}/api/companies?type=STARTUP&industry=TECHNOLOGY",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "STARTUP"
+                },
+                {
+                  "key": "industry",
+                  "value": "TECHNOLOGY"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Company",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{COMPANY}}/api/companies/1",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Noir Technologies Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Verify Company (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{COMPANY}}/api/companies/1/verify",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies",
+                "1",
+                "verify"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Deactivate Company",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{COMPANY}}/api/companies/1/deactivate",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies",
+                "1",
+                "deactivate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Company",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{COMPANY}}/api/companies/1",
+              "host": [
+                "{{COMPANY}}"
+              ],
+              "path": [
+                "api",
+                "companies",
+                "1"
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "3. Job Service",
+      "name": "Job Service",
       "item": [
         {
-          "name": "Job - Create",
+          "name": "Create Job",
           "request": {
             "method": "POST",
             "header": [
@@ -171,21 +435,123 @@
                 "value": "1"
               }
             ],
+            "url": {
+              "raw": "{{JOB}}/api/jobs",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs"
+              ]
+            },
             "body": {
               "mode": "raw",
               "raw": "{\n  \"title\": \"Senior React Developer\",\n  \"description\": \"Develop UI layouts.\",\n  \"requirements\": \"3+ years of React experience.\",\n  \"responsibilities\": \"Optimize application performance.\",\n  \"jobType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"experienceLevel\": \"SENIOR\",\n  \"categoryId\": 1,\n  \"skillIds\": [1],\n  \"tagIds\": [1]\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/jobs",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "jobs"]
             }
           }
         },
         {
-          "name": "Job - Publish",
+          "name": "Get Job By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/jobs/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Jobs (search/filter)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/jobs?keyword=React&location=Delhi&jobType=FULL_TIME",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs"
+              ],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "React"
+                },
+                {
+                  "key": "location",
+                  "value": "Delhi"
+                },
+                {
+                  "key": "jobType",
+                  "value": "FULL_TIME"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Jobs By Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/jobs/company/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "company",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Job",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/jobs/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Senior React Developer II\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Publish Job",
           "request": {
             "method": "PATCH",
             "header": [
@@ -195,83 +561,433 @@
               }
             ],
             "url": {
-              "raw": "http://localhost:5000/api/jobs/1/publish",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "jobs", "1", "publish"]
+              "raw": "{{JOB}}/api/jobs/1/publish",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "1",
+                "publish"
+              ]
             }
           }
         },
         {
-          "name": "Job - Get All (Active)",
+          "name": "Delete Job",
           "request": {
-            "method": "GET",
-            "header": [],
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
             "url": {
-              "raw": "http://localhost:5000/api/jobs",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "jobs"]
+              "raw": "{{JOB}}/api/jobs/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "1"
+              ]
             }
           }
         },
         {
-          "name": "Job - Get All (Draft)",
+          "name": "Close Job",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/jobs/1/close",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "1",
+                "close"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Jobs (Admin)",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/jobs?status=DRAFT",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "jobs"],
+              "raw": "{{JOB}}/api/jobs/admin",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "jobs",
+                "admin"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/categories",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/categories",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "categories"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Category By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/categories/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/categories/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Engineering & IT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/categories/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "categories",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Job Tag",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/job-tags",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "job-tags"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Remote\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Job Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/job-tags",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "job-tags"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Job Tags",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/job-tags/search?keyword=rem",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "job-tags",
+                "search"
+              ],
               "query": [
                 {
-                  "key": "status",
-                  "value": "DRAFT"
+                  "key": "keyword",
+                  "value": "rem"
                 }
               ]
             }
           }
         },
         {
-          "name": "Job - Get All (Admin)",
+          "name": "Get Job Tag By Id",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/jobs/admin",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "jobs", "admin"]
+              "raw": "{{JOB}}/api/job-tags/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "job-tags",
+                "1"
+              ]
             }
           }
         },
         {
-          "name": "Job - Get By ID",
+          "name": "Update Job Tag",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/job-tags/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "job-tags",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Remote-Friendly\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Job Tag",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/job-tags/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "job-tags",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/skills",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "skills"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Java\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Skills",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:5000/api/jobs/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "jobs", "1"]
+              "raw": "{{JOB}}/api/skills",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "skills"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Skill By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/skills/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "skills",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Skill",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{JOB}}/api/skills/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "skills",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Java 21\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Skill",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{JOB}}/api/skills/1",
+              "host": [
+                "{{JOB}}"
+              ],
+              "path": [
+                "api",
+                "skills",
+                "1"
+              ]
             }
           }
         }
       ]
     },
     {
-      "name": "4. Application Service",
+      "name": "Resume Service",
       "item": [
         {
-          "name": "Application - Create",
+          "name": "Create Resume",
           "request": {
             "method": "POST",
             "header": [
@@ -284,35 +1000,24 @@
                 "value": "2"
               }
             ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes"
+              ]
+            },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"jobId\": 1,\n  \"resumeId\": 1,\n  \"coverLetter\": \"Applying for Senior Developer role\",\n  \"expectedSalary\": 100000,\n  \"availableFrom\": \"2026-09-01\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:5000/api/applications",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "applications"]
+              "raw": "{\n  \"title\": \"My Resume\"\n}"
             }
           }
         },
         {
-          "name": "Application - Get By ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "http://localhost:5000/api/applications/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "applications", "1"]
-            }
-          }
-        },
-        {
-          "name": "Application - Get My Applications",
+          "name": "Get Resume By Id",
           "request": {
             "method": "GET",
             "header": [
@@ -322,15 +1027,1235 @@
               }
             ],
             "url": {
-              "raw": "http://localhost:5000/api/applications/my",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "5000",
-              "path": ["api", "applications", "my"]
+              "raw": "{{RESUME}}/api/resumes/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Resumes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/my",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "my"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Personal Info",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/personal-info",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "personal-info"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"phone\": \"9999999999\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Summary",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/summary",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "summary"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Experienced backend developer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Set Default Resume",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/set-default",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "set-default"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Resume",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Education",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/educations",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "educations"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institution\": \"XYZ University\",\n  \"degree\": \"B.Tech\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Educations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/educations",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "educations"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Education",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/educations/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "educations",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"degree\": \"M.Tech\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Education",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/educations/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "educations",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Resume Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/skills",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "skills"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Java\",\n  \"level\": \"ADVANCED\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Resume Skills",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/skills",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "skills"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Resume Skill",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/skills/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "skills",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"EXPERT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Resume Skill",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/skills/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "skills",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Language",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/languages",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "languages"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"English\",\n  \"proficiency\": \"FLUENT\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Languages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/languages",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "languages"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Language",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/languages/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "languages",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proficiency\": \"NATIVE\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Language",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/languages/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "languages",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/projects",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "projects"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Job Portal\",\n  \"description\": \"Microservices project\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/projects",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "projects"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/projects/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "projects",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Job Portal v2\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/projects/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "projects",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Work Experience",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/work-experiences",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "work-experiences"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"company\": \"Acme Corp\",\n  \"title\": \"Backend Developer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Work Experiences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/work-experiences",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "work-experiences"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Work Experience",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/work-experiences/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "work-experiences",
+                "1"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Sr. Backend Developer\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Work Experience",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{RESUME}}/api/resumes/1/work-experiences/1",
+              "host": [
+                "{{RESUME}}"
+              ],
+              "path": [
+                "api",
+                "resumes",
+                "1",
+                "work-experiences",
+                "1"
+              ]
             }
           }
         }
       ]
+    },
+    {
+      "name": "Application Service",
+      "item": [
+        {
+          "name": "Create Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": 1,\n  \"resumeId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Application By Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get My Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/my",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "my"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Applications For Job",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/job/1",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "job",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Applications For Company",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/company",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "company"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Application Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/status",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "status"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SHORTLISTED\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Withdraw Application",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/withdraw",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "withdraw"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Application As Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/read",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "read"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Toggle Star Application",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "1"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/star",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "star"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Application",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "2"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Application Note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/notes",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "notes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"Strong candidate\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Application Notes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/notes",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "notes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Application Note",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{APPLICATION}}/api/applications/1/notes/1",
+              "host": [
+                "{{APPLICATION}}"
+              ],
+              "path": [
+                "api",
+                "applications",
+                "1",
+                "notes",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Preferences Service",
+      "item": [
+        {
+          "name": "Save Job",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{PREFERENCES}}/api/preferences/saved-jobs",
+              "host": [
+                "{{PREFERENCES}}"
+              ],
+              "path": [
+                "api",
+                "preferences",
+                "saved-jobs"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get My Saved Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PREFERENCES}}/api/preferences/saved-jobs",
+              "host": [
+                "{{PREFERENCES}}"
+              ],
+              "path": [
+                "api",
+                "preferences",
+                "saved-jobs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Check If Job Saved",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{PREFERENCES}}/api/preferences/saved-jobs/check?jobId=1",
+              "host": [
+                "{{PREFERENCES}}"
+              ],
+              "path": [
+                "api",
+                "preferences",
+                "saved-jobs",
+                "check"
+              ],
+              "query": [
+                {
+                  "key": "jobId",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unsave Job",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{PREFERENCES}}/api/preferences/saved-jobs/1",
+              "host": [
+                "{{PREFERENCES}}"
+              ],
+              "path": [
+                "api",
+                "preferences",
+                "saved-jobs",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "API Gateway (5000)",
+      "item": [
+        {
+          "name": "[Gateway] Get Jobs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{GATEWAY}}/api/jobs",
+              "host": [
+                "{{GATEWAY}}"
+              ],
+              "path": [
+                "api",
+                "jobs"
+              ]
+            }
+          }
+        },
+        {
+          "name": "[Gateway] Get Companies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{GATEWAY}}/api/companies",
+              "host": [
+                "{{GATEWAY}}"
+              ],
+              "path": [
+                "api",
+                "companies"
+              ]
+            }
+          }
+        },
+        {
+          "name": "[Gateway] Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{GATEWAY}}/auth/login",
+              "host": [
+                "{{GATEWAY}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"vikas.prajapati@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "USER",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "COMPANY",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "JOB",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "RESUME",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "APPLICATION",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "PREFERENCES",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "GATEWAY",
+      "value": "http://localhost:5000"
     }
   ]
 }
