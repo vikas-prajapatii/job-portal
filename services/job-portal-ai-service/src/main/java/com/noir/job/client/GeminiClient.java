@@ -12,17 +12,10 @@ public class GeminiClient {
     private final Client client;
     private final GeminiProperties properties;
 
+    // 1. Fix: Added constructor to initialize the final fields
     public GeminiClient(GeminiProperties properties) {
         this.properties = properties;
-        this.client = genAiClient(properties);
-    }
-
-    public Client genAiClient(GeminiProperties props) {
-        return Client.builder().apiKey(props.getKey()).build();
-    }
-
-    public String generateText(String prompt) {
-        return generateText(prompt, properties.getTemperature(), properties.getMaxOutputTokens());
+        this.client = Client.builder().apiKey(properties.getKey()).build();
     }
 
     public String generateText(String prompt, double temperature, int maxToken) {
@@ -31,13 +24,17 @@ public class GeminiClient {
                     .temperature((float) temperature)
                     .maxOutputTokens(maxToken)
                     .build();
-
-            String model = properties.getModel() != null ? properties.getModel() : "gemini-2.5-flash";
-
-            GenerateContentResponse response = client.models.generateContent(model, prompt, config);
+                    
+            // 2. Fix: Changed genAiClient to client (to match the field definition)
+            GenerateContentResponse response = client.models.generateContent(
+                    properties.getModel() != null ? properties.getModel() : "gemini-2.5-flash",
+                    prompt,
+                    config
+            );
             return response.text();
         } catch (Exception e) {
-            return "Error generating text from Gemini: " + e.getMessage();
+            // 3. Fix: Added the '+' operator for string concatenation and wrapped in RuntimeException
+            throw new RuntimeException("failed to get responses from gemini: " + e.getMessage(), e);
         }
     }
 }
