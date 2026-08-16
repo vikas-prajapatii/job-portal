@@ -22,7 +22,7 @@ public class GeminiClient {
     }
 
     public String generateText(String prompt) {
-        return generateText(prompt, properties.getTemperature(), properties.getMaxOutPutToken());
+        return generateText(prompt, properties.getTemperature(), properties.getMaxOutputTokens());
     }
 
     public String generateText(String prompt, double temperature, int maxToken) {

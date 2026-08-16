@@ -151,7 +151,6 @@ public class ApplicationServiceImpl implements ApplicationService {
 
     @Override
     public void markScreeningsStaleForJob(Long jobId) {
-
     }
 
     public ApplicationResponse buildFullResponse(Application application) {
