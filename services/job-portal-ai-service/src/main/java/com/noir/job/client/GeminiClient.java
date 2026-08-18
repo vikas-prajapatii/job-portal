@@ -15,73 +15,63 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class GeminiClient {
-    private final Client client;
-    private final GeminiProperties properties;
+
+    private final Client genAiClient;
+    private final GeminiProperties props;
     private final ObjectMapper objectMapper;
 
+    public String generateText(String systemInstruction, String prompt) {
+        return callText(systemInstruction, prompt,
+                (float) props.getTemperature(), props.getMaxOutputTokens());
+    }
+
     public <T> T generateJson(String systemInstruction, String prompt, Class<T> responseType) {
+        return callJson(systemInstruction, prompt, responseType);
+    }
+
+    // ── private helpers ──────────────────────────────────────────────────────
+
+    private String callText(String systemInstruction, String prompt, float temperature, int maxTokens) {
+        try {
+            GenerateContentConfig config = buildConfig(systemInstruction,
+                    temperature, maxTokens, false);
+            GenerateContentResponse response = genAiClient.models
+                    .generateContent(props.getModel() != null ? props.getModel() : "gemini-3.5-flash", prompt, config);
+            String text = response.text();
+            log.debug("Gemini response received, length: {}", text.length());
+            return text;
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error calling Gemini API: {}", e.getMessage());
+            throw new RuntimeException("Failed to get response from Gemini: " + e.getMessage(), e);
+        }
+    }
+
+    private <T> T callJson(String systemInstruction, String prompt, Class<T> responseType) {
         try {
             GenerateContentConfig config = buildConfig(systemInstruction, 0.3f,
-                    properties.getMaxOutputTokens(), true);
-            String model = properties.getModel() != null ? properties.getModel() : "gemini-3.5-flash";
-            GenerateContentResponse response = client.models.generateContent(
-                    model, prompt, config);
+                    props.getMaxOutputTokens(), true);
+            GenerateContentResponse response = genAiClient.models.generateContent(
+                    props.getModel() != null ? props.getModel() : "gemini-3.5-flash", prompt, config);
             return objectMapper.readValue(response.text(), responseType);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             log.error("Failed to parse Gemini JSON response: {}", e.getMessage());
             throw new RuntimeException("AI returned invalid JSON. Please try again.", e);
         }
     }
 
-    public String generateText(String prompt) {
-        try {
-            return generateText(null, prompt);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String generateText(String systemInstruction, String prompt) throws Exception {
-        return generateText(
-                systemInstruction,
-                prompt,
-                properties.getTemperature(),
-                properties.getMaxOutputTokens());
-    }
-
-    public String generateText(String systemInstruction, String prompt, double temperature, int maxToken) throws Exception {
-        return callText(
-                systemInstruction, prompt,
-                (float) temperature,
-                maxToken
-        );
-    }
-
-    private String callText(String systemInstruction, String prompt,
-                            float temperature, int maxToken) throws Exception {
-        try {
-            GenerateContentConfig config = buildConfig(systemInstruction, temperature, maxToken, false);
-            String model = properties.getModel() != null ? properties.getModel() : "gemini-3.5-flash";
-            GenerateContentResponse response = client.models.generateContent(
-                    model,
-                    prompt,
-                    config
-            );
-            return response.text();
-        } catch (Exception e) {
-            throw new RuntimeException("failed to get responses from gemini: " + e.getMessage(), e);
-        }
-    }
-
-    private GenerateContentConfig buildConfig(String systemInstruction, float temperature, int maxToken, boolean jsonMode) {
+    private GenerateContentConfig buildConfig(String systemInstruction,
+                                              float temperature, int maxTokens, boolean jsonMode) {
         GenerateContentConfig.Builder builder = GenerateContentConfig.builder()
                 .temperature(temperature)
-                .maxOutputTokens(maxToken);
-                
+                .maxOutputTokens(maxTokens);
+
         if (systemInstruction != null && !systemInstruction.isBlank()) {
-            builder.systemInstruction(
-                    Content.fromParts(Part.fromText(systemInstruction))
-            );
+            builder.systemInstruction(Content.fromParts(Part.fromText(
+                    systemInstruction)));
         }
         if (jsonMode) {
             builder.responseMimeType("application/json");

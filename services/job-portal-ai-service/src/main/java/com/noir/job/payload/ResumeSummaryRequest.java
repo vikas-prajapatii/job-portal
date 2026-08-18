@@ -14,7 +14,7 @@ public class ResumeSummaryRequest {
     private String targetJobTitle;
     private List<WorkExperienceInfo> workExperience;
     private List<EducationInfo> education;
-    private String skills;
+    private List<String> skills;
     private Integer yearOfExperience;
     @Data
     public static class WorkExperienceInfo {

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ai")
-public class AiServiceController {
+public class ServiceAiController {
 
     private final GeminiClient geminiClient;
 
@@ -19,6 +19,7 @@ public class AiServiceController {
     public ResponseEntity<String> testAi(@RequestParam String prompt) throws Exception {
         String systemInstruction = """
                 You are an AI assistant for a Job Portal application.
+                Your name is Noir assistant
                 Your role is strictly limited to helping users with job-related tasks only.
                 You can help with:
                 - job search and job recommendations
@@ -38,7 +39,6 @@ public class AiServiceController {
                 4. Keep responses professional, short, and helpful.
                 5. Always guide the user toward career growth and job opportunities.
                 """;
-                
         String response = geminiClient.generateText(systemInstruction, prompt);
         return ResponseEntity.ok(response);
     }

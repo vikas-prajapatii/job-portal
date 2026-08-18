@@ -6,8 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RestClientConfig {
+
     @Bean
     public Client genAiClient(GeminiProperties props) {
+        System.out.println("KEY = " + props.getKey());
         return Client.builder()
                 .apiKey(props.getKey())
                 .build();

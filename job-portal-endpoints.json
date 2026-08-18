@@ -2163,6 +2163,583 @@
       ]
     },
     {
+      "name": "AI Service",
+      "item": [
+        {
+          "name": "General Chatbot",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{AI}}/api/ai?prompt=What is a resume?",
+              "host": [
+                "{{AI}}"
+              ],
+              "path": [
+                "api",
+                "ai"
+              ],
+              "query": [
+                {
+                  "key": "prompt",
+                  "value": "What is a resume?"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Resume AI",
+          "item": [
+            {
+              "name": "Generate Summary",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/resume/summary",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "resume",
+                    "summary"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetJobTitle\": \"Java Developer\",\n  \"yearOfExperience\": 3,\n  \"skills\": [\"Java\", \"Spring Boot\", \"PostgreSQL\"],\n  \"workExperience\": [\n    {\n      \"jobTitle\": \"Backend Engineer\",\n      \"company\": \"Tech Solutions\",\n      \"description\": \"Developed REST APIs and optimized database queries.\"\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"B.Tech\",\n      \"fieldOfStudy\": \"Computer Science\",\n      \"institutionName\": \"University of Delhi\"\n    }\n  ]\n}"
+                }
+              }
+            },
+            {
+              "name": "Generate Experience Bullets",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/resume/experience-bullets",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "resume",
+                    "experience-bullets"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jobTitle\": \"Software Engineer\",\n  \"company\": \"Innovate Corp\",\n  \"rawDescription\": \"Worked on the backend using Java. Improved speed.\",\n  \"achievementsHint\": \"Improved database response times by 30%\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Parse Resume",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/resume/parse",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "resume",
+                    "parse"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"resumeText\": \"Vikas Prajapati\\nEmail: vikas@example.com\\nExperience: Java Developer at Noir (2024-Present). Skills: Java, SQL.\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Improvements",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/resume/improvements",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "resume",
+                    "improvements"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetJobTitle\": \"Senior Java Developer\",\n  \"resumeContent\": \"I have 5 years experience coding in Java, building APIs, and writing SQL queries.\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Career Feedback",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/resume/career-feedback",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "resume",
+                    "career-feedback"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"targetJobTitle\": \"Full Stack Engineer\",\n  \"resumeContent\": \"B.Tech Graduate. Knows React and Spring Boot. No projects listed.\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Job AI",
+          "item": [
+            {
+              "name": "Generate Description",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/describe",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "describe"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"React Developer\",\n  \"skill\": [\"React\", \"Redux\", \"CSS\"],\n  \"experienceLevel\": \"MID\",\n  \"jobType\": \"FULL_TIME\",\n  \"workMode\": \"REMOTE\",\n  \"category\": \"Frontend Development\",\n  \"additionalContext\": \"Looking for someone with experience in TailwindCSS.\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Get Requirements",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/requirements?title=Java Developer&category=Backend",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "requirements"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "Java Developer"
+                    },
+                    {
+                      "key": "category",
+                      "value": "Backend"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Suggest Salary Range",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/salary-suggestion",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "salary-suggestion"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"DevOps Engineer\",\n  \"skills\": [\"Kubernetes\", \"Docker\", \"AWS\"],\n  \"experienceLevel\": \"SENIOR\",\n  \"jobType\": \"FULL_TIME\",\n  \"location\": \"Bangalore\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Recommend Skills",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/skills-recommendation?title=Data Scientist&description=Building ML models",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "skills-recommendation"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "Data Scientist"
+                    },
+                    {
+                      "key": "description",
+                      "value": "Building ML models"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Recommend Responsibilities",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/responsibilities?title=Project Manager",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "responsibilities"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "Project Manager"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Recommend Benefits",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/benefits?title=Sales Manager&jobType=FULL_TIME",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "benefits"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "Sales Manager"
+                    },
+                    {
+                      "key": "jobType",
+                      "value": "FULL_TIME"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Recommend Tags",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{AI}}/api/ai/job/tags-recommendation?title=UX Designer",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "job",
+                    "tags-recommendation"
+                  ],
+                  "query": [
+                    {
+                      "key": "title",
+                      "value": "UX Designer"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Application AI",
+          "item": [
+            {
+              "name": "Generate Cover Letter",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/application/cover-letter",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "application",
+                    "cover-letter"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jobTitle\": \"Spring Boot Developer\",\n  \"jobDescription\": \"Build microservices and handle integration.\",\n  \"targetCompanyName\": \"Noir Tech Solutions\",\n  \"candidateName\": \"Aman Sharma\",\n  \"candidateSummary\": \"Backend engineer with passion for distributed architectures.\",\n  \"candidateSkills\": [\"Java\", \"Spring Boot\", \"Kafka\"],\n  \"candidateExperience\": [\"Built a streaming application serving 10k users.\"]\n}"
+                }
+              }
+            },
+            {
+              "name": "Score Candidate",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/application/screening-score",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "application",
+                    "screening-score"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jobTitle\": \"Java Developer\",\n  \"experienceLevel\": \"MID\",\n  \"requiredSkills\": [\"Java\", \"Spring Boot\", \"PostgreSQL\"],\n  \"responsibilities\": \"Develop backend code, optimize db queries\",\n  \"candidateSummary\": \"Full Stack developer with strong Java background.\",\n  \"candidateSkills\": [\"Java\", \"Spring Boot\", \"React\", \"PostgreSQL\"],\n  \"candidateExperience\": [\"3 years developer experience\"],\n  \"candidateEducation\": [\"B.Tech CS - DU\"]\n}"
+                }
+              }
+            },
+            {
+              "name": "Analyze Skills Gap",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/application/skills-gap",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "application",
+                    "skills-gap"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"jobTitle\": \"Cloud Architect\",\n  \"candidateSkills\": [\"AWS\", \"Terraform\", \"Linux\"],\n  \"requiredSkills\": [\"AWS\", \"Azure\", \"Terraform\", \"Kubernetes\", \"Go\"]\n}"
+                }
+              }
+            },
+            {
+              "name": "Summarize Recruiter Notes",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/application/summarize-notes",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "application",
+                    "summarize-notes"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "[\n  \"Candidate showed strong logic skills in technical interview.\",\n  \"Unsure about Docker experience; needs verification in Round 2.\",\n  \"Expected salary matches range. Candidate is eager to join.\"\n]"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Search AI",
+          "item": [
+            {
+              "name": "Enhance Search",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/search/enhance",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "search",
+                    "enhance"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"query\": \"freshers remote react jobs paying at least 800000 in bangalore\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Calculate Job Match",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/search/job-match",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "search",
+                    "job-match"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"candidateSkills\": [\"React\", \"JavaScript\", \"HTML\"],\n  \"jobSkills\": [\"React\", \"TypeScript\", \"Node.js\"],\n  \"preferredWorkModes\": [\"REMOTE\", \"HYBRID\"],\n  \"preferredJobTypes\": [\"FULL_TIME\"],\n  \"minSalary\": 700000,\n  \"candidateExperienceLevel\": \"MID\",\n  \"jobTitle\": \"React Developer\",\n  \"workMode\": \"REMOTE\",\n  \"jobType\": \"FULL_TIME\",\n  \"salaryMin\": 800000,\n  \"salaryMax\": 1200000,\n  \"currency\": \"INR\",\n  \"industry\": \"IT Solutions\",\n  \"jobExperienceLevel\": \"MID\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Suggest Alert Criteria",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{AI}}/api/ai/search/alert-suggestion",
+                  "host": [
+                    "{{AI}}"
+                  ],
+                  "path": [
+                    "api",
+                    "ai",
+                    "search",
+                    "alert-suggestion"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"skills\": [\"Java\", \"Spring Boot\", \"MySQL\"],\n  \"previousJobTitles\": [\"Junior Software Engineer\"],\n  \"educations\": [\"B.Tech in CS\"],\n  \"experienceLevel\": \"ENTRY\"\n}"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "API Gateway (5000)",
       "item": [
         {
@@ -2255,6 +2832,10 @@
     },
     {
       "key": "GATEWAY",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "AI",
       "value": "http://localhost:5000"
     }
   ]
