@@ -1,5 +1,6 @@
 package com.noir.job.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
@@ -7,41 +8,28 @@ import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
 import com.noir.job.config.GeminiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class GeminiClient {
     private final Client client;
     private final GeminiProperties properties;
+    private final ObjectMapper objectMapper;
 
-    public <T> T generateJson(String systemInstruction, String prompt, Class<T> responseClass) {
+    public <T> T generateJson(String systemInstruction, String prompt, Class<T> responseType) {
         try {
-            GenerateContentConfig config = buildConfig(systemInstruction, (float) properties.getTemperature(), properties.getMaxOutputTokens(), true);
+            GenerateContentConfig config = buildConfig(systemInstruction, 0.3f,
+                    properties.getMaxOutputTokens(), true);
             String model = properties.getModel() != null ? properties.getModel() : "gemini-3.5-flash";
             GenerateContentResponse response = client.models.generateContent(
-                    model,
-                    prompt,
-                    config
-            );
-            String jsonText = response.text();
-            
-            // Strip markdown formatting if present
-            if (jsonText.startsWith("```json")) {
-                jsonText = jsonText.substring(7);
-            } else if (jsonText.startsWith("```")) {
-                jsonText = jsonText.substring(3);
-            }
-            if (jsonText.endsWith("```")) {
-                jsonText = jsonText.substring(0, jsonText.length() - 3);
-            }
-            jsonText = jsonText.trim();
-            
-            return new com.fasterxml.jackson.databind.ObjectMapper()
-                    .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .readValue(jsonText, responseClass);
+                    model, prompt, config);
+            return objectMapper.readValue(response.text(), responseType);
         } catch (Exception e) {
-            throw new RuntimeException("failed to parse JSON from gemini: " + e.getMessage(), e);
+            log.error("Failed to parse Gemini JSON response: {}", e.getMessage());
+            throw new RuntimeException("AI returned invalid JSON. Please try again.", e);
         }
     }
 
