@@ -15,6 +15,36 @@ public class GeminiClient {
     private final Client client;
     private final GeminiProperties properties;
 
+    public <T> T generateJson(String systemInstruction, String prompt, Class<T> responseClass) {
+        try {
+            GenerateContentConfig config = buildConfig(systemInstruction, (float) properties.getTemperature(), properties.getMaxOutputTokens(), true);
+            String model = properties.getModel() != null ? properties.getModel() : "gemini-3.5-flash";
+            GenerateContentResponse response = client.models.generateContent(
+                    model,
+                    prompt,
+                    config
+            );
+            String jsonText = response.text();
+            
+            // Strip markdown formatting if present
+            if (jsonText.startsWith("```json")) {
+                jsonText = jsonText.substring(7);
+            } else if (jsonText.startsWith("```")) {
+                jsonText = jsonText.substring(3);
+            }
+            if (jsonText.endsWith("```")) {
+                jsonText = jsonText.substring(0, jsonText.length() - 3);
+            }
+            jsonText = jsonText.trim();
+            
+            return new com.fasterxml.jackson.databind.ObjectMapper()
+                    .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .readValue(jsonText, responseClass);
+        } catch (Exception e) {
+            throw new RuntimeException("failed to parse JSON from gemini: " + e.getMessage(), e);
+        }
+    }
+
     public String generateText(String prompt) {
         try {
             return generateText(null, prompt);
