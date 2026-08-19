@@ -8,9 +8,8 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<artifactId>job-portal-preferences</artifactId>
-
-	<name>job-portal-preferences-service</name>
+	<artifactId>job-portal-preference-service</artifactId>
+	<name>job-portal-preference-service</name>
 	<description> Services for managaing candidate for prefernece like saved jobs</description>
 	<dependencies>
 		<dependency>
@@ -68,7 +67,20 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.5.2</version>
+				<configuration>
+					<to>
+						<image>vikasprajapatii/job-portal-preference-service:latest</image>
+					</to>
+				</configuration>
+			</plugin>
 		</plugins>
+
+
 	</build>
 
 </project>
