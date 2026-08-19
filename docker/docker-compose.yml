@@ -1,14 +1,14 @@
 networks:
   job-portal-net:
     driver: bridge
-
 services:
-  uderdb:
-    image: postgres-16
+  userdb:
+    image: postgres:16
     container_name: job-portal-userdb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5433:5432"
     environment:
@@ -20,14 +20,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - job-portal-net
 
 
   companydb:
-    image: postgres-16
+    image: postgres:16
     container_name: job-portal-companydb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5434:5432"
     environment:
@@ -39,14 +42,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - job-portal-net
 
 
   jobdb:
-    image: postgres-16
+    image: postgres:16
     container_name: job-portal-jobdb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5435:5432"
     environment:
@@ -58,15 +64,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - job-portal-net
 
 
 
   applicationdb:
-    image: postgres-16
+    image: postgres:16
     container_name: job-portal-applicationdb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5436:5432"
     environment:
@@ -78,14 +87,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - job-portal-net
 
 
   preferencedb:
-    image: postgres-16
+    image: postgres:16
     container_name: job-portal-preferencedb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5437:5432"
     environment:
@@ -97,14 +109,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - job-portal-net
 
 
   resumedb:
-    image: postgres-16
+    image: postgres:16
     container_name: job-portal-resumedb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5438:5432"
     environment:
@@ -116,24 +131,21 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - job-portal-net
 
 
 
 # spring cloud
-  dicovery:
+  discovery:
     image: vikasprajapatii/job-portal-service-registry:latest
     container_name: job-portal-discovery
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "8761:8761"
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q0- http://localhost:8761/actuator/health || exit 1"]
-      interval: 15s
-      timeout: 10s
-      retries: 8
-
     networks:
       - job-portal-net
 
@@ -143,21 +155,14 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "8888:8888"
     depends_on:
-      dicovery:
-        condition: service_healthy
-
+      discovery:
+        condition: service_started
     environment:
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-
-    healthcheck:
-      test: [ "CMD-SHELL", "wget -q0- http://localhost:8761/actuator/health || exit 1" ]
-      interval: 15s
-      timeout: 10s
-      retries: 8
-
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -168,14 +173,15 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5000:5000"
     depends_on:
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -187,19 +193,22 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5001:5001"
     depends_on:
-      uderdb:
+      discovery:
+        condition: service_started
+      userdb:
         condition: service_healthy
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://userdb:5432/job_portal_user;
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -211,19 +220,22 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5002:5002"
     depends_on:
+      discovery:
+        condition: service_started
       companydb:
         condition: service_healthy
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
-      SPRING_DATASOURCE_URL: jdbc:postgresql://companydb:5432/job_portal_company;
+      SPRING_DATASOURCE_URL: jdbc:postgresql://companydb:5432/job_portal_company
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -233,19 +245,22 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5003:5003"
     depends_on:
+      discovery:
+        condition: service_started
       jobdb:
         condition: service_healthy
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://jobdb:5432/job_portal_job;
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -256,19 +271,22 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5004:5004"
     depends_on:
+      discovery:
+        condition: service_started
       applicationdb:
         condition: service_healthy
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://applicationdb:5432/job_portal_application;
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -279,19 +297,22 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5005:5005"
     depends_on:
+      discovery:
+        condition: service_started
       preferencedb:
         condition: service_healthy
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://preferencedb:5432/job_portal_preferencedb;
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -302,19 +323,22 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5009:5009"
     depends_on:
+      discovery:
+        condition: service_started
       resumedb:
         condition: service_healthy
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://resumedb:5432/job_portal_resume;
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
@@ -325,14 +349,17 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
+    restart: always
     ports:
       - "5010:5010"
     depends_on:
+      discovery:
+        condition: service_started
       config-server:
-        condition: service_healthy
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
-      EUREKA_CLEINT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
     networks:
       - job-portal-net
 
