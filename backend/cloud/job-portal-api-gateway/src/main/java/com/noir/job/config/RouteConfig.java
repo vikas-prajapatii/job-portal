@@ -123,6 +123,14 @@ public class RouteConfig {
                 .build();
     }
 
+    @Bean
+    public RouterFunction<ServerResponse> notificationServiceRoutes() {
+        return GatewayRouterFunctions.route("notification-service-routes")
+                .route(RequestPredicates.path("/api/notifications/**"), HandlerFunctions.http())
+                .filter(LoadBalancerFilterFunctions.lb("job-portal-notification-service"))
+                .build();
+    }
+
 
     private ServerRequest jwtAuthFilter(ServerRequest request) {
         String authHeader = request.headers().firstHeader(JwtConstant.JWT_HEADER);
