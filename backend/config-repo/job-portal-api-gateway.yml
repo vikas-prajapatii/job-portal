@@ -41,6 +41,12 @@ spring:
           predicates:
             - Path=/api/preferences/**
 
+        # Notification Service
+        - id: notification-service
+          uri: lb://JOB-PORTAL-NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+
       globalcors:
         cors-configurations:
           '[/**]':
