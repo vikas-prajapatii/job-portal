@@ -9,7 +9,7 @@ spring:
         - id: user-service
           uri: lb://JOB-PORTAL-USER-SERVICE
           predicates:
-            - Path=/api/auth/**, /api/users/**
+            - Path=/auth/**, /api/users/**
 
         # Company Service
         - id: company-service
