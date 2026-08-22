@@ -1,20 +1,39 @@
+
+
 networks:
   job-portal-net:
     driver: bridge
+
+volumes:
+  userdb_data:
+  companydb_data:
+  jobdb_data:
+  applicationdb_data:
+  paymentdb_data:
+  subscriptiondb_data:
+  preferencedb_data:
+  resumedb_data:
+
 services:
+
+  # ============================================================
+  # DATABASES  (one container per service)
+  # ============================================================
+
   userdb:
     image: postgres:16
     container_name: job-portal-userdb
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
       - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: job_portal_user
+    volumes:
+      - userdb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -22,7 +41,6 @@ services:
       retries: 5
     networks:
       - job-portal-net
-
 
   companydb:
     image: postgres:16
@@ -30,13 +48,14 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
       - "5434:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: job_portal_company
+    volumes:
+      - companydb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -44,7 +63,6 @@ services:
       retries: 5
     networks:
       - job-portal-net
-
 
   jobdb:
     image: postgres:16
@@ -52,13 +70,14 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
       - "5435:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: job_portal_job
+    volumes:
+      - jobdb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -66,8 +85,6 @@ services:
       retries: 5
     networks:
       - job-portal-net
-
-
 
   applicationdb:
     image: postgres:16
@@ -75,13 +92,14 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
       - "5436:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: job_portal_application
+    volumes:
+      - applicationdb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -90,6 +108,49 @@ services:
     networks:
       - job-portal-net
 
+  paymentdb:
+    image: postgres:16
+    container_name: job-portal-paymentdb
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: job_portal_payment
+    volumes:
+      - paymentdb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job-portal-net
+
+  subscriptiondb:
+    image: postgres:16
+    container_name: job-portal-subscriptiondb
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: job_portal_subscription
+    volumes:
+      - subscriptiondb_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job-portal-net
 
   preferencedb:
     image: postgres:16
@@ -97,13 +158,14 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5437:5432"
+      - "5439:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: job_portal_preferencedb
+      POSTGRES_DB: job_portal_preference
+    volumes:
+      - preferencedb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -111,7 +173,6 @@ services:
       retries: 5
     networks:
       - job-portal-net
-
 
   resumedb:
     image: postgres:16
@@ -119,13 +180,14 @@ services:
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5438:5432"
+      - "5440:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: job_portal_resumedb
+      POSTGRES_DB: job_portal_resume
+    volumes:
+      - resumedb_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -134,267 +196,356 @@ services:
     networks:
       - job-portal-net
 
+  # ============================================================
+  # KAFKA
+  # ============================================================
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: job-portal-zookeeper
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - job-portal-net
 
-# spring cloud
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: job-portal-kafka
+    mem_limit: 1g
+    mem_reservation: 512m
+    cpus: 1.0
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+    networks:
+      - job-portal-net
+
+  # ============================================================
+  # SPRING CLOUD
+  # ============================================================
+
   discovery:
-    image: vikasprajapatii/job-portal-service-registry:latest
+    image: zoshilo/job-portal-discovery:1.0.0
     container_name: job-portal-discovery
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
       - "8761:8761"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 8
     networks:
       - job-portal-net
 
   config-server:
-    image: vikasprajapatii/job-portal-config-server:latest
-    volumes:
-      - ../backend/config-repo:/config-repo
+    image: zoshilo/job-portal-config-server:1.0.0
     container_name: job-portal-config-server
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
       - "8888:8888"
     depends_on:
       discovery:
-        condition: service_started
+        condition: service_healthy
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8888/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
     networks:
       - job-portal-net
 
-
   gateway:
-    image: vikasprajapatii/job-portal-api-gateway:latest
+    image: zoshilo/job-portal-gateway:1.0.0
     container_name: job-portal-gateway
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5000:5000"
+      - "9000:9000"
     depends_on:
       config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
+        condition: service_healthy
     environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      SERVER_PORT: 9000
     networks:
       - job-portal-net
 
-
+  # ============================================================
+  # APPLICATION SERVICES
+  # ============================================================
 
   user-service:
-    image: vikasprajapatii/job-portal-user-service:latest
+    image: zoshilo/job-portal-user-service:1.0.0
     container_name: job-portal-user-service
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5001:5001"
+      - "9001:9001"
     depends_on:
-      discovery:
-        condition: service_started
       userdb:
         condition: service_healthy
       config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
+        condition: service_healthy
     environment:
-      SPRING_CONFIG_SERVER_URL: http://config-server:8888
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://userdb:5432/job_portal_user
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9001
     networks:
       - job-portal-net
 
-
-
   company-service:
-    image: vikasprajapatii/job-portal-company-service:latest
+    image: zoshilo/job-portal-company-service:1.0.0
     container_name: job-portal-company-service
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5002:5002"
+      - "9002:9002"
     depends_on:
-      discovery:
-        condition: service_started
       companydb:
         condition: service_healthy
       config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
+        condition: service_healthy
     environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://companydb:5432/job_portal_company
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9002
     networks:
       - job-portal-net
 
   job-service:
-    image: vikasprajapatii/job-portal-job-service:latest
+    image: zoshilo/job-portal-job-service:1.0.0
     container_name: job-portal-job-service
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5003:5003"
+      - "9003:9003"
     depends_on:
-      discovery:
-        condition: service_started
       jobdb:
         condition: service_healthy
       config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
+        condition: service_healthy
     environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://jobdb:5432/job_portal_job
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-      SPRING_REDIS_HOST: redis
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9003
     networks:
       - job-portal-net
 
-
   application-service:
-    image: vikasprajapatii/job-portal-application-service:latest
+    image: zoshilo/job-portal-application-service:1.0.0
     container_name: job-portal-application-service
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5004:5004"
+      - "9004:9004"
     depends_on:
-      discovery:
-        condition: service_started
       applicationdb:
         condition: service_healthy
       config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
       SPRING_DATASOURCE_URL: jdbc:postgresql://applicationdb:5432/job_portal_application
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-    networks:
-      - job-portal-net
-
-
-  preference-service:
-    image: vikasprajapatii/job-portal-preference-service:latest
-    container_name: job-portal-preference-service
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    restart: always
-    ports:
-      - "5005:5005"
-    depends_on:
-      discovery:
-        condition: service_started
-      preferencedb:
-        condition: service_healthy
-      config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://preferencedb:5432/job_portal_preferencedb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-    networks:
-      - job-portal-net
-
-
-  resume-service:
-    image: vikasprajapatii/job-portal-resume-service:latest
-    container_name: job-portal-resume-service
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    restart: always
-    ports:
-      - "5009:5009"
-    depends_on:
-      discovery:
-        condition: service_started
-      resumedb:
-        condition: service_healthy
-      config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://resumedb:5432/job_portal_resumedb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-    networks:
-      - job-portal-net
-
-
-  ai-service:
-    image: vikasprajapatii/job-portal-ai-service:latest
-    container_name: job-portal-ai-service
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    restart: always
-    ports:
-      - "5010:5010"
-    depends_on:
-      discovery:
-        condition: service_started
-      config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9004
     networks:
       - job-portal-net
 
   notification-service:
-    image: vikasprajapatii/job-portal-notification-service:latest
+    image: zoshilo/job-portal-notification-service:1.0.0
     container_name: job-portal-notification-service
     mem_limit: 512m
     mem_reservation: 256m
     cpus: 0.5
-    restart: always
     ports:
-      - "5008:5008"
+      - "9005:9005"
     depends_on:
-      discovery:
-        condition: service_started
       config-server:
-        condition: service_started
-    command: ["--spring.config.import=configserver:http://config-server:8888"]
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
-      SPRING_CONFIG_SERVER_URL: http://config-server:8888
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-      KAFKA_BOOTSTRAP_SERVERS: "host.docker.internal:9092"
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9005
+      MAIL_HOST: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     networks:
       - job-portal-net
 
-  redis:
-    image: redis:7-alpine
-    container_name: job-portal-redis
+  payment-service:
+    image: zoshilo/job-portal-payment-service:1.0.0
+    container_name: job-portal-payment-service
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
     ports:
-      - "6379:6379"
+      - "9006:9006"
+    depends_on:
+      paymentdb:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://paymentdb:5432/job_portal_payment
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9006
     networks:
       - job-portal-net
 
+  subscription-service:
+    image: zoshilo/job-portal-subscription-service:1.0.0
+    container_name: job-portal-subscription-service
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "9007:9007"
+    depends_on:
+      subscriptiondb:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://subscriptiondb:5432/job_portal_subscription
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9007
+    networks:
+      - job-portal-net
 
+  preference-service:
+    image: zoshilo/job-portal-preference-service:1.0.0
+    container_name: job-portal-preference-service
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "9008:9008"
+    depends_on:
+      preferencedb:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://preferencedb:5432/job_portal_preference
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9008
+    networks:
+      - job-portal-net
+
+  resume-service:
+    image: zoshilo/job-portal-resume-service:1.0.0
+    container_name: job-portal-resume-service
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "9009:9009"
+    depends_on:
+      resumedb:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_DATASOURCE_URL: jdbc:postgresql://resumedb:5432/job_portal_resume
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9009
+    networks:
+      - job-portal-net
+
+  ai-service:
+    image: zoshilo/job-portal-ai-service:1.0.0
+    container_name: job-portal-ai-service
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    ports:
+      - "9010:9010"
+    depends_on:
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      EUREKA_URL: http://discovery:8761/eureka
+      SERVER_PORT: 9010
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    networks:
+      - job-portal-net
