@@ -50,8 +50,9 @@ public class AuthServiceImpl implements AuthService {
 
         User savedUser = userRepository.save(user);
 
+        org.springframework.security.core.userdetails.UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getEmail());
         Authentication authentication = new UsernamePasswordAuthenticationToken(
-                savedUser.getEmail(), savedUser.getPassword()
+                savedUser.getEmail(), null, userDetails.getAuthorities()
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 

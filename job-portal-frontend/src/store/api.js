@@ -34,11 +34,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid - clear auth data
       localStorage.removeItem("accessToken")
-
-      // Redirect to login page if not already there
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login"
-      }
     }
     return Promise.reject(error)
   }
