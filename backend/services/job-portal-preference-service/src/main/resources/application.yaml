@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: job-portal-preference-service
+  config:
+    import: optional:configserver:${SPRING_CONFIG_SERVER_URL:http://localhost:8888}
