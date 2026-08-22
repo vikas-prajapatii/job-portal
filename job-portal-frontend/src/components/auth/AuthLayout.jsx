@@ -7,53 +7,7 @@ const AUTH_IMAGE = authSideImage
 
 export default function AuthLayout({ title, description, children, footerText, footerLink, footerLinkText }) {
   return (
-    <div className="min-h-screen flex">
-
-      {/* ── Left panel — image (hidden on mobile) ─────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative overflow-hidden shrink-0">
-        <img
-          src={AUTH_IMAGE}
-          alt="Noir Hire"
-          className="w-full h-full object-cover object-center"
-        />
-        {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-linear-to-t from-slate-900/70 via-slate-900/10 to-transparent" />
-
-        {/* Branding overlay — bottom left */}
-        <div className="absolute bottom-10 left-10 right-10 text-white">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-1.5">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-sm font-semibold text-white/90 tracking-wide uppercase">
-              Noir Hire
-            </span>
-          </div>
-          <h2 className="text-3xl font-bold leading-snug">
-            Your next career move <br /> starts here.
-          </h2>
-          <p className="text-white/70 mt-3 text-sm leading-relaxed max-w-sm">
-            AI-powered job matching, smart resume builder, and real-time insights — all in one place.
-          </p>
-
-          {/* Trust indicators */}
-          <div className="flex items-center gap-5 mt-6">
-            {[
-              { dot: "bg-emerald-400", text: "100K+ Jobs" },
-              { dot: "bg-blue-400", text: "50K+ Companies" },
-              { dot: "bg-violet-400", text: "AI-Powered" },
-            ].map(({ dot, text }) => (
-              <div key={text} className="flex items-center gap-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-                <span className="text-xs text-white/80 font-medium">{text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Right panel — form ────────────────────────────────────────────── */}
-      <div className="flex-1 relative overflow-hidden bg-linear-to-br from-slate-50 via-brand/5 to-slate-50">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-50 via-brand/5 to-slate-50 relative overflow-hidden">
         {/* Decorative blobs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-brand/10 rounded-full blur-3xl" />
@@ -124,7 +78,5 @@ export default function AuthLayout({ title, description, children, footerText, f
           </div>
         </div>
       </div>
-
-    </div>
   )
 }
