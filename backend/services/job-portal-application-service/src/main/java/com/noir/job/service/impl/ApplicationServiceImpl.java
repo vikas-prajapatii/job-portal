@@ -19,6 +19,7 @@ import com.noir.job.repository.ApplicationRepository;
 import com.noir.job.repository.ApplicationSpecification;
 import com.noir.job.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
+import com.noir.job.event.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final ResumeClient resumeClient;
     private final CompanyClient companyClient;
     private final UserClient userClient;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public ApplicationResponse createApplication(Long candidateId, CreateApplicationRequest req) throws Exception {
@@ -99,13 +101,14 @@ public class ApplicationServiceImpl implements ApplicationService {
     public ApplicationResponse updateStatus(Long applicationId, Long employerId, ApplicationStatus status) throws Exception {
         Application application = getApplicationEntity(applicationId);
         assertEmployer(application, employerId);
-
+        ApplicationStatus oldStatus = application.getStatus();
         if (application.getStatus() == ApplicationStatus.WITHDRAWN) {
             throw new Exception("Cannot update status of a withdrawn application");
         }
 
         application.setStatus(status);
         Application updatedApplication = applicationRepository.save(application);
+        applicationEventPublisher.publishStatusChanged(application, oldStatus, "your application status get change");
         return buildFullResponse(updatedApplication);
     }
 

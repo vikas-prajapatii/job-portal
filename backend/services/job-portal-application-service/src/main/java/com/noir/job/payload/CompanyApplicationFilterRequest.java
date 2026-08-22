@@ -9,7 +9,7 @@ public class CompanyApplicationFilterRequest {
     private Long jobId;
     private ApplicationStatus status;
 
-    private boolean isStarred;
+    private boolean isStarred = false;
     private AiShortlistStatus aiShortlistStatus;
     private Integer minAiScore;
     private String sortBy;
