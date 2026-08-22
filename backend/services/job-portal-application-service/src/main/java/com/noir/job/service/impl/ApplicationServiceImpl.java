@@ -4,67 +4,104 @@ import com.noir.job.client.CompanyClient;
 import com.noir.job.client.JobClient;
 import com.noir.job.client.ResumeClient;
 import com.noir.job.client.UserClient;
-import com.noir.job.domain.ApplicationStatus;
-import com.noir.job.dto.*;
-import com.noir.job.dto.response.UserResponse;
+import com.noir.job.common.domain.ApplicationStatus;
+import com.noir.job.common.dto.response.*;
+import com.noir.job.common.exception.ApplicationException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.CompanyApplicationFilterRequest;
+import com.noir.job.dto.request.CreateApplicationRequest;
+import com.noir.job.dto.request.UpdateApplicationStatusRequest;
+import com.noir.job.dto.request.WithdrawApplicationRequest;
+import com.noir.job.entity.Application;
+import com.noir.job.entity.ApplicationNote;
+import com.noir.job.entity.ApplicationScreening;
+import com.noir.job.entity.ApplicationStatusHistory;
 import com.noir.job.mapper.ApplicationMapper;
-import com.noir.job.model.Application;
-import com.noir.job.model.ApplicationNote;
-import com.noir.job.payload.CompanyApplicationFilterRequest;
-import com.noir.job.payload.CreateApplicationRequest;
-import com.noir.job.payload.UpdateApplicationStatusRequest;
-import com.noir.job.payload.WithdrawApplicationRequest;
+import com.noir.job.event.ApplicationEventPublisher;
+import com.noir.job.service.ApplicationScreeningService;
 import com.noir.job.repository.ApplicationNoteRepository;
 import com.noir.job.repository.ApplicationRepository;
+import com.noir.job.repository.ApplicationScreeningRepository;
 import com.noir.job.repository.ApplicationSpecification;
+import com.noir.job.repository.ApplicationStatusHistoryRepository;
 import com.noir.job.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
-import com.noir.job.event.ApplicationEventPublisher;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ApplicationServiceImpl implements ApplicationService {
+
     private final ApplicationRepository applicationRepository;
-    private final ApplicationNoteRepository applicationNoteRepository;
+    private final ApplicationScreeningRepository screeningRepository;
+    private final ApplicationStatusHistoryRepository historyRepository;
+    private final ApplicationNoteRepository noteRepository;
     private final JobClient jobClient;
     private final ResumeClient resumeClient;
     private final CompanyClient companyClient;
     private final UserClient userClient;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApplicationScreeningService screeningService;
+    private final ApplicationEventPublisher eventPublisher;
+
+    // ── Create ────────────────────────────────────────────────────────────────
 
     @Override
-    public ApplicationResponse createApplication(Long candidateId, CreateApplicationRequest req) throws Exception {
+    @Transactional
+    public ApplicationResponse createApplication(Long candidateId,
+                                                 CreateApplicationRequest req)
+            throws ApplicationException {
         if (applicationRepository.existsByCandidateIdAndJobId(candidateId, req.getJobId())) {
-            throw new Exception("You have already applied for this job");
+            throw new ApplicationException("You have already applied for this job");
         }
-        
-        // Verify candidate has a valid resume
-       ResumeResponse resume =
-               resumeClient.getResumeById(req.getResumeId(), candidateId);
 
+        // Fetch job to resolve companyId and employerId
         JobResponse job = jobClient.getJobById(req.getJobId());
-        Long companyId = job.getCompany().getId();
-        long employeeId = job.getEmployerId();
-        Application application = ApplicationMapper.toEntity(req, candidateId,
-               companyId, employeeId );
-        Application savedApplication = applicationRepository.save(application);
 
-        return buildFullResponse(savedApplication);
+        // Validate resume belongs to the candidate (security check only)
+        ResumeResponse resume = resumeClient.getResumeById(req.getResumeId(), candidateId);
+        if (!resume.getCandidateId().equals(candidateId)) {
+            throw new ApplicationException("Resume does not belong to you");
+        }
+
+        Application application = ApplicationMapper.toEntity(req, candidateId,
+                job.getCompany().getId(), job.getEmployerId());
+
+        application = applicationRepository.save(application);
+
+        ApplicationStatusHistory initialHistory = ApplicationStatusHistory.builder()
+                .application(application)
+                .fromStatus(null)
+                .toStatus(ApplicationStatus.PENDING)
+                .changedByUserId(candidateId)
+                .note("Application submitted")
+                .build();
+        historyRepository.save(initialHistory);
+
+        // Fire-and-forget — AI screening runs in a background thread, no callback needed
+        screeningService.screenAsync(application.getId(), candidateId, req.getJobId(), req.getResumeId());
+
+        return buildFullResponse(application);
     }
 
+    // ── Read ──────────────────────────────────────────────────────────────────
+
     @Override
-    public ApplicationResponse getApplicationById(Long id) throws Exception {
+    @Transactional(readOnly = true)
+    public ApplicationResponse getApplicationById(Long id) throws ResourceNotFoundException {
         Application application = getApplicationEntity(id);
         return buildFullResponse(application);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ApplicationResponse> getMyApplications(Long candidateId) {
         return applicationRepository.findByCandidateId(candidateId).stream()
                 .map(this::buildFullResponse)
@@ -72,6 +109,7 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ApplicationResponse> getApplicationsForJob(Long jobId) {
         return applicationRepository.findByJobId(jobId).stream()
                 .map(this::buildFullResponse)
@@ -79,51 +117,111 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public List<ApplicationResponse> getApplicationsForCompany(Long userId,
-                                                               CompanyApplicationFilterRequest filter) {
+    @Transactional(readOnly = true)
+    public List<ApplicationResponse> getApplicationsForCompany(
+            Long userId,
+            CompanyApplicationFilterRequest filter
+    ) throws ResourceNotFoundException {
         Long companyId = companyClient.getMyCompany(userId).getId();
+
+        LocalDateTime from = filter.getAppliedFrom() != null
+                ? filter.getAppliedFrom().atStartOfDay() : null;
+        LocalDateTime to = filter.getAppliedTo() != null
+                ? filter.getAppliedTo().atTime(LocalTime.MAX) : null;
+
         Sort sort = buildSort(filter.getSortBy());
+
         return applicationRepository.findAll(
-                ApplicationSpecification.forCompanyFilters(
+                ApplicationSpecification.forCompanyWithFilters(
                         companyId,
                         filter.getJobId(),
                         filter.getStatus(),
-                        filter.isStarred(),
+                        filter.getSource(),
+                        filter.getIsRead(),
+                        filter.getIsStarred(),
+                        from,
+                        to,
                         filter.getAiShortlistStatus(),
                         filter.getMinAiScore()
-                ),sort)
-                .stream().map(
-                        this::buildFullResponse
-                ).toList();
+                ), sort).stream()
+                .map(this::buildFullResponse)
+                .collect(Collectors.toList());
     }
 
+    // ── Status update ─────────────────────────────────────────────────────────
+
     @Override
-    public ApplicationResponse updateStatus(Long applicationId, Long employerId, ApplicationStatus status) throws Exception {
+    @Transactional
+    public ApplicationResponse updateStatus(Long applicationId, Long employerId,
+                                             UpdateApplicationStatusRequest req)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = getApplicationEntity(applicationId);
         assertEmployer(application, employerId);
-        ApplicationStatus oldStatus = application.getStatus();
+
         if (application.getStatus() == ApplicationStatus.WITHDRAWN) {
-            throw new Exception("Cannot update status of a withdrawn application");
+            throw new ApplicationException("Cannot update status of a withdrawn application");
+        }
+        if (application.getStatus() == req.getStatus()) {
+            throw new ApplicationException("Application is already in status: " + req.getStatus());
         }
 
-        application.setStatus(status);
-        Application updatedApplication = applicationRepository.save(application);
-        applicationEventPublisher.publishStatusChanged(application, oldStatus, "your application status get change");
-        return buildFullResponse(updatedApplication);
+        ApplicationStatus oldStatus = application.getStatus();
+        application.setStatus(req.getStatus());
+        application = applicationRepository.save(application);
+
+        historyRepository.save(ApplicationStatusHistory.builder()
+                .application(application)
+                .fromStatus(oldStatus)
+                .toStatus(req.getStatus())
+                .changedByUserId(employerId)
+                .note(req.getNote())
+                .build());
+
+        eventPublisher.publishStatusChanged(application, oldStatus, req.getNote());
+
+        return buildFullResponse(application);
     }
 
+    // ── Withdraw ──────────────────────────────────────────────────────────────
+
     @Override
-    public ApplicationResponse withdraw(Long applicationId, Long candidateId, WithdrawApplicationRequest req) throws Exception {
+    @Transactional
+    public ApplicationResponse withdraw(Long applicationId, Long candidateId,
+                                         WithdrawApplicationRequest req)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = getApplicationEntity(applicationId);
         assertCandidate(application, candidateId);
+
+        if (application.getStatus() == ApplicationStatus.WITHDRAWN) {
+            throw new ApplicationException("Application is already withdrawn");
+        }
+        if (application.getStatus() == ApplicationStatus.HIRED) {
+            throw new ApplicationException("Cannot withdraw an accepted offer");
+        }
+
+        ApplicationStatus oldStatus = application.getStatus();
         application.setStatus(ApplicationStatus.WITHDRAWN);
+        application.setWithdrawnAt(LocalDateTime.now());
         application.setWithdrawnReason(req.getReason());
-        Application savedApplication = applicationRepository.save(application);
-        return buildFullResponse(savedApplication);
+        application = applicationRepository.save(application);
+
+        historyRepository.save(ApplicationStatusHistory.builder()
+                .application(application)
+                .fromStatus(oldStatus)
+                .toStatus(ApplicationStatus.WITHDRAWN)
+                .changedByUserId(candidateId)
+                .note(req.getReason())
+                .build());
+
+        return buildFullResponse(application);
     }
 
+    // ── Tracking flags ────────────────────────────────────────────────────────
+
     @Override
-    public ApplicationResponse markAsRead(Long applicationId, Long employerId) throws Exception {
+    @Transactional
+    public ApplicationResponse markAsRead(Long applicationId, Long employerId)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = getApplicationEntity(applicationId);
         assertEmployer(application, employerId);
         application.setIsRead(true);
@@ -131,57 +229,81 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public ApplicationResponse toggleStar(Long applicationId, Long employerId) throws Exception {
+    @Transactional
+    public ApplicationResponse toggleStar(Long applicationId, Long employerId)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = getApplicationEntity(applicationId);
         assertEmployer(application, employerId);
         application.setIsStarred(!application.getIsStarred());
         return buildFullResponse(applicationRepository.save(application));
     }
 
+    // ── Delete ────────────────────────────────────────────────────────────────
+
     @Override
-    public void deleteApplication(Long applicationId, Long candidateId) throws Exception {
+    @Transactional
+    public void deleteApplication(Long applicationId, Long candidateId)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = getApplicationEntity(applicationId);
         assertCandidate(application, candidateId);
         applicationRepository.delete(application);
     }
 
+    // ── Internal ──────────────────────────────────────────────────────────────
+
     @Override
-    public Application getApplicationEntity(Long id) throws Exception {
-        return applicationRepository.findById(id).orElseThrow(
-                ()-> new Exception("application not found")
-        );
+    @Transactional(readOnly = true)
+    public Application getApplicationEntity(Long id) throws ResourceNotFoundException {
+        return applicationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Application not found with id: " + id));
     }
 
     @Override
+    @Transactional
     public void markScreeningsStaleForJob(Long jobId) {
+        List<Long> applicationIds = applicationRepository.findByJobId(jobId)
+                .stream().map(Application::getId).collect(Collectors.toList());
+        if (applicationIds.isEmpty()) return;
+        List<ApplicationScreening> screenings = screeningRepository.findByApplicationIdIn(applicationIds);
+        screenings.forEach(s -> s.setIsStale(true));
+        screeningRepository.saveAll(screenings);
     }
 
-    public ApplicationResponse buildFullResponse(Application application) {
-        List<ApplicationNote> notes = applicationNoteRepository.findByApplicationIdOrderByCreatedAtDesc(application.getId());
-        JobResponse job = jobClient.getJobById(application.getJobId());
-        CompanyResponse company = companyClient.getCompanyById(application.getCompanyId());
-        UserResponse candidate = userClient.getUserById(application.getCandidateId());
-        return ApplicationMapper.toResponse(application,notes,job,company,candidate);
+    // ── Private utilities ─────────────────────────────────────────────────────
+
+    private void assertEmployer(Application application, Long employerId) throws ApplicationException {
+        if (!application.getEmployerId().equals(employerId)) {
+            throw new ApplicationException("You are not the employer for this application");
+        }
+    }
+
+    private void assertCandidate(Application application, Long candidateId) throws ApplicationException {
+        if (!application.getCandidateId().equals(candidateId)) {
+            throw new ApplicationException("You are not the owner of this application");
+        }
     }
 
     private Sort buildSort(String sortBy) {
-        if("AI_SCORE_DESC".equals(sortBy)){
+        if ("AI_SCORE_DESC".equals(sortBy)) {
             return Sort.by(Sort.Order.desc("aiScore").with(Sort.NullHandling.NULLS_LAST));
-        }else if("AI_SCORE_ASC".equals(sortBy)){
+        } else if ("AI_SCORE_ASC".equals(sortBy)) {
             return Sort.by(Sort.Order.asc("aiScore").with(Sort.NullHandling.NULLS_LAST));
         }
         return Sort.by(Sort.Direction.DESC, "appliedAt");
     }
 
-    private void assertEmployer(Application application, Long employerId) throws Exception {
-        if (!application.getEmployerId().equals(employerId)) {
-            throw new Exception("You are not the employer for this application");
-        }
-    }
+    private ApplicationResponse buildFullResponse(Application application) {
+        List<ApplicationStatusHistory> history =
+                historyRepository.findByApplicationIdOrderByChangedAtAsc(application.getId());
 
-    private void assertCandidate(Application application, Long candidateId) throws Exception {
-        if (!application.getCandidateId().equals(candidateId)) {
-            throw new Exception("You are not the owner of this application");
-        }
+        List<ApplicationNote> notes =
+                noteRepository.findByApplicationIdOrderByCreatedAtDesc(application.getId());
+        JobSummaryResponse job = jobClient.getJobSummaryById(application.getJobId());
+        CompanySummaryResponse company = companyClient.getCompanySummaryById(application.getCompanyId());
+        UserResponse candidate = userClient.getUserById(application.getCandidateId());
+        ApplicationScreening screening = screeningRepository.findByApplicationId(application.getId()).orElse(null);
+
+        return ApplicationMapper.toResponse(application, history, notes, job, company, candidate, screening);
     }
 }

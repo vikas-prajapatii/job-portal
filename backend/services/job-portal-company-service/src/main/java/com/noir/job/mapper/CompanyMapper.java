@@ -1,58 +1,85 @@
 package com.noir.job.mapper;
 
-import com.noir.job.domain.CompanyStatus;
-import com.noir.job.dto.CompanyResponse;
-import com.noir.job.dto.SocialLinkResponse;
-import com.noir.job.model.Company;
-import com.noir.job.model.SocialLink;
+import com.noir.job.common.dto.response.CompanyLocationResponse;
+import com.noir.job.common.dto.response.CompanyResponse;
+import com.noir.job.common.dto.response.CompanySummaryResponse;
+import com.noir.job.common.dto.response.SocialLinkResponse;
+import com.noir.job.entity.Company;
+import com.noir.job.entity.CompanyLocation;
+import com.noir.job.entity.embeddable.SocialLink;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CompanyMapper {
 
-    public static SocialLinkResponse toSocialLinkResponse(SocialLink socialLink) {
-        if (socialLink == null) {
-            return null;
-        }
+    private CompanyMapper() {}
+
+    // ── Location ──────────────────────────────────────────────────────────────
+
+
+
+
+
+    // ── Social link ───────────────────────────────────────────────────────────
+
+    private static SocialLinkResponse toSocialLinkResponse(SocialLink sl) {
         return SocialLinkResponse.builder()
-                .platform(socialLink.getPlatform())
-                .url(socialLink.getUrl())
+                .platform(sl.getPlatform())
+                .url(sl.getUrl())
                 .build();
     }
 
-    public static CompanyResponse toResponse(Company company) {
-        if (company == null) {
-            return null;
-        }
+    // ── Company ───────────────────────────────────────────────────────────────
 
+    public static CompanyResponse toResponse(
+            Company company
+    ) {
         List<SocialLinkResponse> socialLinks = company.getSocialLinks() == null
                 ? Collections.emptyList()
                 : company.getSocialLinks().stream()
-                .map(CompanyMapper::toSocialLinkResponse)
-                .toList();
+                        .map(CompanyMapper::toSocialLinkResponse)
+                        .collect(Collectors.toList());
 
         return CompanyResponse.builder()
                 .id(company.getId())
                 .name(company.getName())
                 .slug(company.getSlug())
+                .tagline(company.getTagline())
                 .description(company.getDescription())
-                .tagLine(company.getTagLine())
                 .logoUrl(company.getLogoUrl())
                 .coverImageUrl(company.getCoverImageUrl())
                 .website(company.getWebsite())
                 .email(company.getEmail())
                 .phone(company.getPhone())
-                .founderYear(company.getFoundedYear())
+                .foundedYear(company.getFoundedYear())
                 .companySize(company.getCompanySize())
                 .companyType(company.getCompanyType())
                 .industryType(company.getIndustryType())
-                .companyStatus(company.getCompanyStatus())
-                .verified(company.isVerified())
+                .status(company.getStatus())
+                .verified(company.getVerified())
+                .active(company.getActive())
                 .ownerId(company.getOwnerId())
-                .socialLinkResponses(socialLinks)
+                .socialLinks(socialLinks)
+
                 .createdAt(company.getCreatedAt())
                 .updatedAt(company.getUpdatedAt())
+                .verifiedAt(company.getVerifiedAt())
+                .build();
+    }
+
+    public static CompanySummaryResponse toSummaryResponse(Company company) {
+        return CompanySummaryResponse.builder()
+                .id(company.getId())
+                .name(company.getName())
+                .slug(company.getSlug())
+                .logoUrl(company.getLogoUrl())
+                .tagline(company.getTagline())
+                .industryType(company.getIndustryType())
+                .companySize(company.getCompanySize())
+                .verified(company.getVerified())
+
                 .build();
     }
 }

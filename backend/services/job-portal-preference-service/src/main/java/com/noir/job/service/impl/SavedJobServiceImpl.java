@@ -1,9 +1,11 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.dto.SavedJobResponse;
+import com.noir.job.common.dto.response.SavedJobResponse;
+import com.noir.job.common.exception.ApplicationException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.SaveJobRequest;
 import com.noir.job.entity.SavedJob;
 import com.noir.job.mapper.PreferenceMapper;
-import com.noir.job.payload.SaveJobRequest;
 import com.noir.job.repository.SavedJobRepository;
 import com.noir.job.service.SavedJobService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,9 @@ public class SavedJobServiceImpl implements SavedJobService {
 
     @Override
     @Transactional
-    public SavedJobResponse saveJob(Long candidateId, SaveJobRequest req) throws Exception {
+    public SavedJobResponse saveJob(Long candidateId, SaveJobRequest req) throws ApplicationException {
         if (savedJobRepository.existsByCandidateIdAndJobId(candidateId, req.getJobId())) {
-            throw new Exception("Job is already saved");
+            throw new ApplicationException("Job is already saved");
         }
 
         SavedJob savedJob = SavedJob.builder()
@@ -37,11 +39,12 @@ public class SavedJobServiceImpl implements SavedJobService {
 
     @Override
     @Transactional
-    public void unsaveJob(Long candidateId, Long savedJobId) throws Exception {
+    public void unsaveJob(Long candidateId, Long savedJobId) throws ResourceNotFoundException {
         SavedJob savedJob = savedJobRepository.findById(savedJobId)
-                .orElseThrow(() -> new Exception("job not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Saved job not found with id: " + savedJobId));
         if (!savedJob.getCandidateId().equals(candidateId)) {
-            throw new Exception("job not found");
+            throw new ResourceNotFoundException("Saved job not found with id: " + savedJobId);
         }
         savedJobRepository.delete(savedJob);
     }

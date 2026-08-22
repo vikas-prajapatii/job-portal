@@ -1,10 +1,17 @@
 package com.noir.job.service;
 
 import com.noir.job.client.GeminiClient;
-import com.noir.job.payload.*;
+import com.noir.job.dto.request.HiringInsightsRequest;
+import com.noir.job.dto.request.JobDescriptionRequest;
+import com.noir.job.dto.request.SalaryRangeRequest;
+import com.noir.job.dto.response.AiTextResponse;
+import com.noir.job.dto.response.HiringInsightsResponse;
+import com.noir.job.dto.response.SalaryRangeResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JobAiService {
@@ -17,8 +24,11 @@ public class JobAiService {
             Always write in a professional, engaging, inclusive, and bias-free tone.
             When asked for JSON, respond ONLY with valid JSON — no explanation, no markdown fences.
             """;
-    public AiTextResponse generateJobDescription(JobDescriptionRequest req) throws Exception {
-        String skills = req.getSkill() != null ? String.join(", ", req.getSkill()) : "Not specified";
+
+    // ==================== Phase 1: Job Description Generator ====================
+
+    public AiTextResponse generateJobDescription(JobDescriptionRequest req) {
+        String skills = req.getSkills() != null ? String.join(", ", req.getSkills()) : "Not specified";
         String prompt = """
                 Write a comprehensive, engaging, and inclusive job description.
 
@@ -62,7 +72,9 @@ public class JobAiService {
                 .build();
     }
 
-    public AiTextResponse generateJobRequirements(String title, String category) throws Exception {
+    // ==================== Phase 1: Job Requirements Auto-fill ====================
+
+    public AiTextResponse generateJobRequirements(String title, String category) {
         String prompt = """
                 Generate professional job requirements and responsibilities for this role.
 
@@ -84,8 +96,9 @@ public class JobAiService {
                 .build();
     }
 
+    // ==================== Phase 1: Salary Range Suggestion ====================
 
-    public SalaryRangeResponse suggestSalaryRange(SalaryRangeRequest req) throws Exception {
+    public SalaryRangeResponse suggestSalaryRange(SalaryRangeRequest req) {
         String skills = req.getSkills() != null ? String.join(", ", req.getSkills()) : "Not specified";
         String prompt = """
                 Provide a realistic and competitive salary range for this role.
@@ -116,8 +129,9 @@ public class JobAiService {
         return geminiClient.generateJson(SYSTEM, prompt, SalaryRangeResponse.class);
     }
 
+    // ==================== Responsibilities Auto-fill ====================
 
-    public AiTextResponse generateJobResponsibilities(String title, String category) throws Exception {
+    public AiTextResponse generateJobResponsibilities(String title, String category) {
         String prompt = """
                 Generate 6 specific, action-oriented job responsibilities for this role.
 
@@ -137,8 +151,9 @@ public class JobAiService {
                 .build();
     }
 
+    // ==================== Benefits Auto-fill ====================
 
-    public AiTextResponse generateJobBenefits(String title, String category, String jobType) throws Exception {
+    public AiTextResponse generateJobBenefits(String title, String category, String jobType) {
         String prompt = """
                 Generate 6 competitive, attractive job benefits for this role.
 
@@ -160,8 +175,9 @@ public class JobAiService {
                 .build();
     }
 
+    // ==================== Phase 3: Skills Recommendation for Job ====================
 
-    public AiTextResponse recommendSkillsForJob(String jobTitle, String description) throws Exception {
+    public AiTextResponse recommendSkillsForJob(String jobTitle, String description) {
         String prompt = """
                 Recommend the most relevant skills for this job posting.
 
@@ -178,8 +194,9 @@ public class JobAiService {
                 .build();
     }
 
+    // ==================== Tags Recommendation for Job ====================
 
-    public AiTextResponse recommendTagsForJob(String title, String description) throws Exception {
+    public AiTextResponse recommendTagsForJob(String title, String description) {
         String prompt = """
                 Recommend 8-10 relevant tags/keywords for this job posting that improve discoverability.
 

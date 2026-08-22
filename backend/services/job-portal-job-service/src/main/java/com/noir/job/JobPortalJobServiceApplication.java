@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EnableCaching
-@EnableFeignClients
 @SpringBootApplication
+@EnableFeignClients
+@EnableCaching
 public class JobPortalJobServiceApplication {
 
 	public static void main(String[] args) {

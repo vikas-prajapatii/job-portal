@@ -1,8 +1,9 @@
-package com.noir.job.Controller;
+package com.noir.job.controller;
 
-import com.noir.job.dto.ApiResponse;
-import com.noir.job.dto.ResumeSkillResponse;
-import com.noir.job.payload.AddResumeSkillRequest;
+import com.noir.job.common.dto.response.ApiResponse;
+import com.noir.job.common.dto.response.ResumeSkillResponse;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.AddResumeSkillRequest;
 import com.noir.job.service.ResumeSkillService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +14,24 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/resumes/{resumeId}/skills")
+@RequiredArgsConstructor
 public class ResumeSkillController {
+
     private final ResumeSkillService resumeSkillService;
 
     @PostMapping
     public ResponseEntity<ResumeSkillResponse> addSkill(
             @PathVariable Long resumeId,
             @RequestHeader("X-User-Id") Long candidateId,
-            @RequestBody @Valid AddResumeSkillRequest req) throws Exception {
+            @RequestBody @Valid AddResumeSkillRequest req) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resumeSkillService.addSkill(resumeId, candidateId, req));
     }
+
     @GetMapping
     public ResponseEntity<List<ResumeSkillResponse>> getSkills(
-            @PathVariable Long resumeId) throws Exception {
+            @PathVariable Long resumeId) throws ResourceNotFoundException {
         return ResponseEntity.ok(resumeSkillService.getSkills(resumeId));
     }
 
@@ -37,7 +40,7 @@ public class ResumeSkillController {
             @PathVariable Long resumeId,
             @PathVariable Long skillId,
             @RequestHeader("X-User-Id") Long candidateId,
-            @RequestBody @Valid AddResumeSkillRequest req) throws Exception {
+            @RequestBody @Valid AddResumeSkillRequest req) throws ResourceNotFoundException {
         return ResponseEntity.ok(
                 resumeSkillService.updateSkill(skillId, resumeId, candidateId, req));
     }
@@ -46,9 +49,8 @@ public class ResumeSkillController {
     public ResponseEntity<ApiResponse> deleteSkill(
             @PathVariable Long resumeId,
             @PathVariable Long skillId,
-            @RequestHeader("X-User-Id") Long candidateId) throws Exception {
+            @RequestHeader("X-User-Id") Long candidateId) throws ResourceNotFoundException {
         resumeSkillService.deleteSkill(skillId, resumeId, candidateId);
         return ResponseEntity.ok(new ApiResponse("Skill deleted successfully", true));
     }
-
 }

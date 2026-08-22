@@ -1,22 +1,33 @@
 package com.noir.job.service;
 
-import com.noir.job.dto.JobTagResponse;
-import com.noir.job.model.JobTags;
-import com.noir.job.payload.JobTagRequest;
+import com.noir.job.common.dto.response.JobTagResponse;
+import com.noir.job.common.exception.JobException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.BulkJobTagRequest;
+import com.noir.job.dto.request.JobTagRequest;
+import com.noir.job.dto.response.BulkJobTagResponse;
+import com.noir.job.entity.JobTag;
 
 import java.util.List;
 import java.util.Set;
 
 public interface JobTagService {
-    JobTagResponse createTag(JobTagRequest req) throws Exception;
+
+    JobTagResponse createTag(JobTagRequest req) throws JobException;
+
+    BulkJobTagResponse createTagsBulk(BulkJobTagRequest req);
+
     List<JobTagResponse> getAllTags();
+
     List<JobTagResponse> searchTags(String keyword);
-    JobTagResponse getTagId(Long id) throws Exception;
 
-    JobTagResponse updateTag(Long id, JobTagRequest req) throws Exception;
+    JobTagResponse getTagById(Long id) throws ResourceNotFoundException;
 
-    void deleteTag(Long id) throws Exception;
+    JobTagResponse updateTag(Long id, JobTagRequest req)
+            throws ResourceNotFoundException, JobException;
 
-    JobTags getTagEntitiesByIds(Long ids) throws Exception;
-    Set<JobTags> getTagsByIds(Set<Long> ids) throws Exception;
+    void deleteTag(Long id) throws ResourceNotFoundException;
+
+    /** Used internally to load tags by IDs for job creation. */
+    Set<JobTag> getTagEntitiesByIds(Set<Long> ids) throws ResourceNotFoundException;
 }

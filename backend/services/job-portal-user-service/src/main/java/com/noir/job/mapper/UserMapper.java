@@ -1,29 +1,34 @@
 package com.noir.job.mapper;
 
-import com.noir.job.dto.response.UserResponse;
-import com.noir.job.model.User;
+import com.noir.job.common.dto.response.UserResponse;
+import com.noir.job.entity.User;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserMapper {
 
+    private UserMapper() {}
+
     public static UserResponse toDTO(User user) {
-        UserResponse dto= new UserResponse();
+        UserResponse dto = new UserResponse();
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
         dto.setFullName(user.getFullName());
-        dto.setRole(user.getRole());
         dto.setPhone(user.getPhone());
         dto.setProfileImage(user.getProfileImage());
+        dto.setRole(user.getRole());
+        dto.setAuthProvider(user.getAuthProvider());
+        dto.setStatus(user.getStatus());
+        dto.setVerified(user.getVerified());
         dto.setLastLogin(user.getLastLogin());
         dto.setCreatedAt(user.getCreatedAt());
-        dto.setStatus(user.getStatus());
         return dto;
     }
 
     public static List<UserResponse> toDTOList(List<User> users) {
-        return users.stream().map(UserMapper::toDTO).collect(Collectors.toList());
+        return users.stream()
+                .map(UserMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

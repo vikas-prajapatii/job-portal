@@ -1,48 +1,71 @@
 package com.noir.job.service;
+
 import com.noir.job.client.GeminiClient;
-import com.noir.job.payload.*;
+import com.noir.job.dto.request.CareerFeedbackRequest;
+import com.noir.job.dto.request.ResumeImprovementRequest;
+import com.noir.job.dto.request.ResumeParseRequest;
+import com.noir.job.dto.request.ResumeSummaryRequest;
+import com.noir.job.dto.request.WorkExperienceBulletRequest;
+import com.noir.job.dto.response.AiTextResponse;
+import com.noir.job.dto.response.CareerFeedbackResponse;
+import com.noir.job.dto.response.ResumeImprovementResponse;
+import com.noir.job.dto.response.ResumeParseResponse;
+import com.noir.job.dto.response.WorkExperienceBulletsResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.stream.Collectors;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResumeAiService {
-    String SYSTEM_PROMPT = """
+
+    private final GeminiClient geminiClient;
+
+    private static final String SYSTEM = """
             You are a senior resume writer and career coach with 15+ years of experience in the Indian tech job market.
             You specialize in ATS-optimized resumes, career coaching, and professional branding.
             Always be specific and results-oriented. Never use generic phrases like "hard-working", "team player", or "passionate".
             When asked for JSON, respond ONLY with valid JSON — no explanation, no markdown fences.
             """;
-    private final GeminiClient geminiClient;
-    public AiTextResponse generateProfessionalSummary(ResumeSummaryRequest req) throws Exception {
-        String experiences = req.getWorkExperience() != null
-                ? req.getWorkExperience().stream()
-                .map(e -> e.getJobTitle() + " at " + e.getCompany()
-                        + (e.getDescription() != null && !e.getDescription().isBlank() ?
-                        ": " + e.getDescription() : ""))
-                .collect(Collectors.joining("; "))
+
+    // ==================== Phase 1: Professional Summary Generator ====================
+
+    public AiTextResponse generateProfessionalSummary(ResumeSummaryRequest req) {
+        String experiences = req.getWorkExperiences() != null
+                ? req.getWorkExperiences().stream()
+                        .map(e -> e.getJobTitle() + " at " + e.getCompany()
+                                + (e.getDescription() != null && !e.getDescription().isBlank() ?
+                                ": " + e.getDescription() : ""))
+                        .collect(Collectors.joining("; "))
                 : "Not provided";
         String skills = req.getSkills() != null ? String.join(", ", req.getSkills()) : "Not provided";
-        String educations = req.getEducation() != null
-                ? req.getEducation().stream()
-                .map(e -> e.getDegree()
-                        + (e.getFieldOfStudy() != null ? " in " + e.getFieldOfStudy() : "")
-                        + (e.getInstitutionName() != null ? " from " + e.getInstitutionName() : ""))
-                .collect(Collectors.joining("; "))
+        String educations = req.getEducations() != null
+                ? req.getEducations().stream()
+                        .map(e -> e.getDegree()
+                                + (e.getFieldOfStudy() != null ? " in " + e.getFieldOfStudy() : "")
+                                + (e.getInstitutionName() != null ? " from " + e.getInstitutionName() : ""))
+                        .collect(Collectors.joining("; "))
                 : "Not provided";
+
         String prompt = """
                 Write a compelling professional summary for a resume.
+
                 Candidate Profile:
                 - Target Job Title: %s
                 - Years of Experience: %d
                 - Work Experience: %s
                 - Key Skills: %s
                 - Education: %s
+
                 Write a 3-4 sentence professional summary that:
                 1. Opens with seniority level and area of expertise
                 2. Highlights 2-3 key achievements or strengths with impact
                 3. Mentions specific technical skills relevant to the target role
                 4. Ends with a value proposition or career goal
+
                 Rules:
                 - Write in first person (no "I" at the start)
                 - Be specific and results-oriented
@@ -50,19 +73,25 @@ public class ResumeAiService {
                 - Make it ATS-friendly
                 """.formatted(
                 req.getTargetJobTitle() != null ? req.getTargetJobTitle() : "Software Developer",
-                req.getYearOfExperience() != null ? req.getYearOfExperience() : 0,
+                req.getYearsOfExperience() != null ? req.getYearsOfExperience() : 0,
                 experiences, skills, educations
         );
+
         return AiTextResponse.builder()
-                .content(geminiClient.generateText(SYSTEM_PROMPT, prompt))
+                .content(geminiClient.generateText(SYSTEM, prompt))
                 .build();
     }
+
+    // ==================== Phase 2: Work Experience Bullet Generator ====================
+
     public WorkExperienceBulletsResponse generateWorkExperienceBullets(WorkExperienceBulletRequest req) {
         String prompt = """
                 Transform this work experience into powerful, ATS-friendly resume bullet points.
+
                 Role: %s at %s
                 Raw Description: %s
                 Achievements/Hints: %s
+
                 Generate exactly 4-5 bullet points that:
                 1. Start with strong action verbs (Developed, Led, Implemented, Architected, Optimized, Reduced, Increased, Delivered, Built, Designed)
                 2. Include quantifiable metrics where possible (percentages, numbers, time saved)
@@ -79,13 +108,19 @@ public class ResumeAiService {
                 req.getRawDescription(),
                 req.getAchievementsHint() != null ? req.getAchievementsHint() : "None"
         );
-        return geminiClient.generateJson(SYSTEM_PROMPT, prompt, WorkExperienceBulletsResponse.class);
+
+        return geminiClient.generateJson(SYSTEM, prompt, WorkExperienceBulletsResponse.class);
     }
+
+    // ==================== Phase 3: Resume PDF Parser ====================
+
     public ResumeParseResponse parseResume(ResumeParseRequest req) {
         String prompt = """
                 Parse this resume text and extract all structured information.
+
                 Resume Text:
                 %s
+
                 Extract all available information and return JSON in this exact structure:
                 {
                   "personalInfo": { "fullName": "", "email": "", "phone": "", "location": "", "linkedIn": "", "github": "", "website": "" },
@@ -104,20 +139,27 @@ public class ResumeAiService {
                     { "language": "", "proficiency": "BASIC or INTERMEDIATE or ADVANCED or NATIVE" }
                   ]
                 }
+
                 Rules:
                 - Use null for missing fields
                 - Dates in YYYY-MM format
                 - If current job, set endDate to null and isCurrent to true
                 - Extract all skills mentioned anywhere in the resume
                 """.formatted(req.getResumeText());
-        return geminiClient.generateJson(SYSTEM_PROMPT, prompt, ResumeParseResponse.class);
+
+        return geminiClient.generateJson(SYSTEM, prompt, ResumeParseResponse.class);
     }
+
+    // ==================== AI Career Feedback Engine ====================
+
     public CareerFeedbackResponse getCareerFeedback(CareerFeedbackRequest req) {
         String prompt = """
                 Analyze this resume and deliver an honest, actionable career feedback report.
+
                 Target Job Title (if provided): %s
                 Resume Content:
                 %s
+
                 {
                   "profileStrength": 65,
                   "shortlistingIssues": ["Reason 1 why recruiters are skipping this profile", "Reason 2", "Reason 3"],
@@ -140,14 +182,21 @@ public class ResumeAiService {
                 req.getTargetJobTitle() != null ? req.getTargetJobTitle() : "Not specified",
                 req.getResumeContent()
         );
-        return geminiClient.generateJson(SYSTEM_PROMPT, prompt, CareerFeedbackResponse.class);
+
+        return geminiClient.generateJson(SYSTEM, prompt, CareerFeedbackResponse.class);
     }
+
+    // ==================== Phase 4: Resume Improvement Tips ====================
+
     public ResumeImprovementResponse getResumeImprovementTips(ResumeImprovementRequest req) {
         String prompt = """
                 Analyze this resume and provide specific, actionable improvement suggestions.
+
                 Target Job Title: %s
+
                 Resume Content:
                 %s
+
                 {
                   "overallScore": 72,
                   "improvements": [
@@ -156,11 +205,13 @@ public class ResumeAiService {
                   "strengths": ["what is already good about this resume"],
                   "summary": "2-sentence overall assessment"
                 }
+
                 Provide 4-6 specific improvements. Score should be 0-100.
                 """.formatted(
                 req.getTargetJobTitle() != null ? req.getTargetJobTitle() : "Not specified",
                 req.getResumeContent()
         );
-        return geminiClient.generateJson(SYSTEM_PROMPT, prompt, ResumeImprovementResponse.class);
+
+        return geminiClient.generateJson(SYSTEM, prompt, ResumeImprovementResponse.class);
     }
 }

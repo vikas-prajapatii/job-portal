@@ -2,12 +2,16 @@ package com.noir.job;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
-@org.springframework.cloud.openfeign.EnableFeignClients
+@EnableFeignClients
+@EnableAsync
 public class JobPortalApplicationServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(JobPortalApplicationServiceApplication.class, args);
 	}
+
 }

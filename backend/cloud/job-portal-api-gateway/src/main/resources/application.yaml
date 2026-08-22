@@ -1,6 +1,5 @@
 spring:
   application:
-    name: job-portal-api-gateway
-
+    name: job-portal-gateway
   config:
-    import: optional:configserver:http://localhost:8888
+    import: configserver:http://localhost:8888

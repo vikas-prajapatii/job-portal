@@ -1,11 +1,11 @@
 package com.noir.job.repository;
 
-import com.noir.job.model.WorkExperience;
+import com.noir.job.entity.WorkExperience;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
 public interface WorkExperienceRepository extends JpaRepository<WorkExperience, Long> {
-    List<WorkExperience> findByResume_IdOrderByDisplayOrderAsc(Long resumeId);
 
+    List<WorkExperience> findByResume_IdOrderByDisplayOrderAsc(Long resumeId);
 }

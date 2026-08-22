@@ -7,13 +7,14 @@ import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
 import com.noir.job.config.GeminiProperties;
+import com.noir.job.exception.AiServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class GeminiClient {
 
     private final Client genAiClient;
@@ -36,15 +37,15 @@ public class GeminiClient {
             GenerateContentConfig config = buildConfig(systemInstruction,
                     temperature, maxTokens, false);
             GenerateContentResponse response = genAiClient.models
-                    .generateContent(props.getModel() != null ? props.getModel() : "gemini-3.5-flash", prompt, config);
+                    .generateContent(props.getModel(), prompt, config);
             String text = response.text();
             log.debug("Gemini response received, length: {}", text.length());
             return text;
-        } catch (RuntimeException e) {
+        } catch (AiServiceException e) {
             throw e;
         } catch (Exception e) {
             log.error("Error calling Gemini API: {}", e.getMessage());
-            throw new RuntimeException("Failed to get response from Gemini: " + e.getMessage(), e);
+            throw new AiServiceException("Failed to get response from Gemini: " + e.getMessage());
         }
     }
 
@@ -53,13 +54,13 @@ public class GeminiClient {
             GenerateContentConfig config = buildConfig(systemInstruction, 0.3f,
                     props.getMaxOutputTokens(), true);
             GenerateContentResponse response = genAiClient.models.generateContent(
-                    props.getModel() != null ? props.getModel() : "gemini-3.5-flash", prompt, config);
+                    props.getModel(), prompt, config);
             return objectMapper.readValue(response.text(), responseType);
-        } catch (RuntimeException e) {
+        } catch (AiServiceException e) {
             throw e;
         } catch (Exception e) {
             log.error("Failed to parse Gemini JSON response: {}", e.getMessage());
-            throw new RuntimeException("AI returned invalid JSON. Please try again.", e);
+            throw new AiServiceException("AI returned invalid JSON. Please try again.");
         }
     }
 

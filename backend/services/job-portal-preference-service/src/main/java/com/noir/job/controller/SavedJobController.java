@@ -1,8 +1,10 @@
 package com.noir.job.controller;
 
-import com.noir.job.dto.ApiResponse;
-import com.noir.job.dto.SavedJobResponse;
-import com.noir.job.payload.SaveJobRequest;
+import com.noir.job.common.dto.response.ApiResponse;
+import com.noir.job.common.dto.response.SavedJobResponse;
+import com.noir.job.common.exception.ApplicationException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.SaveJobRequest;
 import com.noir.job.service.SavedJobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ public class SavedJobController {
     @PostMapping
     public ResponseEntity<SavedJobResponse> saveJob(
             @RequestHeader("X-User-Id") Long candidateId,
-            @RequestBody SaveJobRequest req) throws Exception {
+            @RequestBody SaveJobRequest req) throws ApplicationException {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(savedJobService.saveJob(candidateId, req));
     }
@@ -42,7 +44,7 @@ public class SavedJobController {
     @DeleteMapping("/{savedJobId}")
     public ResponseEntity<ApiResponse> unsaveJob(
             @PathVariable Long savedJobId,
-            @RequestHeader("X-User-Id") Long candidateId) throws Exception {
+            @RequestHeader("X-User-Id") Long candidateId) throws ResourceNotFoundException {
         savedJobService.unsaveJob(candidateId, savedJobId);
         return ResponseEntity.ok(new ApiResponse("Job removed from saved list", true));
     }

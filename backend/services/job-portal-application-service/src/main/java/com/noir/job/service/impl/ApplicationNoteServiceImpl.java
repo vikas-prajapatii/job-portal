@@ -1,15 +1,19 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.dto.ApplicationNoteResponse;
+import com.noir.job.common.dto.response.ApplicationNoteResponse;
+import com.noir.job.common.exception.ApplicationException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.AddApplicationNoteRequest;
+import com.noir.job.entity.Application;
+import com.noir.job.entity.ApplicationNote;
+import com.noir.job.event.ApplicationEventPublisher;
 import com.noir.job.mapper.ApplicationMapper;
-import com.noir.job.model.Application;
-import com.noir.job.model.ApplicationNote;
-import com.noir.job.payload.AddApplicationNoteRequest;
 import com.noir.job.repository.ApplicationNoteRepository;
 import com.noir.job.service.ApplicationNoteService;
 import com.noir.job.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,10 +21,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ApplicationNoteServiceImpl implements ApplicationNoteService {
+
     private final ApplicationNoteRepository noteRepository;
     private final ApplicationService applicationService;
+    private final ApplicationEventPublisher eventPublisher;
+
+    // ── Add ───────────────────────────────────────────────────────────────────
+
     @Override
-    public ApplicationNoteResponse addNote(Long applicationId, Long employerId, AddApplicationNoteRequest req) throws Exception {
+    @Transactional
+    public ApplicationNoteResponse addNote(Long applicationId, Long employerId,
+                                            AddApplicationNoteRequest req)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = applicationService
                 .getApplicationEntity(applicationId);
 
@@ -33,11 +45,16 @@ public class ApplicationNoteServiceImpl implements ApplicationNoteService {
                 .build();
 
         ApplicationNoteResponse response = ApplicationMapper.toNoteResponse(noteRepository.save(note));
+        eventPublisher.publishNoteAdded(application);
         return response;
     }
 
+    // ── Read ──────────────────────────────────────────────────────────────────
+
     @Override
-    public List<ApplicationNoteResponse> getNotesByApplication(Long applicationId, Long employerId) throws Exception {
+    @Transactional(readOnly = true)
+    public List<ApplicationNoteResponse> getNotesByApplication(Long applicationId, Long employerId)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = applicationService.getApplicationEntity(applicationId);
         assertEmployer(application, employerId);
 
@@ -47,25 +64,32 @@ public class ApplicationNoteServiceImpl implements ApplicationNoteService {
                 .collect(Collectors.toList());
     }
 
+    // ── Delete ────────────────────────────────────────────────────────────────
+
     @Override
-    public void deleteNote(Long noteId, Long applicationId, Long employerId) throws Exception {
+    @Transactional
+    public void deleteNote(Long noteId, Long applicationId, Long employerId)
+            throws ResourceNotFoundException, ApplicationException {
         Application application = applicationService.getApplicationEntity(applicationId);
         assertEmployer(application, employerId);
 
         ApplicationNote note = noteRepository.findById(noteId)
-                .orElseThrow(() -> new Exception(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "Note not found with id: " + noteId));
 
         if (!note.getApplication().getId().equals(applicationId)) {
-            throw new Exception(
+            throw new ApplicationException(
                     "Note does not belong to application with id: " + applicationId);
         }
 
         noteRepository.delete(note);
     }
-    private void assertEmployer(Application application, Long employerId) throws Exception {
+
+    // ── Private utilities ─────────────────────────────────────────────────────
+
+    private void assertEmployer(Application application, Long employerId) throws ApplicationException {
         if (!application.getEmployerId().equals(employerId)) {
-            throw new Exception("You are not the employer for this application");
+            throw new ApplicationException("You are not the employer for this application");
         }
     }
 }

@@ -15,24 +15,25 @@ import java.util.Map;
 
 @Configuration
 public class KafkaConsumerConfig {
+
     @Value("${spring.kafka.bootstrap-servers}")
-    private String bootStrapServers;
+    private String bootstrapServers;
+
     @Bean
     public ConsumerFactory<String, Object> consumerFactory() {
         JacksonJsonDeserializer<Object> deserializer =
                 new JacksonJsonDeserializer<>(Object.class);
-        deserializer.addTrustedPackages("com.noir.job.*");
-        deserializer.setUseTypeHeaders(true);
+        deserializer.addTrustedPackages("com.noir.job.common.event");
+        deserializer.setUseTypeHeaders(true);  // equivalent to setUseTypeHeaders(true)
 
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "notification-service");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), deserializer);
     }
-
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
@@ -41,5 +42,4 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
-
 }

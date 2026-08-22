@@ -1,9 +1,11 @@
-package com.noir.job.Controller;
+package com.noir.job.controller;
 
-import com.noir.job.dto.ApiResponse;
-import com.noir.job.dto.PersonalInfoResponse;
-import com.noir.job.dto.ResumeResponse;
-import com.noir.job.payload.CreateResumeRequest;
+import com.noir.job.common.dto.response.ApiResponse;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.CreateResumeRequest;
+import com.noir.job.dto.request.UpdatePersonalInfoRequest;
+import com.noir.job.dto.request.UpdateResumeRequest;
+import com.noir.job.dto.response.ResumeResponse;
 import com.noir.job.service.ResumeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +16,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/resumes")
+@RequiredArgsConstructor
 public class ResumeController {
+
     private final ResumeService resumeService;
+
     @PostMapping
     public ResponseEntity<ResumeResponse> createResume(
             @RequestHeader("X-User-Id") Long candidateId,
@@ -25,46 +29,56 @@ public class ResumeController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(resumeService.createResume(candidateId, req));
     }
+
     @GetMapping("/{resumeId}")
     public ResponseEntity<ResumeResponse> getResumeById(
             @PathVariable Long resumeId,
-            @RequestHeader("X-User-Id") Long candidateId) throws Exception {
+            @RequestHeader("X-User-Id") Long candidateId) throws ResourceNotFoundException {
         return ResponseEntity.ok(resumeService.getResumeById(resumeId, candidateId));
     }
+
     @GetMapping("/my")
     public ResponseEntity<List<ResumeResponse>> getMyResumes(
             @RequestHeader("X-User-Id") Long candidateId) {
         return ResponseEntity.ok(resumeService.getMyResumes(candidateId));
     }
+
     @PutMapping("/{resumeId}/personal-info")
     public ResponseEntity<ResumeResponse> updatePersonalInfo(
             @PathVariable Long resumeId,
             @RequestHeader("X-User-Id") Long candidateId,
-            @RequestBody @Valid PersonalInfoResponse req) throws Exception {
+            @RequestBody @Valid UpdatePersonalInfoRequest req) throws ResourceNotFoundException {
         return ResponseEntity.ok(resumeService.updatePersonalInfo(resumeId, candidateId, req));
     }
+
     @PatchMapping("/{resumeId}/summary")
     public ResponseEntity<ResumeResponse> updateSummary(
             @PathVariable Long resumeId,
             @RequestHeader("X-User-Id") Long candidateId,
-            @RequestParam String summary) throws Exception {
+            @RequestParam String summary) throws ResourceNotFoundException {
         return ResponseEntity.ok(resumeService.updateSummary(resumeId, candidateId, summary));
     }
 
+    @PutMapping("/{resumeId}")
+    public ResponseEntity<ResumeResponse> updateResume(
+            @PathVariable Long resumeId,
+            @RequestHeader("X-User-Id") Long candidateId,
+            @RequestBody @Valid UpdateResumeRequest req) throws ResourceNotFoundException {
+        return ResponseEntity.ok(resumeService.updateResume(resumeId, candidateId, req));
+    }
 
     @PatchMapping("/{resumeId}/set-default")
     public ResponseEntity<ResumeResponse> setDefaultResume(
             @PathVariable Long resumeId,
-            @RequestHeader("X-User-Id") Long candidateId) throws Exception {
+            @RequestHeader("X-User-Id") Long candidateId) throws ResourceNotFoundException {
         return ResponseEntity.ok(resumeService.setDefaultResume(resumeId, candidateId));
     }
 
     @DeleteMapping("/{resumeId}")
     public ResponseEntity<ApiResponse> deleteResume(
             @PathVariable Long resumeId,
-            @RequestHeader("X-User-Id") Long candidateId) throws Exception, Exception {
+            @RequestHeader("X-User-Id") Long candidateId) throws ResourceNotFoundException {
         resumeService.deleteResume(resumeId, candidateId);
         return ResponseEntity.ok(new ApiResponse("Resume deleted successfully", true));
     }
-
 }

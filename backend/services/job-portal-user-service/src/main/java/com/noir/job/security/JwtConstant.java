@@ -1,5 +1,12 @@
 package com.noir.job.security;
 
 public class JwtConstant {
-    public static final String SECRET_KEY = "hfidsjifmigsihn0vuttnrsevnntnurmvlrnyivmmgvgm";
+
+    public static final String SECRET_KEY =
+            "asdfghjklpoiuytrewqzxcvbnmlkjhglpouhggfdsawqwertyyuiioplmnbvcxzasdfgh";
+
+    public static final String JWT_HEADER = "Authorization";
+    public static final String TOKEN_PREFIX = "Bearer ";
+
+    private JwtConstant() {}
 }

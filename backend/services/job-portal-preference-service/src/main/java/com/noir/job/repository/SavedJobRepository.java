@@ -1,4 +1,3 @@
-
 package com.noir.job.repository;
 
 import com.noir.job.entity.SavedJob;

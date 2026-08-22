@@ -1,7 +1,10 @@
-package com.noir.job.Controller;
+package com.noir.job.controller;
 
-import com.noir.job.dto.ApplicationNoteResponse;
-import com.noir.job.payload.AddApplicationNoteRequest;
+import com.noir.job.common.dto.response.ApiResponse;
+import com.noir.job.common.dto.response.ApplicationNoteResponse;
+import com.noir.job.common.exception.ApplicationException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.AddApplicationNoteRequest;
 import com.noir.job.service.ApplicationNoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -12,34 +15,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/applications/{applicationId}/notes")
+@RequiredArgsConstructor
 public class ApplicationNoteController {
 
-    private final ApplicationNoteService applicationNoteService;
+    private final ApplicationNoteService noteService;
 
     @PostMapping
     public ResponseEntity<ApplicationNoteResponse> addNote(
             @PathVariable Long applicationId,
             @RequestHeader("X-User-Id") Long employerId,
-            @RequestBody @Valid AddApplicationNoteRequest req) throws Exception {
+            @RequestBody @Valid AddApplicationNoteRequest req)
+            throws ResourceNotFoundException, ApplicationException {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(applicationNoteService.addNote(applicationId, employerId, req));
+                .body(noteService.addNote(applicationId, employerId, req));
     }
 
     @GetMapping
-    public ResponseEntity<List<ApplicationNoteResponse>> getNotesByApplication(
+    public ResponseEntity<List<ApplicationNoteResponse>> getNotes(
             @PathVariable Long applicationId,
-            @RequestHeader("X-User-Id") Long employerId) throws Exception {
-        return ResponseEntity.ok(applicationNoteService.getNotesByApplication(applicationId, employerId));
+            @RequestHeader("X-User-Id") Long employerId)
+            throws ResourceNotFoundException, ApplicationException {
+        return ResponseEntity.ok(noteService.getNotesByApplication(applicationId, employerId));
     }
 
     @DeleteMapping("/{noteId}")
-    public ResponseEntity<Void> deleteNote(
+    public ResponseEntity<ApiResponse> deleteNote(
             @PathVariable Long applicationId,
             @PathVariable Long noteId,
-            @RequestHeader("X-User-Id") Long employerId) throws Exception {
-        applicationNoteService.deleteNote(noteId, applicationId, employerId);
-        return ResponseEntity.noContent().build();
+            @RequestHeader("X-User-Id") Long employerId)
+            throws ResourceNotFoundException, ApplicationException {
+        noteService.deleteNote(noteId, applicationId, employerId);
+        return ResponseEntity.ok(new ApiResponse("Note deleted successfully", true));
     }
 }

@@ -3,12 +3,15 @@ package com.noir.job.event;
 import com.noir.job.client.CompanyClient;
 import com.noir.job.client.JobClient;
 import com.noir.job.client.UserClient;
-import com.noir.job.domain.ApplicationStatus;
-import com.noir.job.dto.CompanyResponse;
-import com.noir.job.dto.JobResponse;
-import com.noir.job.dto.response.UserResponse;
-import com.noir.job.model.Application;
+import com.noir.job.common.domain.ApplicationStatus;
+import com.noir.job.common.dto.response.CompanySummaryResponse;
+import com.noir.job.common.dto.response.JobSummaryResponse;
+import com.noir.job.common.dto.response.UserResponse;
+import com.noir.job.common.event.ApplicationNoteAddedEvent;
+import com.noir.job.common.event.ApplicationStatusChangedEvent;
+import com.noir.job.entity.Application;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
@@ -16,38 +19,67 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class ApplicationEventPublisher {
-    public static final String TOPIC = "application.status.changed";
-//    public static final String TOPIC_NOTE_ADDED = "application.note.added";
+
+    public static final String TOPIC_STATUS_CHANGED = "application.status.changed";
+    public static final String TOPIC_NOTE_ADDED = "application.note.added";
+
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final UserClient userClient;
     private final JobClient jobClient;
     private final CompanyClient companyClient;
+
     public void publishStatusChanged(Application app,
                                      ApplicationStatus oldStatus,
                                      String note) {
-       try{
-           UserResponse candidate = userClient.getUserById(app.getCandidateId());
-           JobResponse job = jobClient.getJobById(app.getJobId());
-           CompanyResponse company = companyClient.getCompanyById(app.getJobId());
-           ApplicationStatusChangedEvent event = ApplicationStatusChangedEvent.builder()
-                   .applicationId(app.getId())
-                   .candidateId(app.getCandidateId())
-                   .candidateEmail(candidate.getEmail())
-                   .candidateName(candidate.getFullName())
-                   .oldStatus(oldStatus)
-                   .newStatus(app.getStatus())
-                   .note(note)
-                   .jobTitle(job.getTitle())
-                   .companyName(company.getName())
-                   .changedAt(LocalDateTime.now())
-                   .build();
+        try {
+            UserResponse candidate = userClient.getUserById(app.getCandidateId());
+            JobSummaryResponse job = jobClient.getJobSummaryById(app.getJobId());
+            CompanySummaryResponse company = companyClient.getCompanySummaryById(
+                    app.getCompanyId());
 
-           kafkaTemplate.send(TOPIC,String.valueOf(app.getId()), event);
-       } catch (Exception e){
-           System.out.println("Error in publish status"+ e.getMessage());
-       }
+            ApplicationStatusChangedEvent event = ApplicationStatusChangedEvent.builder()
+                    .applicationId(app.getId())
+                    .candidateId(app.getCandidateId())
+                    .candidateEmail(candidate.getEmail())
+                    .candidateName(candidate.getFullName())
+                    .oldStatus(oldStatus)
+                    .newStatus(app.getStatus())
+                    .note(note)
+                    .jobTitle(job.getTitle())
+                    .companyName(company.getName())
+                    .changedAt(LocalDateTime.now())
+                    .build();
 
+            kafkaTemplate.send(TOPIC_STATUS_CHANGED,
+                    String.valueOf(app.getId()), event);
+            log.info("Published status-changed event for application {}", app.getId());
+        } catch (Exception e) {
+            log.error("Failed to publish status-changed event for application {}", app.getId(), e);
+        }
+    }
 
+    public void publishNoteAdded(Application app) {
+        try {
+            UserResponse candidate = userClient.getUserById(app.getCandidateId());
+            JobSummaryResponse job = jobClient.getJobSummaryById(app.getJobId());
+            CompanySummaryResponse company = companyClient.getCompanySummaryById(app.getCompanyId());
+
+            ApplicationNoteAddedEvent event = ApplicationNoteAddedEvent.builder()
+                    .applicationId(app.getId())
+                    .candidateId(app.getCandidateId())
+                    .candidateEmail(candidate.getEmail())
+                    .candidateName(candidate.getFullName())
+                    .jobTitle(job.getTitle())
+                    .companyName(company.getName())
+                    .addedAt(LocalDateTime.now())
+                    .build();
+
+            kafkaTemplate.send(TOPIC_NOTE_ADDED, String.valueOf(app.getId()), event);
+            log.info("Published note-added event for application {}", app.getId());
+        } catch (Exception e) {
+            log.error("Failed to publish note-added event for application {}", app.getId(), e);
+        }
     }
 }

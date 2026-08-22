@@ -1,12 +1,24 @@
 package com.noir.job.mapper;
 
-import com.noir.job.dto.*;
-import com.noir.job.dto.response.UserResponse;
-import com.noir.job.model.Application;
-import com.noir.job.model.ApplicationNote;
-import com.noir.job.payload.CreateApplicationRequest;
+import com.noir.job.common.dto.response.*;
+import com.noir.job.dto.request.AttachmentRequest;
+import com.noir.job.dto.request.CreateApplicationRequest;
+import com.noir.job.entity.Application;
+import com.noir.job.entity.ApplicationNote;
+import com.noir.job.entity.ApplicationScreening;
+import com.noir.job.entity.ApplicationStatusHistory;
+import com.noir.job.entity.embeddable.ApplicationAttachment;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ApplicationMapper {
+
+    private ApplicationMapper() {}
+
+    // ── toEntity ──────────────────────────────────────────────────────────────
+
     public static Application toEntity(CreateApplicationRequest req,
                                        Long candidateId,
                                        Long companyId,
@@ -24,38 +36,52 @@ public class ApplicationMapper {
                 .availableFrom(req.getAvailableFrom())
                 .build();
     }
-    public static ApplicationResponse toResponse(Application application,
-                                                 JobResponse job,
-                                                 CompanyResponse company,
-                                                 UserResponse candidate) {
-        return toResponse(application, null, job, company, candidate);
-    }
 
-    public static ApplicationResponse toResponse(Application application,
-                                                 java.util.List<ApplicationNote> notes,
-                                                 JobResponse job,
-                                                 CompanyResponse company,
-                                                 UserResponse candidate) {
-
-        return ApplicationResponse.builder()
-                .id(application.getId())
-                .candidate(candidate)
-                .employerId(application.getEmployerId())
-                .job(job)
-                .company(company)
-                .status(application.getStatus())
-                .resumeId(application.getResumeId())
-                .coverLetter(application.getCoverLetter())
-                .expectedSalary(application.getExpectedSalary())
-                .availableFrom(application.getAvailableFrom())
-                .isStarred(application.getIsStarred())
-                .notes(notes != null ? notes.stream().map(ApplicationMapper::toNoteResponse).toList() : null)
-                .withdrawnAt(application.getWithdrawnAt())
-                .withdrawnReason(application.getWithdrawnReason())
-                .appliedAt(application.getAppliedAt())
-                .updatedAt(application.getUpdatedAt())
+    private static ApplicationAttachment toAttachmentEntity(AttachmentRequest r) {
+        return ApplicationAttachment.builder()
+                .fileUrl(r.getFileUrl())
+                .fileName(r.getFileName())
+                .fileType(r.getFileType())
+                .fileSizeBytes(r.getFileSizeBytes())
                 .build();
     }
+
+    // ── Attachment ────────────────────────────────────────────────────────────
+
+    public static ApplicationAttachmentResponse toAttachmentResponse(ApplicationAttachment a) {
+        return ApplicationAttachmentResponse.builder()
+                .fileUrl(a.getFileUrl())
+                .fileName(a.getFileName())
+                .fileType(a.getFileType())
+                .fileSizeBytes(a.getFileSizeBytes())
+                .build();
+    }
+
+    // ── Status History ────────────────────────────────────────────────────────
+
+    public static ApplicationStatusHistoryResponse toHistoryResponse(ApplicationStatusHistory h) {
+        return ApplicationStatusHistoryResponse.builder()
+                .id(h.getId())
+                .fromStatus(h.getFromStatus())
+                .toStatus(h.getToStatus())
+                .changedByUserId(h.getChangedByUserId())
+                .note(h.getNote())
+                .changedAt(h.getChangedAt())
+                .build();
+    }
+
+    public static List<ApplicationStatusHistoryResponse> toHistoryResponseList(
+            List<ApplicationStatusHistory> history) {
+        if (history == null) return Collections.emptyList();
+        return history.stream().map(ApplicationMapper::toHistoryResponse).collect(Collectors.toList());
+    }
+
+    // ── Interview ─────────────────────────────────────────────────────────────
+
+
+
+
+    // ── Note ──────────────────────────────────────────────────────────────────
 
     public static ApplicationNoteResponse toNoteResponse(ApplicationNote note) {
         return ApplicationNoteResponse.builder()
@@ -64,5 +90,94 @@ public class ApplicationMapper {
                 .content(note.getContent())
                 .createdAt(note.getCreatedAt())
                 .build();
+    }
+
+    public static List<ApplicationNoteResponse> toNoteResponseList(List<ApplicationNote> notes) {
+        if (notes == null) return Collections.emptyList();
+        return notes.stream().map(ApplicationMapper::toNoteResponse).collect(Collectors.toList());
+    }
+
+    // ── Screening ─────────────────────────────────────────────────────────────
+
+    public static ApplicationScreeningResponse toScreeningResponse(ApplicationScreening s) {
+        if (s == null) return null;
+        return ApplicationScreeningResponse.builder()
+                .id(s.getId())
+                .overallScore(s.getOverallScore())
+                .skillsMatchScore(s.getSkillsMatchScore())
+                .experienceMatchScore(s.getExperienceMatchScore())
+                .educationMatchScore(s.getEducationMatchScore())
+                .shortlistStatus(s.getShortlistStatus())
+                .summary(s.getSummary())
+                .matchedSkills(s.getMatchedSkills())
+                .missingSkills(s.getMissingSkills())
+                .strengths(s.getStrengths())
+                .concerns(s.getConcerns())
+                .isStale(s.getIsStale())
+                .screenedAt(s.getScreenedAt())
+                .screeningVersion(s.getScreeningVersion())
+                .build();
+    }
+
+    // ── Application ───────────────────────────────────────────────────────────
+
+    public static ApplicationResponse toResponse(Application application,
+                                                   List<ApplicationStatusHistory> history,
+
+                                                   List<ApplicationNote> notes,
+                                                   JobSummaryResponse job,
+                                                   CompanySummaryResponse company,
+                                                   UserResponse candidate,
+                                                   ApplicationScreening screening) {
+
+        return ApplicationResponse.builder()
+                .id(application.getId())
+                .candidate(candidate)
+                .employerId(application.getEmployerId())
+                .job(job)
+                .company(company)
+                .status(application.getStatus())
+
+                .resumeId(application.getResumeId())
+                .coverLetter(application.getCoverLetter())
+
+                .expectedSalary(application.getExpectedSalary())
+
+                .availableFrom(application.getAvailableFrom())
+                .isRead(application.getIsRead())
+                .isStarred(application.getIsStarred())
+                .statusHistory(toHistoryResponseList(history))
+
+                .notes(toNoteResponseList(notes))
+                .withdrawnAt(application.getWithdrawnAt())
+                .withdrawnReason(application.getWithdrawnReason())
+                .appliedAt(application.getAppliedAt())
+                .updatedAt(application.getUpdatedAt())
+                .screening(toScreeningResponse(screening))
+                .build();
+    }
+
+    public static ApplicationSummaryResponse toSummaryResponse(Application application) {
+        return ApplicationSummaryResponse.builder()
+                .id(application.getId())
+                .candidateId(application.getCandidateId())
+                .jobId(application.getJobId())
+                .companyId(application.getCompanyId())
+                .status(application.getStatus())
+
+                .isRead(application.getIsRead())
+                .isStarred(application.getIsStarred())
+                .appliedAt(application.getAppliedAt())
+                .updatedAt(application.getUpdatedAt())
+                .aiScore(application.getAiScore())
+                .aiShortlistStatus(application.getAiShortlistStatus())
+                .build();
+    }
+
+    public static List<ApplicationSummaryResponse> toSummaryResponseList(List<Application> applications) {
+        if (applications == null) return Collections.emptyList();
+        return applications.stream()
+                .map(ApplicationMapper::toSummaryResponse)
+                .collect(Collectors.toList());
     }
 }

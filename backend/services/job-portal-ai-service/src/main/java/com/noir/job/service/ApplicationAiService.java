@@ -1,14 +1,26 @@
 package com.noir.job.service;
 
 import com.noir.job.client.GeminiClient;
-import com.noir.job.payload.*;
+import com.noir.job.dto.request.BulkScreeningRequest;
+import com.noir.job.dto.request.CandidateScreeningInput;
+import com.noir.job.dto.request.CoverLetterRequest;
+import com.noir.job.dto.request.InterviewQuestionsRequest;
+import com.noir.job.dto.request.ScreeningScoreRequest;
+import com.noir.job.dto.request.SkillsGapRequest;
+import com.noir.job.dto.response.AiTextResponse;
+import com.noir.job.dto.response.BulkScreeningResponse;
+import com.noir.job.dto.response.InterviewQuestionsResponse;
+import com.noir.job.dto.response.ScreeningScoreResponse;
+import com.noir.job.dto.response.SkillsGapResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ApplicationAiService {
@@ -22,7 +34,9 @@ public class ApplicationAiService {
             When asked for JSON, respond ONLY with valid JSON — no explanation, no markdown fences.
             """;
 
-    public AiTextResponse generateCoverLetter(CoverLetterRequest req) throws Exception {
+    // ==================== Phase 2: Cover Letter Generator ====================
+
+    public AiTextResponse generateCoverLetter(CoverLetterRequest req) {
         String skills = req.getCandidateSkills() != null
                 ? String.join(", ", req.getCandidateSkills())
                 : "Not provided";
@@ -69,7 +83,9 @@ public class ApplicationAiService {
                 .build();
     }
 
-    public ScreeningScoreResponse scoreCandidate(ScreeningScoreRequest req) throws Exception {
+    // ==================== Phase 3: Candidate Screening Score ====================
+
+    public ScreeningScoreResponse scoreCandidate(ScreeningScoreRequest req) {
         String requiredSkills = req.getRequiredSkills() != null
                 ? String.join(", ", req.getRequiredSkills()) : "Not specified";
         String candidateSkills = req.getCandidateSkills() != null
@@ -124,7 +140,9 @@ public class ApplicationAiService {
         return geminiClient.generateJson(SYSTEM, prompt, ScreeningScoreResponse.class);
     }
 
-    public SkillsGapResponse analyzeSkillsGap(SkillsGapRequest req) throws Exception {
+    // ==================== Phase 4: Skills Gap Analysis ====================
+
+    public SkillsGapResponse analyzeSkillsGap(SkillsGapRequest req) {
         String candidateSkills = req.getCandidateSkills() != null
                 ? String.join(", ", req.getCandidateSkills()) : "None provided";
         String requiredSkills = req.getRequiredSkills() != null
@@ -153,7 +171,9 @@ public class ApplicationAiService {
         return geminiClient.generateJson(SYSTEM, prompt, SkillsGapResponse.class);
     }
 
-    public AiTextResponse summarizeApplicationNotes(List<String> notes) throws Exception {
+    // ==================== Phase 3: Application Note Summarizer ====================
+
+    public AiTextResponse summarizeApplicationNotes(List<String> notes) {
         String allNotes = String.join("\n---\n", notes);
         String prompt = """
                 Summarize these recruiter notes about a job candidate into a concise TL;DR.

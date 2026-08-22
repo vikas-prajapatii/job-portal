@@ -1,10 +1,11 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.dto.ProjectResponse;
+import com.noir.job.common.dto.response.ProjectResponse;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.AddProjectRequest;
+import com.noir.job.entity.Project;
+import com.noir.job.entity.Resume;
 import com.noir.job.mapper.ResumeMapper;
-import com.noir.job.model.Project;
-import com.noir.job.model.Resume;
-import com.noir.job.payload.AddProjectRequest;
 import com.noir.job.repository.ProjectRepository;
 import com.noir.job.service.ProjectService;
 import com.noir.job.service.ResumeService;
@@ -12,8 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
@@ -22,7 +23,9 @@ public class ProjectServiceImpl implements ProjectService {
     private final ResumeService resumeService;
 
     @Override
-    public ProjectResponse addProject(Long resumeId, Long candidateId, AddProjectRequest req) throws Exception {
+    @Transactional
+    public ProjectResponse addProject(Long resumeId, Long candidateId, AddProjectRequest req)
+            throws ResourceNotFoundException {
         Resume resume = resumeService.getResumeEntity(resumeId);
         assertOwner(resume, candidateId, resumeId);
 
@@ -44,7 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectResponse> getProjects(Long resumeId) throws Exception {
+    public List<ProjectResponse> getProjects(Long resumeId) throws ResourceNotFoundException {
         resumeService.getResumeEntity(resumeId);
         return projectRepository.findByResume_IdOrderByDisplayOrderAsc(resumeId)
                 .stream().map(ResumeMapper::toProjectResponse).toList();
@@ -52,7 +55,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public ProjectResponse updateProject(Long projectId, Long resumeId, Long candidateId, AddProjectRequest req) throws Exception {
+    public ProjectResponse updateProject(Long projectId, Long resumeId, Long candidateId,
+            AddProjectRequest req) throws ResourceNotFoundException {
         Project project = getProjectEntity(projectId, resumeId);
         assertOwner(project.getResume(), candidateId, resumeId);
 
@@ -71,25 +75,27 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public void deleteProject(Long projectId, Long resumeId, Long candidateId) throws Exception {
+    public void deleteProject(Long projectId, Long resumeId, Long candidateId)
+            throws ResourceNotFoundException {
         Project project = getProjectEntity(projectId, resumeId);
         assertOwner(project.getResume(), candidateId, resumeId);
         projectRepository.delete(project);
     }
-    private void assertOwner(Resume resume, Long candidateId, Long resumeId)
-            throws Exception {
-        if (!resume.getCandidateId().equals(candidateId)) {
-            throw new Exception("Resume not found with id: " + resumeId);
-        }
-    }
-    private Project getProjectEntity(Long projectId, Long resumeId) throws Exception {
+
+    private Project getProjectEntity(Long projectId, Long resumeId) throws ResourceNotFoundException {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new Exception(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "Project not found with id: " + projectId));
         if (!project.getResume().getId().equals(resumeId)) {
-            throw new Exception("Project not found with id: " + projectId);
+            throw new ResourceNotFoundException("Project not found with id: " + projectId);
         }
         return project;
     }
 
+    private void assertOwner(Resume resume, Long candidateId, Long resumeId)
+            throws ResourceNotFoundException {
+        if (!resume.getCandidateId().equals(candidateId)) {
+            throw new ResourceNotFoundException("Resume not found with id: " + resumeId);
+        }
+    }
 }

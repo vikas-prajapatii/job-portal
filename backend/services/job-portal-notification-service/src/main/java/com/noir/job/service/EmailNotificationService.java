@@ -1,52 +1,95 @@
 package com.noir.job.service;
-import com.noir.job.domain.ApplicationStatus;
-import com.noir.job.event.ApplicationStatusChangedEvent;
+
+import com.noir.job.common.domain.ApplicationStatus;
+import com.noir.job.common.event.ApplicationNoteAddedEvent;
+import com.noir.job.common.event.ApplicationStatusChangedEvent;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 import java.util.Map;
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailNotificationService {
+
+    private static final Map<ApplicationStatus, String> STATUS_LABELS = Map.of(
+            ApplicationStatus.PENDING, "Pending Review",
+            ApplicationStatus.REVIEWING, "Under Review",
+            ApplicationStatus.SHORTLISTED, "Shortlisted",
+            ApplicationStatus.INTERVIEW_SCHEDULED, "Interview Scheduled",
+            ApplicationStatus.REJECTED, "Not Selected",
+            ApplicationStatus.HIRED, "Hired!",
+            ApplicationStatus.WITHDRAWN, "Withdrawn"
+    );
+
+    private static final Map<ApplicationStatus, String> STATUS_COLORS = Map.of(
+            ApplicationStatus.PENDING, "#f59e0b",
+            ApplicationStatus.REVIEWING, "#3b82f6",
+            ApplicationStatus.SHORTLISTED, "#8b5cf6",
+            ApplicationStatus.INTERVIEW_SCHEDULED, "#06b6d4",
+            ApplicationStatus.REJECTED, "#ef4444",
+            ApplicationStatus.HIRED, "#22c55e",
+            ApplicationStatus.WITHDRAWN, "#6b7280"
+    );
+
     private final JavaMailSender mailSender;
+
     @Value("${spring.mail.username}")
     private String fromEmail;
-    public void sendStatusChangedEmail(ApplicationStatusChangedEvent event) throws Exception {
-        try{
-            String subject = "application updated" + event.getJobTitle()+" at"+ event.getCompanyName();
-            String body = buildStatusChangeHtml(event);
-            String candidateEmail = event.getCandidateEmail();
-            sendEmail(candidateEmail,subject,body);
-        } catch (Exception e){
-            throw new Exception(e.getMessage());
-        }
-    }
-    private void sendEmail(String candidateEmail, String subject, String body) throws MessagingException {
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true,"UTF-8");
-        mimeMessageHelper.setFrom(fromEmail);
-        mimeMessageHelper.setTo(candidateEmail);
-        mimeMessageHelper.setSubject(subject);
-        mimeMessageHelper.setText(body,true);
-        mailSender.send(mimeMessage);
-    }
-    private String buildStatusChangeHtml(ApplicationStatusChangedEvent event){
-        ApplicationStatus newStatus = event.getNewStatus();
-        String statusColor = STATUS_COLORS.getOrDefault(newStatus, "#6b7280");
-        String statusLabel = STATUS_LABELS.getOrDefault(newStatus, newStatus.toString());
 
-        String noteSection = "";
-        if (event.getNote() != null && !event.getNote().trim().isEmpty()) {
-            noteSection = "<div style='margin:20px 0;padding:16px;background:#f9fafb;border-left:4px solid #3b82f6;color:#4b5563;'>"
-                    + "<p style='margin:0;font-weight:bold;'>Note:</p>"
-                    + "<p style='margin:4px 0 0;font-style:italic;'>\"" + escapeHtml(event.getNote()) + "\"</p>"
-                    + "</div>";
+    public void sendStatusChangedEmail(ApplicationStatusChangedEvent event) {
+        try {
+            String statusLabel = STATUS_LABELS.getOrDefault(event.getNewStatus(),
+                    event.getNewStatus().name());
+            String statusColor = STATUS_COLORS.getOrDefault(event.getNewStatus(), "#6b7280");
+
+            String subject = "Application Update: " + event.getJobTitle() + " at " + event.getCompanyName();
+            String html = buildStatusChangedHtml(event, statusLabel, statusColor);
+
+            sendHtmlEmail(event.getCandidateEmail(), subject, html);
+            log.info("Status-changed email sent to {} for application {}", event.getCandidateEmail(), event.getApplicationId());
+        } catch (Exception e) {
+            log.error("Failed to send status-changed email for application {}", event.getApplicationId(), e);
         }
+    }
+
+    public void sendNoteAddedEmail(ApplicationNoteAddedEvent event) {
+        try {
+            String subject = "New Activity on Your Application: " + event.getJobTitle();
+            String html = buildNoteAddedHtml(event);
+
+            sendHtmlEmail(event.getCandidateEmail(), subject, html);
+            log.info("Note-added email sent to {} for application {}", event.getCandidateEmail(), event.getApplicationId());
+        } catch (Exception e) {
+            log.error("Failed to send note-added email for application {}", event.getApplicationId(), e);
+        }
+    }
+
+    private void sendHtmlEmail(String to, String subject, String html) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setFrom(fromEmail);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);
+        mailSender.send(message);
+    }
+
+    private String buildStatusChangedHtml(ApplicationStatusChangedEvent event,
+                                           String statusLabel, String statusColor) {
+        String noteSection = (event.getNote() != null && !event.getNote().isBlank())
+                ? "<div style='background:#f8fafc;border-left:4px solid " + statusColor + ";"
+                  + "padding:12px 16px;margin:16px 0;border-radius:4px;'>"
+                  + "<p style='margin:0;color:#374151;font-size:14px;'><strong>Note from employer:</strong> "
+                  + escapeHtml(event.getNote()) + "</p></div>"
+                : "";
 
         return "<!DOCTYPE html><html><body style='font-family:Arial,sans-serif;background:#f3f4f6;margin:0;padding:20px;'>"
                 + "<div style='max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);'>"
@@ -70,26 +113,32 @@ public class EmailNotificationService {
                 + "</div>"
                 + "</div></body></html>";
     }
+
+    private String buildNoteAddedHtml(ApplicationNoteAddedEvent event) {
+        return "<!DOCTYPE html><html><body style='font-family:Arial,sans-serif;background:#f3f4f6;margin:0;padding:20px;'>"
+                + "<div style='max-width:600px;margin:0 auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.1);'>"
+                + "<div style='background:#4f46e5;padding:24px;text-align:center;'>"
+                + "<h1 style='color:#fff;margin:0;font-size:22px;'>New Activity on Your Application</h1>"
+                + "</div>"
+                + "<div style='padding:32px;'>"
+                + "<p style='color:#374151;font-size:16px;'>Hi <strong>" + escapeHtml(event.getCandidateName()) + "</strong>,</p>"
+                + "<p style='color:#6b7280;'>The employer has reviewed your application for <strong>"
+                + escapeHtml(event.getJobTitle()) + "</strong> at <strong>"
+                + escapeHtml(event.getCompanyName()) + "</strong> and added a comment.</p>"
+                + "<div style='background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:20px;margin:20px 0;text-align:center;'>"
+                + "<p style='margin:0;color:#4f46e5;font-size:15px;font-weight:bold;'>Your application is receiving attention!</p>"
+                + "<p style='margin:8px 0 0;color:#6b7280;font-size:13px;'>Log in to stay up to date with your application progress.</p>"
+                + "</div>"
+                + "<p style='color:#9ca3af;font-size:13px;margin-top:24px;'>You can log in to the Job Portal to view your full application timeline.</p>"
+                + "</div>"
+                + "<div style='background:#f9fafb;padding:16px;text-align:center;border-top:1px solid #e5e7eb;'>"
+                + "<p style='margin:0;color:#9ca3af;font-size:12px;'>Job Portal &mdash; You are receiving this because you applied for a job.</p>"
+                + "</div>"
+                + "</div></body></html>";
+    }
+
     private String escapeHtml(String text) {
         if (text == null) return "";
         return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;");
     }
-    private static final Map<ApplicationStatus, String> STATUS_LABELS = Map.of(
-            ApplicationStatus.PENDING, "Pending Review",
-            ApplicationStatus.REVIEWED, "Under Review",
-            ApplicationStatus.APPROVED, "Shortlisted",
-            ApplicationStatus.INTERVIEW_SCHEDULED, "Interview Scheduled",
-            ApplicationStatus.REJECTED, "Not Selected",
-            ApplicationStatus.HIRED, "Hired!",
-            ApplicationStatus.WITHDRAWN, "Withdrawn"
-    );
-    private static final Map<ApplicationStatus, String> STATUS_COLORS = Map.of(
-            ApplicationStatus.PENDING, "#f59e0b",
-            ApplicationStatus.REVIEWED, "#3b82f6",
-            ApplicationStatus.APPROVED, "#8b5cf6",
-            ApplicationStatus.INTERVIEW_SCHEDULED, "#06b6d4",
-            ApplicationStatus.REJECTED, "#ef4444",
-            ApplicationStatus.HIRED, "#22c55e",
-            ApplicationStatus.WITHDRAWN, "#6b7280"
-    );
 }

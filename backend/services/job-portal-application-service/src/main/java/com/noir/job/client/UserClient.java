@@ -1,15 +1,13 @@
 package com.noir.job.client;
 
-import com.noir.job.dto.response.UserResponse;
+import com.noir.job.common.dto.response.UserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "JOB-PORTAL-USER-SERVICE")
+@FeignClient(name = "job-portal-user-service")
 public interface UserClient {
 
     @GetMapping("/api/users/{userId}")
-    UserResponse getUserById(
-            @PathVariable Long userId
-    );
+    UserResponse getUserById(@PathVariable("userId") Long userId);
 }

@@ -1,16 +1,23 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.dto.JobSkillResponse;
-import com.noir.job.mapper.JobSkillMapper;
-import com.noir.job.model.JobSkill;
-import com.noir.job.payload.JobSkillRequest;
+import com.noir.job.common.domain.SkillCategory;
+import com.noir.job.common.dto.response.JobSkillResponse;
+import com.noir.job.common.exception.JobException;
+import com.noir.job.common.exception.ResourceNotFoundException;
+import com.noir.job.dto.request.BulkJobSkillRequest;
+import com.noir.job.dto.request.JobSkillRequest;
+import com.noir.job.dto.response.BulkJobSkillFailure;
+import com.noir.job.dto.response.BulkJobSkillResponse;
+import com.noir.job.entity.JobSkill;
+import com.noir.job.mapper.JobMapper;
 import com.noir.job.repository.JobSkillRepository;
 import com.noir.job.service.JobSkillService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,80 +25,148 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class JobSkillServiceImpl implements JobSkillService {
-    private final JobSkillRepository jobSkillRepository;
+
+    private final JobSkillRepository skillRepository;
+
+    // ── Create ────────────────────────────────────────────────────────────────
 
     @Override
-    public JobSkillResponse createSkill(JobSkillRequest req) throws Exception {
-        if(jobSkillRepository.existsByName(req.getName())) {
-            throw new Exception("skill name already exist");
+    @Transactional
+    public JobSkillResponse createSkill(JobSkillRequest req) throws JobException {
+        if (skillRepository.existsByName(req.getName())) {
+            throw new JobException("Skill '" + req.getName() + "' already exists");
         }
         String slug = generateUniqueSlug(req.getName());
+
         JobSkill skill = JobSkill.builder()
                 .name(req.getName())
                 .slug(slug)
                 .category(req.getCategory())
                 .build();
-        JobSkill saveSkill = jobSkillRepository.save(skill);
-        return JobSkillMapper.toJobSkillResponse(saveSkill);
+
+        return JobMapper.toSkillResponse(skillRepository.save(skill));
     }
 
     @Override
+    public BulkJobSkillResponse createSkillsBulk(BulkJobSkillRequest req) {
+        List<JobSkillResponse>   succeeded = new ArrayList<>();
+        List<BulkJobSkillFailure> failed   = new ArrayList<>();
+
+        List<JobSkillRequest> skills = req.getSkills();
+        for (int i = 0; i < skills.size(); i++) {
+            JobSkillRequest skillReq = skills.get(i);
+            try {
+                succeeded.add(createSkill(skillReq));
+            } catch (Exception e) {
+                failed.add(BulkJobSkillFailure.builder()
+                        .index(i)
+                        .name(skillReq.getName())
+                        .error(e.getMessage())
+                        .build());
+            }
+        }
+
+        return BulkJobSkillResponse.builder()
+                .totalRequested(skills.size())
+                .totalSucceeded(succeeded.size())
+                .totalFailed(failed.size())
+                .succeeded(succeeded)
+                .failed(failed)
+                .build();
+    }
+
+    // ── Read ──────────────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional(readOnly = true)
     public List<JobSkillResponse> getAllSkills() {
-        return jobSkillRepository.findByActiveTrue()
-                .stream().map(JobSkillMapper::toJobSkillResponse)
+        return skillRepository.findByActiveTrue().stream()
+                .map(JobMapper::toSkillResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public JobSkillResponse getSkillsById(Long id) throws Exception {
-        JobSkill skill = jobSkillRepository.findById(id)
-                .orElseThrow(() -> new Exception("Skill not found with id: " + id));
-        return JobSkillMapper.toJobSkillResponse(skill);
+    @Transactional(readOnly = true)
+    public List<JobSkillResponse> getSkillsByCategory(SkillCategory category) {
+        return skillRepository.findByCategoryAndActiveTrue(category).stream()
+                .map(JobMapper::toSkillResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public JobSkillResponse updateSkill(Long id, JobSkillRequest req) throws Exception {
-        JobSkill skill = jobSkillRepository.findById(id)
-                .orElseThrow(() -> new Exception("Skill not found with id: " + id));
+    @Transactional(readOnly = true)
+    public List<JobSkillResponse> searchSkills(String keyword) {
+        return skillRepository.findByNameContainingIgnoreCaseAndActiveTrue(keyword).stream()
+                .map(JobMapper::toSkillResponse)
+                .collect(Collectors.toList());
+    }
 
-        if (!skill.getName().equalsIgnoreCase(req.getName()) && jobSkillRepository.existsByName(req.getName())) {
-            throw new Exception("Skill name already exists");
+    @Override
+    @Transactional(readOnly = true)
+    public JobSkillResponse getSkillById(Long id) throws ResourceNotFoundException {
+        return JobMapper.toSkillResponse(getSkillEntityById(id));
+    }
+
+    // ── Update ────────────────────────────────────────────────────────────────
+
+    @Override
+    @Transactional
+    public JobSkillResponse updateSkill(Long id, JobSkillRequest req)
+            throws ResourceNotFoundException, JobException {
+        JobSkill skill = getSkillEntityById(id);
+
+        if (!skill.getName().equals(req.getName())
+                && skillRepository.existsByName(req.getName())) {
+            throw new JobException("Skill '" + req.getName() + "' already exists");
         }
 
         skill.setName(req.getName());
         skill.setCategory(req.getCategory());
-        JobSkill updated = jobSkillRepository.save(skill);
-        return JobSkillMapper.toJobSkillResponse(updated);
+        return JobMapper.toSkillResponse(skillRepository.save(skill));
     }
 
+    // ── Delete ────────────────────────────────────────────────────────────────
+
     @Override
-    public void deleteSkill(Long id) throws Exception {
-        JobSkill skill = jobSkillRepository.findById(id)
-                .orElseThrow(() -> new Exception("Skill not found with id: " + id));
+    @Transactional
+    public void deleteSkill(Long id) throws ResourceNotFoundException {
+        JobSkill skill = getSkillEntityById(id);
         skill.setActive(false);
-        JobSkill updated = jobSkillRepository.save(skill);
+        skillRepository.save(skill);
     }
 
+    // ── Internal ──────────────────────────────────────────────────────────────
+
     @Override
-    public Set<JobSkill> getSkillsByIds(Set<Long> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return Set.of();
+    @Transactional(readOnly = true)
+    public Set<JobSkill> getSkillEntitiesByIds(Set<Long> ids) throws ResourceNotFoundException {
+        Set<JobSkill> skills = new HashSet<>(skillRepository.findAllById(ids));
+        if (skills.size() != ids.size()) {
+            throw new ResourceNotFoundException("One or more skill IDs are invalid");
         }
-        return new java.util.HashSet<>(jobSkillRepository.findAllById(ids));
+        return skills;
+    }
+
+    // ── Private utilities ─────────────────────────────────────────────────────
+
+    private JobSkill getSkillEntityById(Long id) throws ResourceNotFoundException {
+        return skillRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Job skill not found with id: " + id));
     }
 
     private String generateUniqueSlug(String name) {
         String base = name.toLowerCase()
-                .replaceAll("[^a-zA-Z0-9]", "").trim()
-                .replaceAll("[\\s-]", "-");
-        if(!jobSkillRepository.existsBySlug(base)){
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .trim()
+                .replaceAll("[\\s-]+", "-");
+        if (!skillRepository.existsBySlug(base)) {
             return base;
         }
         int counter = 1;
-        while (jobSkillRepository.existsBySlug(base+"-"+counter)){
+        while (skillRepository.existsBySlug(base + "-" + counter)) {
             counter++;
         }
-        return base+"-"+counter;
-
+        return base + "-" + counter;
     }
 }

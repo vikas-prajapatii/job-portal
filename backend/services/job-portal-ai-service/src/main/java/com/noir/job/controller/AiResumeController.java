@@ -1,0 +1,86 @@
+package com.noir.job.controller;
+
+import com.noir.job.common.dto.response.ApiResponse;
+import com.noir.job.dto.request.CareerFeedbackRequest;
+import com.noir.job.dto.request.ResumeImprovementRequest;
+import com.noir.job.dto.request.ResumeParseRequest;
+import com.noir.job.dto.request.ResumeSummaryRequest;
+import com.noir.job.dto.request.WorkExperienceBulletRequest;
+import com.noir.job.dto.response.AiTextResponse;
+import com.noir.job.dto.response.CareerFeedbackResponse;
+import com.noir.job.dto.response.ResumeImprovementResponse;
+import com.noir.job.dto.response.ResumeParseResponse;
+import com.noir.job.dto.response.WorkExperienceBulletsResponse;
+import com.noir.job.service.ResumeAiService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/ai/resume")
+@RequiredArgsConstructor
+public class AiResumeController {
+
+    private final ResumeAiService resumeAiService;
+
+    /**
+     * Phase 2: Generate a professional summary for a resume.
+     * Used in resume builder summary section.
+     * POST /api/ai/resume/summary
+     */
+    @PostMapping("/summary")
+    public ResponseEntity<ApiResponse<AiTextResponse>> generateSummary(
+            @RequestBody ResumeSummaryRequest request) {
+        AiTextResponse response = resumeAiService.generateProfessionalSummary(request);
+        return ResponseEntity.ok(ApiResponse.success("Professional summary generated", response));
+    }
+
+    /**
+     * Phase 2: Generate polished bullet points from raw work experience description.
+     * Used in resume builder work experience section.
+     * POST /api/ai/resume/experience-bullets
+     */
+    @PostMapping("/experience-bullets")
+    public ResponseEntity<ApiResponse<WorkExperienceBulletsResponse>> generateBullets(
+            @Valid @RequestBody WorkExperienceBulletRequest request) {
+        WorkExperienceBulletsResponse response = resumeAiService.generateWorkExperienceBullets(request);
+        return ResponseEntity.ok(ApiResponse.success("Bullet points generated", response));
+    }
+
+    /**
+     * Phase 3: Parse a raw resume text into structured data.
+     * Called by resume-service when processing a ResumeParseJob.
+     * POST /api/ai/resume/parse
+     */
+    @PostMapping("/parse")
+    public ResponseEntity<ApiResponse<ResumeParseResponse>> parseResume(
+            @Valid @RequestBody ResumeParseRequest request) {
+        ResumeParseResponse response = resumeAiService.parseResume(request);
+        return ResponseEntity.ok(ApiResponse.success("Resume parsed successfully", response));
+    }
+
+    /**
+     * Phase 4: Get specific improvement suggestions for a resume.
+     * POST /api/ai/resume/improvements
+     */
+    @PostMapping("/improvements")
+    public ResponseEntity<ApiResponse<ResumeImprovementResponse>> getImprovements(
+            @Valid @RequestBody ResumeImprovementRequest request) {
+        ResumeImprovementResponse response = resumeAiService.getResumeImprovementTips(request);
+        return ResponseEntity.ok(ApiResponse.success("Resume improvements analyzed", response));
+    }
+
+    /**
+     * AI Career Feedback Engine: holistic feedback covering shortlisting issues,
+     * improvements, and recommended job targets.
+     * POST /api/ai/resume/career-feedback
+     */
+    @PostMapping("/career-feedback")
+    public ResponseEntity<ApiResponse<CareerFeedbackResponse>> getCareerFeedback(
+            @Valid @RequestBody CareerFeedbackRequest request) {
+        CareerFeedbackResponse response = resumeAiService
+                .getCareerFeedback(request);
+        return ResponseEntity.ok(ApiResponse.success("Career feedback generated", response));
+    }
+}

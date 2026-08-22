@@ -1,13 +1,14 @@
 package com.noir.job.repository;
 
-import com.noir.job.dto.ApplicationResponse;
-import com.noir.job.model.Application;
+import com.noir.job.entity.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface ApplicationRepository extends JpaRepository<Application, Long>, JpaSpecificationExecutor<Application> {
+public interface ApplicationRepository extends JpaRepository<Application, Long>,
+        JpaSpecificationExecutor<Application> {
+
     List<Application> findByCandidateId(Long candidateId);
 
     List<Application> findByJobId(Long jobId);
@@ -15,4 +16,5 @@ public interface ApplicationRepository extends JpaRepository<Application, Long>,
     List<Application> findByCompanyId(Long companyId);
 
     boolean existsByCandidateIdAndJobId(Long candidateId, Long jobId);
+
 }

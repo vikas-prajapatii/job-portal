@@ -1,10 +1,19 @@
 package com.noir.job.service;
 
 import com.noir.job.client.GeminiClient;
-import com.noir.job.payload.*;
+import com.noir.job.dto.request.JobAlertSuggestRequest;
+import com.noir.job.dto.request.JobMatchRequest;
+import com.noir.job.dto.request.SearchEnhanceRequest;
+import com.noir.job.dto.response.JobAlertSuggestResponse;
+import com.noir.job.dto.response.JobMatchResponse;
+import com.noir.job.dto.response.SearchEnhanceResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SearchAiService {
@@ -18,7 +27,9 @@ public class SearchAiService {
             When asked for JSON, respond ONLY with valid JSON — no explanation, no markdown fences.
             """;
 
-    public SearchEnhanceResponse enhanceSearch(SearchEnhanceRequest req) throws Exception {
+    // ==================== Phase 3: AI Semantic Search Enhancement ====================
+
+    public SearchEnhanceResponse enhanceSearch(SearchEnhanceRequest req) {
         String prompt = """
                 Extract structured job search criteria from this natural language query.
 
@@ -52,7 +63,9 @@ public class SearchAiService {
         return geminiClient.generateJson(SYSTEM, prompt, SearchEnhanceResponse.class);
     }
 
-    public JobMatchResponse calculateJobMatch(JobMatchRequest req) throws Exception {
+    // ==================== Phase 4: Job Match Score ====================
+
+    public JobMatchResponse calculateJobMatch(JobMatchRequest req) {
         String candidateSkills = req.getCandidateSkills() != null
                 ? String.join(", ", req.getCandidateSkills()) : "Not provided";
         String jobSkills = req.getJobSkills() != null
@@ -109,7 +122,9 @@ public class SearchAiService {
         return geminiClient.generateJson(SYSTEM, prompt, JobMatchResponse.class);
     }
 
-    public JobAlertSuggestResponse suggestJobAlertCriteria(JobAlertSuggestRequest req) throws Exception {
+    // ==================== Phase 4: Smart Job Alert Criteria Suggestion ====================
+
+    public JobAlertSuggestResponse suggestJobAlertCriteria(JobAlertSuggestRequest req) {
         String skills = req.getSkills() != null ? String.join(", ", req.getSkills()) : "Not provided";
         String jobTitles = req.getPreviousJobTitles() != null
                 ? String.join(", ", req.getPreviousJobTitles()) : "Not provided";
