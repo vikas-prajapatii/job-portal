@@ -207,6 +207,7 @@ services:
         condition: service_started
     command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
       SPRING_DATASOURCE_URL: jdbc:postgresql://userdb:5432/job_portal_user
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
@@ -362,6 +363,28 @@ services:
     command: ["--spring.config.import=configserver:http://config-server:8888"]
     environment:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+    networks:
+      - job-portal-net
+
+  notification-service:
+    image: vikasprajapatii/job-portal-notification-service:latest
+    container_name: job-portal-notification-service
+    mem_limit: 512m
+    mem_reservation: 256m
+    cpus: 0.5
+    restart: always
+    ports:
+      - "5008:5008"
+    depends_on:
+      discovery:
+        condition: service_started
+      config-server:
+        condition: service_started
+    command: ["--spring.config.import=configserver:http://config-server:8888"]
+    environment:
+      SPRING_CONFIG_IMPORT: "configserver:http://config-server:8888"
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
+      KAFKA_BOOTSTRAP_SERVERS: "host.docker.internal:9092"
     networks:
       - job-portal-net
 
