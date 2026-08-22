@@ -28,6 +28,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class JobServiceImpl implements JobService {
     private final CompanyClient companyClient;
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public JobResponse createJob(Long employerId, JobRequest req) throws Exception {
         JobCategory category = jobCategoryService.getCategoryEntityById(req.getCategoryId());
         Set<JobSkill> skills = req.getSkillIds() != null?
@@ -89,6 +92,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "jobs", key = "#id")
     public JobResponse getJobById(Long id) throws Exception {
         Job job = jobRepository.findById(id)
                 .orElseThrow(() -> new Exception("Job not found with id: " + id));
@@ -113,6 +117,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public JobResponse updateJob(Long jobId, Long employerId, JobRequest req) throws Exception {
        Job job = jobRepository.findById(jobId).orElseThrow(
                ()->new Exception("Job not found")
@@ -154,6 +159,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public JobResponse publishJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
                 () -> new Exception("Job not found with id: " + jobId));
@@ -175,6 +181,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public void deleteJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
                 () -> new Exception("Job not found with id: " + jobId));
@@ -183,6 +190,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @CacheEvict(value = "jobs", allEntries = true)
     public JobResponse closeJob(Long jobId, Long employerId) throws Exception {
         Job job = jobRepository.findById(jobId).orElseThrow(
                 () -> new Exception("Job not found with id: " + jobId));

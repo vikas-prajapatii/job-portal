@@ -20,3 +20,9 @@ services:
 #      KAFKA_LOG_RETENTION_HOURS: 24
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_HEAP_OPTS: "-Xms256m -Xms512m"
+
+  redis:
+    image: redis:7-alpine
+    container_name: job-portal-redis-dev
+    ports:
+      - "6379:6379"
