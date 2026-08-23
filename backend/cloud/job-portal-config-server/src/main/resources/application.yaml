@@ -2,20 +2,17 @@ server:
   port: 8888
 
 spring:
-  profiles:
-    active: native
   application:
     name: job-portal-config-server
   cloud:
     config:
       server:
-        native:
-          search-locations:
-            - file:./config-repo
-            - file:../config-repo
-            - file:../../config-repo
-            - file:../../../config-repo
-            - file:/config-repo
+        git:
+          uri: https://github.com/vikas-prajapatii/job-portal
+          search-paths: backend/config-repo
+          default-label: main
+          clone-on-start: true
+
 
 eureka:
   client:

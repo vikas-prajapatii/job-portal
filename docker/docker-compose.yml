@@ -16,10 +16,6 @@ volumes:
 
 services:
 
-  # ============================================================
-  # DATABASES  (one container per service)
-  # ============================================================
-
   userdb:
     image: postgres:16
     container_name: job-portal-userdb
@@ -108,49 +104,8 @@ services:
     networks:
       - job-portal-net
 
-  paymentdb:
-    image: postgres:16
-    container_name: job-portal-paymentdb
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    ports:
-      - "5437:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: job_portal_payment
-    volumes:
-      - paymentdb_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - job-portal-net
 
-  subscriptiondb:
-    image: postgres:16
-    container_name: job-portal-subscriptiondb
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    ports:
-      - "5438:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: job_portal_subscription
-    volumes:
-      - subscriptiondb_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - job-portal-net
+
 
   preferencedb:
     image: postgres:16
@@ -195,10 +150,6 @@ services:
       retries: 5
     networks:
       - job-portal-net
-
-  # ============================================================
-  # KAFKA
-  # ============================================================
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
@@ -246,12 +197,8 @@ services:
     networks:
       - job-portal-net
 
-  # ============================================================
-  # SPRING CLOUD
-  # ============================================================
-
   discovery:
-    image: zoshilo/job-portal-discovery:1.0.0
+    image: vikasprajapatii/job-portal-service-registry:latest
     container_name: job-portal-discovery
     mem_limit: 512m
     mem_reservation: 256m
@@ -267,7 +214,7 @@ services:
       - job-portal-net
 
   config-server:
-    image: zoshilo/job-portal-config-server:1.0.0
+    image: vikasprajapatii/job-portal-config-server:latest
     container_name: job-portal-config-server
     mem_limit: 512m
     mem_reservation: 256m
@@ -288,7 +235,7 @@ services:
       - job-portal-net
 
   gateway:
-    image: zoshilo/job-portal-gateway:1.0.0
+    image: vikasprajapatii/job-portal-api-gateway:latest
     container_name: job-portal-gateway
     mem_limit: 512m
     mem_reservation: 256m
@@ -299,18 +246,15 @@ services:
       config-server:
         condition: service_healthy
     environment:
+      SPRING_CONFIG_SERVER_URL: http://config-server:8888
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
       SERVER_PORT: 9000
     networks:
       - job-portal-net
 
-  # ============================================================
-  # APPLICATION SERVICES
-  # ============================================================
-
   user-service:
-    image: zoshilo/job-portal-user-service:1.0.0
+    image: vikasprajapatii/job-portal-user-service:latest
     container_name: job-portal-user-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -334,7 +278,7 @@ services:
       - job-portal-net
 
   company-service:
-    image: zoshilo/job-portal-company-service:1.0.0
+    image: vikasprajapatii/job-portal-company-service:latest
     container_name: job-portal-company-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -358,7 +302,7 @@ services:
       - job-portal-net
 
   job-service:
-    image: zoshilo/job-portal-job-service:1.0.0
+    image: vikasprajapatii/job-portal-job-service:latest
     container_name: job-portal-job-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -382,7 +326,7 @@ services:
       - job-portal-net
 
   application-service:
-    image: zoshilo/job-portal-application-service:1.0.0
+    image: vikasprajapatii/job-portal-application-service:latest
     container_name: job-portal-application-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -409,7 +353,7 @@ services:
       - job-portal-net
 
   notification-service:
-    image: zoshilo/job-portal-notification-service:1.0.0
+    image: vikasprajapatii/job-portal-notification-service:latest
     container_name: job-portal-notification-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -434,56 +378,11 @@ services:
     networks:
       - job-portal-net
 
-  payment-service:
-    image: zoshilo/job-portal-payment-service:1.0.0
-    container_name: job-portal-payment-service
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    ports:
-      - "9006:9006"
-    depends_on:
-      paymentdb:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-    environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
-      SPRING_DATASOURCE_URL: jdbc:postgresql://paymentdb:5432/job_portal_payment
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-      EUREKA_URL: http://discovery:8761/eureka
-      SERVER_PORT: 9006
-    networks:
-      - job-portal-net
 
-  subscription-service:
-    image: zoshilo/job-portal-subscription-service:1.0.0
-    container_name: job-portal-subscription-service
-    mem_limit: 512m
-    mem_reservation: 256m
-    cpus: 0.5
-    ports:
-      - "9007:9007"
-    depends_on:
-      subscriptiondb:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-    environment:
-      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
-      SPRING_DATASOURCE_URL: jdbc:postgresql://subscriptiondb:5432/job_portal_subscription
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery:8761/eureka/
-      EUREKA_URL: http://discovery:8761/eureka
-      SERVER_PORT: 9007
-    networks:
-      - job-portal-net
+
 
   preference-service:
-    image: zoshilo/job-portal-preference-service:1.0.0
+    image: vikasprajapatii/job-portal-preference-service:latest
     container_name: job-portal-preference-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -507,7 +406,7 @@ services:
       - job-portal-net
 
   resume-service:
-    image: zoshilo/job-portal-resume-service:1.0.0
+    image: vikasprajapatii/job-portal-resume-service:latest
     container_name: job-portal-resume-service
     mem_limit: 512m
     mem_reservation: 256m
@@ -531,7 +430,7 @@ services:
       - job-portal-net
 
   ai-service:
-    image: zoshilo/job-portal-ai-service:1.0.0
+    image: vikasprajapatii/job-portal-ai-service:latest
     container_name: job-portal-ai-service
     mem_limit: 512m
     mem_reservation: 256m

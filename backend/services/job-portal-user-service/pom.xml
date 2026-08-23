@@ -121,7 +121,7 @@
                 <artifactId>jib-maven-plugin</artifactId>
                 <configuration>
                     <to>
-                        <image>noirilo/job-portal-user-service:1.0.0</image>
+                        <image>vikasprajapatii/job-portal-user-service:latest</image>
                     </to>
                 </configuration>
             </plugin>

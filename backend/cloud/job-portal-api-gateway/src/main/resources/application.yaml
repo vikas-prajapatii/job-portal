@@ -2,4 +2,4 @@ spring:
   application:
     name: job-portal-gateway
   config:
-    import: configserver:http://localhost:8888
+    import: optional:configserver:${SPRING_CONFIG_SERVER_URL:http://localhost:8888}
