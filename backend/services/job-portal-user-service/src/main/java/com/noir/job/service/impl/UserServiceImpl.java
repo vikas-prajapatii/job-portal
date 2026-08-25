@@ -1,6 +1,6 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import com.noir.job.common.domain.UserStatus;
 import com.noir.job.common.dto.response.UserResponse;
 import com.noir.job.common.exception.UserException;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUsersByRole(UserRole role) throws UserException {
+    public List<User> getUsersByRole(Role role) throws UserException {
         return userRepository.findByRole(role);
     }
 
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponse changeUserRole(Long id, UserRole role) throws UserException {
+    public UserResponse changeUserRole(Long id, Role role) throws UserException {
         User user = getUserById(id);
         user.setRole(role);
         return UserMapper.toDTO(userRepository.save(user));

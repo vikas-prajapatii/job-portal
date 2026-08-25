@@ -39,4 +39,5 @@ public interface CompanyService {
 
     /** Used internally by other services (e.g. location service). */
     Company getCompanyEntityById(Long id) throws ResourceNotFoundException;
+    
 }

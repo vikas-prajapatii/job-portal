@@ -1,6 +1,6 @@
 package com.noir.job.service;
 
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import com.noir.job.common.dto.response.UserResponse;
 import com.noir.job.common.exception.UserException;
 import com.noir.job.dto.request.UpdateUserRequest;
@@ -14,7 +14,7 @@ public interface UserService {
 
     User getUserById(Long id) throws UserException;
 
-    List<User> getUsersByRole(UserRole role) throws UserException;
+    List<User> getUsersByRole(Role role) throws UserException;
 
     List<User> getAllUsers() throws UserException;
 
@@ -27,5 +27,5 @@ public interface UserService {
 
     UserResponse deleteUser(Long id) throws UserException;
 
-    UserResponse changeUserRole(Long id, UserRole role) throws UserException;
+    UserResponse changeUserRole(Long id, Role role) throws UserException;
 }

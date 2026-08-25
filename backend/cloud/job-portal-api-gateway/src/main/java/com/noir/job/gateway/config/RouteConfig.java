@@ -22,7 +22,6 @@ public class RouteConfig {
 
     private final JwtUtil jwtUtil;
 
-    // ==================== Public Routes (no JWT required) ====================
 
     @Bean
     public RouterFunction<ServerResponse> authRoutes() {
@@ -95,23 +94,9 @@ public class RouteConfig {
                 .build();
     }
 
-    @Bean
-    public RouterFunction<ServerResponse> subscriptionServiceRoutes() {
-        return GatewayRouterFunctions.route("subscription-service-routes")
-                .route(RequestPredicates.path("/api/subscriptions/**"), HandlerFunctions.http())
-                .filter(LoadBalancerFilterFunctions.lb("job-portal-subscription-service"))
-                .before(this::jwtAuthFilter)
-                .build();
-    }
 
-    @Bean
-    public RouterFunction<ServerResponse> paymentServiceRoutes() {
-        return GatewayRouterFunctions.route("payment-service-routes")
-                .route(RequestPredicates.path("/api/payments/**"), HandlerFunctions.http())
-                .filter(LoadBalancerFilterFunctions.lb("job-portal-payment-service"))
-                .before(this::jwtAuthFilter)
-                .build();
-    }
+
+
 
     @Bean
     public RouterFunction<ServerResponse> preferenceServiceRoutes() {

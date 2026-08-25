@@ -26,11 +26,7 @@ public class AiApplicationController {
 
     private final ApplicationAiService applicationAiService;
 
-    /**
-     * Phase 2: Generate a personalized cover letter for a job application.
-     * Called from the Apply Job form on the frontend.
-     * POST /api/ai/application/cover-letter
-     */
+
     @PostMapping("/cover-letter")
     public ResponseEntity<ApiResponse<AiTextResponse>> generateCoverLetter(
             @Valid @RequestBody CoverLetterRequest request) {
@@ -38,11 +34,7 @@ public class AiApplicationController {
         return ResponseEntity.ok(ApiResponse.success("Cover letter generated", response));
     }
 
-    /**
-     * Phase 3: Score a candidate's application against job requirements.
-     * Used by employer in the Applications page to see AI match score.
-     * POST /api/ai/application/screening-score
-     */
+
     @PostMapping("/screening-score")
     public ResponseEntity<ApiResponse<ScreeningScoreResponse>> scoreCandidate(
             @RequestBody ScreeningScoreRequest request) {
@@ -52,11 +44,6 @@ public class AiApplicationController {
 
 
 
-    /**
-     * Phase 4: Analyze skills gap between candidate and job requirements.
-     * Used by candidate in JobDetails page.
-     * POST /api/ai/application/skills-gap
-     */
     @PostMapping("/skills-gap")
     public ResponseEntity<ApiResponse<SkillsGapResponse>> analyzeSkillsGap(
             @Valid @RequestBody SkillsGapRequest request) {
@@ -64,17 +51,10 @@ public class AiApplicationController {
         return ResponseEntity.ok(ApiResponse.success("Skills gap analyzed", response));
     }
 
-    /**
-     * Phase 3: Summarize all recruiter notes for an application (TL;DR).
-     * Used by employer in the Application detail view.
-     * POST /api/ai/application/summarize-notes
-     */
     @PostMapping("/summarize-notes")
     public ResponseEntity<ApiResponse<AiTextResponse>> summarizeNotes(
             @RequestBody List<String> notes) {
         AiTextResponse response = applicationAiService.summarizeApplicationNotes(notes);
         return ResponseEntity.ok(ApiResponse.success("Notes summarized", response));
     }
-
-
 }

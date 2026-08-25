@@ -8,6 +8,7 @@ import com.google.genai.types.GenerateContentResponse;
 import com.google.genai.types.Part;
 import com.noir.job.config.GeminiProperties;
 import com.noir.job.exception.AiServiceException;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -55,6 +56,12 @@ public class GeminiClient {
                     props.getMaxOutputTokens(), true);
             GenerateContentResponse response = genAiClient.models.generateContent(
                     props.getModel(), prompt, config);
+
+            System.out.println("========== PROMPT ==========");
+            System.out.println(prompt);
+            System.out.println("========== GEMINI RESPONSE ==========");
+            System.out.println(response.text());
+            System.out.println("====================================");
             return objectMapper.readValue(response.text(), responseType);
         } catch (AiServiceException e) {
             throw e;

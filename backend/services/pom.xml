@@ -21,7 +21,6 @@
         <module>job-portal-preference-service</module>
         <module>job-portal-ai-service</module>
         <module>job-portal-notification-service</module>
-        <module>job-portal-resume-analyzer</module>
     </modules>
 
 </project>

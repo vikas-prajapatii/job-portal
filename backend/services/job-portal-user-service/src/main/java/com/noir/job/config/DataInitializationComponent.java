@@ -1,6 +1,6 @@
 package com.noir.job.config;
 
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import com.noir.job.entity.User;
 import com.noir.job.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class DataInitializationComponent implements CommandLineRunner {
             admin.setFullName("Admin");
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode("codewithnoir"));
-            admin.setRole(UserRole.ROLE_ADMIN);
+            admin.setRole(Role.ROLE_ADMIN);
             admin.setVerified(true);
             userRepository.save(admin);
         }

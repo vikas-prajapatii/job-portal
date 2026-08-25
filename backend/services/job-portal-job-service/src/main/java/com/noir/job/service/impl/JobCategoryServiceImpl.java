@@ -25,7 +25,6 @@ public class JobCategoryServiceImpl implements JobCategoryService {
 
     private final JobCategoryRepository categoryRepository;
 
-    // ── Create ────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -82,7 +81,6 @@ public class JobCategoryServiceImpl implements JobCategoryService {
                 .build();
     }
 
-    // ── Read ──────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)
@@ -116,7 +114,6 @@ public class JobCategoryServiceImpl implements JobCategoryService {
         return JobMapper.toCategoryResponse(category, true);
     }
 
-    // ── Update ────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -146,7 +143,6 @@ public class JobCategoryServiceImpl implements JobCategoryService {
                 categoryRepository.save(category), true);
     }
 
-    // ── Delete ────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -156,7 +152,6 @@ public class JobCategoryServiceImpl implements JobCategoryService {
         categoryRepository.save(category);
     }
 
-    // ── Internal ──────────────────────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)

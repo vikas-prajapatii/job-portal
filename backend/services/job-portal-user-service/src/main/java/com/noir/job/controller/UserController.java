@@ -1,6 +1,6 @@
 package com.noir.job.controller;
 
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import com.noir.job.common.dto.response.UserResponse;
 import com.noir.job.common.exception.UserException;
 import com.noir.job.dto.request.UpdateUserRequest;
@@ -17,11 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserService userService;
-
-    // ── Profile ────────────────────────────────────────────────────────────────
-
     @GetMapping("/api/users/profile")
     public ResponseEntity<UserResponse> getProfile(
             @RequestHeader("X-User-Email") String email) throws UserException {
@@ -36,7 +32,6 @@ public class UserController {
         return ResponseEntity.ok(userService.updateProfile(email, req));
     }
 
-    // ── User lookups (admin / inter-service) ───────────────────────────────────
 
     @GetMapping("/api/users/{userId}")
     public ResponseEntity<UserResponse> getUserById(
@@ -50,7 +45,6 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toDTOList(userService.getAllUsers()));
     }
 
-    // ── Admin actions ──────────────────────────────────────────────────────────
 
     @PatchMapping("/api/users/{userId}/suspend")
     public ResponseEntity<UserResponse> suspendUser(
@@ -73,7 +67,7 @@ public class UserController {
     @PatchMapping("/api/users/{userId}/role")
     public ResponseEntity<UserResponse> changeUserRole(
             @PathVariable Long userId,
-            @RequestParam UserRole role) throws UserException {
+            @RequestParam Role role) throws UserException {
         return ResponseEntity.ok(userService.changeUserRole(userId, role));
     }
 }

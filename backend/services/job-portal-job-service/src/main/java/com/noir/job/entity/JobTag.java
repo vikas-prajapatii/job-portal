@@ -27,7 +27,6 @@ public class JobTag {
     @Column(nullable = false, unique = true, length = 60)
     private String name;
 
-    /** URL-friendly identifier. */
     @Column(unique = true, length = 80)
     private String slug;
 

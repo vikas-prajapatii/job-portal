@@ -1,7 +1,7 @@
 package com.noir.job.entity;
 
 import com.noir.job.common.domain.AuthProvider;
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import com.noir.job.common.domain.UserStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -49,7 +49,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @NotNull(message = "Role is mandatory")
-    private UserRole role;
+    private Role role;
 
     @Column(nullable = false)
     private Boolean verified = false;

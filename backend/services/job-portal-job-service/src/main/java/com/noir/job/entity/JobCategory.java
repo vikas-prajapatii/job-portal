@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Hierarchical master-data category (e.g. "Technology > Web Development").
- * Managed by admins; not created by end-users.
- */
 @Entity
 @Table(name = "job_categories")
 @Getter
@@ -37,11 +33,6 @@ public class JobCategory {
     private String description;
 
     private String iconUrl;
-
-    /**
-     * Self-referential parent for category hierarchy.
-     * Null means this is a root/top-level category.
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private JobCategory parent;

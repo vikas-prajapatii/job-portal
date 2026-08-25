@@ -53,6 +53,8 @@ public class CompanyController {
     @GetMapping("/my")
     public ResponseEntity<CompanyResponse> getMyCompany(
             @RequestHeader("X-User-Id") Long ownerId) throws ResourceNotFoundException {
+        System.out.println("OwnerId = " + ownerId);
+
         return ResponseEntity.ok(companyService.getMyCompany(ownerId));
     }
 

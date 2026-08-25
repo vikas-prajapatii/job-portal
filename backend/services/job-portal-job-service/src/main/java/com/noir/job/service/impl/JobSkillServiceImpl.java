@@ -28,7 +28,6 @@ public class JobSkillServiceImpl implements JobSkillService {
 
     private final JobSkillRepository skillRepository;
 
-    // ── Create ────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -75,7 +74,6 @@ public class JobSkillServiceImpl implements JobSkillService {
                 .build();
     }
 
-    // ── Read ──────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)
@@ -107,8 +105,6 @@ public class JobSkillServiceImpl implements JobSkillService {
         return JobMapper.toSkillResponse(getSkillEntityById(id));
     }
 
-    // ── Update ────────────────────────────────────────────────────────────────
-
     @Override
     @Transactional
     public JobSkillResponse updateSkill(Long id, JobSkillRequest req)
@@ -125,7 +121,6 @@ public class JobSkillServiceImpl implements JobSkillService {
         return JobMapper.toSkillResponse(skillRepository.save(skill));
     }
 
-    // ── Delete ────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
@@ -135,7 +130,6 @@ public class JobSkillServiceImpl implements JobSkillService {
         skillRepository.save(skill);
     }
 
-    // ── Internal ──────────────────────────────────────────────────────────────
 
     @Override
     @Transactional(readOnly = true)
@@ -147,7 +141,6 @@ public class JobSkillServiceImpl implements JobSkillService {
         return skills;
     }
 
-    // ── Private utilities ─────────────────────────────────────────────────────
 
     private JobSkill getSkillEntityById(Long id) throws ResourceNotFoundException {
         return skillRepository.findById(id)

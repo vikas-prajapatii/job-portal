@@ -34,7 +34,6 @@ public class ApplicationAiService {
             When asked for JSON, respond ONLY with valid JSON — no explanation, no markdown fences.
             """;
 
-    // ==================== Phase 2: Cover Letter Generator ====================
 
     public AiTextResponse generateCoverLetter(CoverLetterRequest req) {
         String skills = req.getCandidateSkills() != null
@@ -83,7 +82,6 @@ public class ApplicationAiService {
                 .build();
     }
 
-    // ==================== Phase 3: Candidate Screening Score ====================
 
     public ScreeningScoreResponse scoreCandidate(ScreeningScoreRequest req) {
         String requiredSkills = req.getRequiredSkills() != null
@@ -140,7 +138,6 @@ public class ApplicationAiService {
         return geminiClient.generateJson(SYSTEM, prompt, ScreeningScoreResponse.class);
     }
 
-    // ==================== Phase 4: Skills Gap Analysis ====================
 
     public SkillsGapResponse analyzeSkillsGap(SkillsGapRequest req) {
         String candidateSkills = req.getCandidateSkills() != null
@@ -171,7 +168,6 @@ public class ApplicationAiService {
         return geminiClient.generateJson(SYSTEM, prompt, SkillsGapResponse.class);
     }
 
-    // ==================== Phase 3: Application Note Summarizer ====================
 
     public AiTextResponse summarizeApplicationNotes(List<String> notes) {
         String allNotes = String.join("\n---\n", notes);

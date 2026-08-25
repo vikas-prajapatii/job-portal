@@ -1,6 +1,6 @@
 package com.noir.job.service.impl;
 
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import com.noir.job.common.dto.request.LoginRequest;
 import com.noir.job.common.dto.response.AuthResponse;
 import com.noir.job.common.exception.UserException;
@@ -36,7 +36,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UserException("Email already registered: " + req.getEmail());
         }
 
-        if (req.getRole() == UserRole.ROLE_ADMIN) {
+        if (req.getRole() == Role.ROLE_ADMIN) {
             throw new UserException("Cannot self-register as ROLE_ADMIN");
         }
 

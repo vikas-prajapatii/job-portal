@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: job-portal-resume-analyzer
-  config:
-    import: optional:configserver:${SPRING_CONFIG_SERVER_URL:http://localhost:8888}

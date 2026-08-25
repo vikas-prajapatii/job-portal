@@ -1,6 +1,6 @@
 package com.noir.job.dto.request;
 
-import com.noir.job.common.domain.UserRole;
+import com.noir.job.common.domain.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -22,5 +22,5 @@ public class SignupRequest {
     private String phone;
 
     @NotNull(message = "Role is mandatory")
-    private UserRole role;
+    private Role role;
 }

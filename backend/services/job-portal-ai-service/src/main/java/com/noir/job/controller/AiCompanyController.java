@@ -18,11 +18,7 @@ public class AiCompanyController {
 
     private final CompanyAiService companyAiService;
 
-    /**
-     * Phase 1: Generate company description for employer profile.
-     * Used in CompanyProfile form.
-     * POST /api/ai/company/describe
-     */
+
     @PostMapping("/describe")
     public ResponseEntity<ApiResponse<AiTextResponse>> generateCompanyDescription(
             @Valid @RequestBody CompanyDescriptionRequest request) {
@@ -30,11 +26,7 @@ public class AiCompanyController {
         return ResponseEntity.ok(ApiResponse.success("Company description generated", response));
     }
 
-    /**
-     * Phase 1: Generate 3 tagline options for the company.
-     * Used in CompanyProfile form.
-     * POST /api/ai/company/taglines
-     */
+
     @PostMapping("/taglines")
     public ResponseEntity<ApiResponse<CompanyTaglineResponse>> generateTaglines(
             @Valid @RequestBody CompanyTaglineRequest request) {

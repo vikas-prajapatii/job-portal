@@ -8,10 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-/**
- * Shared skill reference entity (e.g. "Java", "React", "AWS").
- * Skills are reused across many jobs; employers pick from this pool.
- */
+
 @Entity
 @Table(name = "job_skills")
 @Getter

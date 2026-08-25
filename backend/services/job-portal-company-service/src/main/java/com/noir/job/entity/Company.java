@@ -27,11 +27,9 @@ public class Company {
     @Column(nullable = false, unique = true, length = 150)
     private String name;
 
-    /** URL-friendly identifier, e.g. "google", "infosys-ltd". */
     @Column(unique = true, length = 180)
     private String slug;
 
-    /** One-liner shown on job cards and search results. */
     @Column(length = 200)
     private String tagline;
 
@@ -42,7 +40,6 @@ public class Company {
     private String coverImageUrl;
     private String website;
 
-    /** Public contact email for candidates. */
     private String email;
     private String phone;
 
@@ -61,31 +58,23 @@ public class Company {
     private IndustryType industryType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "company_status", nullable = false)
     @Builder.Default
     private CompanyStatus status = CompanyStatus.PENDING_VERIFICATION;
 
-    @Column(nullable = false)
+    @Column(name = "is_verified", nullable = false)
     @Builder.Default
     private Boolean verified = false;
 
     private LocalDateTime verifiedAt;
 
-    /** Official registration / CIN number for verification. */
     @Column(unique = true)
     private String registrationNumber;
 
-    /**
-     * ID of the employer user who owns this company profile (from user-service).
-     * Plain Long — no cross-service FK. Unique: one user can own only one company.
-     */
     @Column(nullable = false, unique = true)
     private Long ownerId;
 
-    /**
-     * Social and web links (LinkedIn, GitHub, Twitter, etc.).
-     * Stored in a separate collection table — no independent lifecycle needed.
-     */
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "company_social_links",

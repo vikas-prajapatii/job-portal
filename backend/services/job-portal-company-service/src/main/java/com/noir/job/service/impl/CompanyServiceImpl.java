@@ -92,6 +92,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional(readOnly = true)
     public CompanyResponse getMyCompany(Long ownerId) throws ResourceNotFoundException {
+        System.out.println("Searching company for owner = " + ownerId);
+
         Company company = companyRepository.findByOwnerId(ownerId)
                 .orElseThrow(() -> new ResourceNotFoundException("No company found for this account"));
 

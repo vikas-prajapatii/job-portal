@@ -52,13 +52,13 @@ public class JobServiceImpl implements JobService {
     private final JobTagService tagService;
     private final CompanyClient companyClient;
 
-    // ── Create ────────────────────────────────────────────────────────────────
 
     @Override
     @Transactional
     @CacheEvict(value = "jobs", allEntries = true)
     public JobResponse createJob(Long employerId, JobRequest req)
             throws ResourceNotFoundException, JobException {
+        System.out.println("Employer ID received = " + employerId);
         CompanyResponse company = companyClient.getMyCompany(employerId);
         Long companyId = company.getId();
 
@@ -340,7 +340,6 @@ public class JobServiceImpl implements JobService {
                 .getCompanySummaryById(job.getCompanyId());
 
         return JobMapper.toResponse(job, companySummaryResponse);
-
 
     }
 }
