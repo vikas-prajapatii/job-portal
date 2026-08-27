@@ -20,7 +20,7 @@ public interface AuthService {
 
     ApiResponse<String> resetPassword(ResetPasswordRequest req) throws UserException;
 
-    ApiResponse<String> verifyOtp(VerifyOtpRequest req) throws UserException;
+    AuthResponse verifyOtp(VerifyOtpRequest req) throws UserException;
 
     AuthResponse refreshToken(RefreshTokenRequest req) throws UserException;
 }

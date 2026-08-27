@@ -28,8 +28,7 @@ public class OAuth2Service {
         if (existingUser != null) {
             existingUser.setGoogleId(sub);
             existingUser.setAuthProvider(AuthProvider.GOOGLE);
-            existingUser.setVerified(true);
-            existingUser.setStatus(UserStatus.ACTIVE);
+            existingUser.setLastLogin(LocalDateTime.now());
             return userRepository.save(existingUser);
         }
 
@@ -38,8 +37,8 @@ public class OAuth2Service {
         user.setFullName(name);
         user.setAuthProvider(AuthProvider.GOOGLE);
         user.setGoogleId(sub);
-        user.setVerified(true);
-        user.setStatus(UserStatus.ACTIVE);
+        user.setVerified(false);
+        user.setStatus(UserStatus.INACTIVE);
         user.setRole(Role.ROLE_JOB_SEEKER);
         user.setLastLogin(LocalDateTime.now());
         

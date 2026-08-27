@@ -24,7 +24,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(req));
     }
     @PostMapping("/verify-otp")
-    public ResponseEntity<com.noir.job.dto.response.ApiResponse<String>> verifyOtp(
+    public ResponseEntity<AuthResponse> verifyOtp(
             @RequestBody @Valid com.noir.job.dto.request.VerifyOtpRequest req) throws UserException {
         return ResponseEntity.ok(authService.verifyOtp(req));
     }

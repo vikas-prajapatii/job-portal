@@ -157,13 +157,27 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public ApiResponse<String> verifyOtp(VerifyOtpRequest request) throws UserException {
+    public AuthResponse verifyOtp(VerifyOtpRequest request) throws UserException {
         otpService.verifyOtp(request.getEmail(), request.getOtp());
-        return ApiResponse.<String>builder()
-                .success(true)
-                .message("Email verified successfully")
-                .data("Account activated")
-                .build();
+        
+        User user = userRepository.findByEmail(request.getEmail());
+        
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getEmail(), null, userDetails.getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String jwt = jwtProvider.generateToken(authentication, user.getId());
+        String refreshToken = jwtProvider.generateRefreshToken(authentication, user.getId());
+
+        AuthResponse response = new AuthResponse();
+        response.setTitle("Account verified");
+        response.setMessage("Welcome to JobPortal");
+        response.setJwt(jwt);
+        response.setRefreshToken(refreshToken);
+        response.setUser(UserMapper.toDTO(user));
+        return response;
     }
 
     @Override
