@@ -72,6 +72,10 @@ public class User {
 
     private LocalDateTime deletedAt;
 
+    private String resetToken;
+
+    private LocalDateTime resetTokenExpiry;
+
     @Column(nullable = false)
     private Integer tokenVersion = 0;
 }

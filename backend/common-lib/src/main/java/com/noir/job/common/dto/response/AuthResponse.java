@@ -7,6 +7,7 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponse {
     private String jwt;
+    private String refreshToken;
     private String title;
     private String message;
     private UserResponse user;

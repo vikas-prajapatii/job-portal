@@ -1,8 +1,4 @@
-server:
-  port: 5001
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/job_portal_user
   security:
     oauth2:
       client:
@@ -16,8 +12,8 @@ spring:
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:placeholder@gmail.com}
-    password: ${MAIL_PASSWORD:placeholder}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:

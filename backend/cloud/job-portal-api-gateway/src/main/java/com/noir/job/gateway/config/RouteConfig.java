@@ -26,7 +26,9 @@ public class RouteConfig {
     @Bean
     public RouterFunction<ServerResponse> authRoutes() {
         return GatewayRouterFunctions.route("auth-routes")
-                .route(RequestPredicates.path("/auth/**"), HandlerFunctions.http())
+                .route(RequestPredicates.path("/auth/**")
+                        .or(RequestPredicates.path("/oauth2/**"))
+                        .or(RequestPredicates.path("/login/**")), HandlerFunctions.http())
                 .filter(LoadBalancerFilterFunctions.lb("job-portal-user-service"))
                 .build();
     }
