@@ -3,7 +3,6 @@
 networks:
   job-portal-net:
     driver: bridge
-
 volumes:
   userdb_data:
   companydb_data:
@@ -13,9 +12,7 @@ volumes:
   subscriptiondb_data:
   preferencedb_data:
   resumedb_data:
-
 services:
-
   userdb:
     image: postgres:16
     container_name: job-portal-userdb
@@ -37,7 +34,6 @@ services:
       retries: 5
     networks:
       - job-portal-net
-
   companydb:
     image: postgres:16
     container_name: job-portal-companydb
@@ -276,6 +272,8 @@ services:
       SERVER_PORT: 9001
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     networks:
       - job-portal-net
 
