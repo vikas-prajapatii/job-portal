@@ -32,28 +32,6 @@ def create_14page_synopsis():
     BORDER_COLOR = colors.HexColor("#E2E8F0") # Slate 200
 
     # Typography Styles
-    title_style = ParagraphStyle(
-        'CoverTitle',
-        parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=24,
-        leading=30,
-        textColor=PRIMARY,
-        alignment=1, # Center
-        spaceAfter=12
-    )
-
-    subtitle_style = ParagraphStyle(
-        'CoverSubtitle',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=12,
-        leading=16,
-        textColor=SECONDARY,
-        alignment=1,
-        spaceAfter=20
-    )
-
     h1_style = ParagraphStyle(
         'Heading1_Custom',
         parent=styles['Normal'],
@@ -129,63 +107,7 @@ def create_14page_synopsis():
     story = []
 
     # =========================================================================
-    # PAGE 1: COVER PAGE
-    # =========================================================================
-    story.append(Spacer(1, 15))
-    
-    # Submissions Header
-    header_data = [
-        [
-            Paragraph("<b>Submitted by:</b><br/>Student Name: <b>Vikas Prajapati & Vineet Kumar</b><br/>Roll No: <b>2026CSE101 / 102</b><br/>Section: <b>CSE-A</b>", table_cell),
-            Paragraph("<b>Under the Supervision of:</b><br/>Guide Name: <b>Dr. A. K. Sharma</b><br/>Assistant Professor<br/>Dept. of Computer Science & Engineering", table_cell)
-        ]
-    ]
-    t_header = Table(header_data, colWidths=[250, 254])
-    t_header.setStyle(TableStyle([
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
-        ('LEFTPADDING', (0,0), (-1,-1), 0),
-        ('RIGHTPADDING', (0,0), (-1,-1), 0),
-    ]))
-    story.append(t_header)
-    story.append(Spacer(1, 45))
-
-    # College Emblem / Logo Placeholder (Drawing Badge)
-    d_logo = Drawing(504, 70)
-    d_logo.add(Rect(202, 5, 100, 60, rx=8, ry=8, fillColor=PRIMARY, strokeColor=ACCENT, strokeWidth=2))
-    d_logo.add(String(252, 40, "LLOYD", textAnchor="middle", fontName="Helvetica-Bold", fontSize=16, fillColor=colors.white))
-    d_logo.add(String(252, 20, "LIET", textAnchor="middle", fontName="Helvetica-Bold", fontSize=11, fillColor=ACCENT))
-    story.append(d_logo)
-    story.append(Spacer(1, 20))
-
-    story.append(HRFlowable(width="100%", thickness=1.5, color=SECONDARY, spaceBefore=10, spaceAfter=25))
-
-    # Department & College Details
-    dept_style = ParagraphStyle('Dept', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=12, leading=16, alignment=1, textColor=PRIMARY)
-    inst_style = ParagraphStyle('Inst', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=15, leading=19, alignment=1, textColor=SECONDARY)
-    addr_style = ParagraphStyle('Addr', parent=styles['Normal'], fontName='Helvetica', fontSize=9.5, leading=13, alignment=1, textColor=TEXT_MUTED)
-
-    story.append(Paragraph("Department of Computer Science & Engineering", dept_style))
-    story.append(Spacer(1, 4))
-    story.append(Paragraph("Lloyd Institute of Engineering & Technology", inst_style))
-    story.append(Spacer(1, 4))
-    story.append(Paragraph("Plot No. 3, Knowledge Park II, Greater Noida, Uttar Pradesh 201306", addr_style))
-    story.append(Spacer(1, 15))
-    story.append(Paragraph("Academic Session: 2026–27", dept_style))
-    story.append(Spacer(1, 40))
-
-    # Main Project Title Card
-    story.append(Paragraph("PROJECT SYNOPSIS", ParagraphStyle('SubHeading', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=14, leading=18, alignment=1, textColor=TEXT_MUTED)))
-    story.append(Spacer(1, 10))
-    story.append(Paragraph("AI-POWERED JOB PORTAL<br/>(NOIR HIRE PLATFORM)", title_style))
-    story.append(Paragraph("A Cloud-Native Microservices Recruitment Ecosystem with Generative AI & Semantic Matching", subtitle_style))
-
-    story.append(Spacer(1, 50))
-    story.append(HRFlowable(width="100%", thickness=1, color=BORDER_COLOR, spaceBefore=10, spaceAfter=10))
-
-    story.append(PageBreak())
-
-    # =========================================================================
-    # PAGE 2: INDEX & CERTIFICATE
+    # PAGE 1: INDEX & CERTIFICATE (START DIRECTLY FROM TOC)
     # =========================================================================
     story.append(Paragraph("TABLE OF CONTENTS", h1_style))
     story.append(Paragraph("This document presents the detailed project synopsis for the AI-Powered Job Portal (NoirHire Platform), mapped across seven structured sections.", body_style))
@@ -193,13 +115,13 @@ def create_14page_synopsis():
 
     index_data = [
         [Paragraph("Sr. No.", table_cell_header), Paragraph("Topic Description", table_cell_header), Paragraph("Page Allocation", table_cell_header)],
-        [Paragraph("01", table_cell_bold), Paragraph("<b>Introduction</b><br/>• System Overview & Domain Context<br/>• Microservices Architecture Topology<br/>• Generative AI Integration", table_cell), Paragraph("Pages 3 – 5<br/>(3 Pages)", table_cell_bold)],
-        [Paragraph("02", table_cell_bold), Paragraph("<b>Statement of Problem with Objective</b><br/>• Industry Pain Points & Limitations<br/>• Core Project Objectives & Key Pillars", table_cell), Paragraph("Pages 6 – 7<br/>(2 Pages)", table_cell_bold)],
-        [Paragraph("03", table_cell_bold), Paragraph("<b>Literature Survey</b><br/>• Comparative Platform Evaluation<br/>• Academic & Industry Research Analysis Matrix", table_cell), Paragraph("Pages 8 – 9<br/>(2 Pages)", table_cell_bold)],
-        [Paragraph("04", table_cell_bold), Paragraph("<b>Expected Outcome / Scope of the Project</b><br/>• Measurable System Outcomes<br/>• Functional Microservices Breakdown<br/>• Natural Language Search Flow", table_cell), Paragraph("Pages 10 – 11<br/>(2 Pages)", table_cell_bold)],
-        [Paragraph("05", table_cell_bold), Paragraph("<b>Tentative Work Plan (10-Week Timeline)</b><br/>• Week-by-Week Development Roadmap<br/>• Project Milestone Timeline Chart", table_cell), Paragraph("Pages 12 – 13<br/>(1.5 Pages)", table_cell_bold)],
-        [Paragraph("06", table_cell_bold), Paragraph("<b>Software / Hardware Requirements</b><br/>• Backend, Database, Cloud & Client Stack<br/>• Minimum Infrastructure Specifications", table_cell), Paragraph("Page 13<br/>(0.5 Page)", table_cell_bold)],
-        [Paragraph("07", table_cell_bold), Paragraph("<b>References</b><br/>• Formal IEEE & Industry Standard References", table_cell), Paragraph("Page 14<br/>(1 Page)", table_cell_bold)]
+        [Paragraph("01", table_cell_bold), Paragraph("<b>Introduction</b><br/>• System Overview & Domain Context<br/>• Microservices Architecture Topology<br/>• Generative AI Integration", table_cell), Paragraph("Pages 2 – 4<br/>(3 Pages)", table_cell_bold)],
+        [Paragraph("02", table_cell_bold), Paragraph("<b>Statement of Problem with Objective</b><br/>• Industry Pain Points & Limitations<br/>• Core Project Objectives & Key Pillars", table_cell), Paragraph("Pages 5 – 6<br/>(2 Pages)", table_cell_bold)],
+        [Paragraph("03", table_cell_bold), Paragraph("<b>Literature Survey</b><br/>• Comparative Platform Evaluation<br/>• Academic & Industry Research Analysis Matrix", table_cell), Paragraph("Pages 7 – 8<br/>(2 Pages)", table_cell_bold)],
+        [Paragraph("04", table_cell_bold), Paragraph("<b>Expected Outcome / Scope of the Project</b><br/>• Measurable System Outcomes<br/>• Functional Microservices Breakdown<br/>• Natural Language Search Flow", table_cell), Paragraph("Pages 9 – 10<br/>(2 Pages)", table_cell_bold)],
+        [Paragraph("05", table_cell_bold), Paragraph("<b>Tentative Work Plan (10-Week Timeline)</b><br/>• Week-by-Week Development Roadmap<br/>• Project Milestone Timeline Chart", table_cell), Paragraph("Pages 11 – 12<br/>(1.5 Pages)", table_cell_bold)],
+        [Paragraph("06", table_cell_bold), Paragraph("<b>Software / Hardware Requirements</b><br/>• Backend, Database, Cloud & Client Stack<br/>• Minimum Infrastructure Specifications", table_cell), Paragraph("Page 12<br/>(0.5 Page)", table_cell_bold)],
+        [Paragraph("07", table_cell_bold), Paragraph("<b>References</b><br/>• Formal IEEE & Industry Standard References", table_cell), Paragraph("Page 13<br/>(1 Page)", table_cell_bold)]
     ]
 
     t_index = Table(index_data, colWidths=[55, 345, 104])
@@ -212,13 +134,13 @@ def create_14page_synopsis():
         ('BOTTOMPADDING', (0,0), (-1,-1), 8),
     ]))
     story.append(t_index)
-    story.append(Spacer(1, 40))
+    story.append(Spacer(1, 45))
 
-    # Signatures Section
+    # Signatures Section (Clean lines without hardcoded names for manual entry)
     sig_data = [
         [
-            Paragraph("________________________<br/><b>Student's Signature</b><br/>Vikas Prajapati & Vineet Kumar", table_cell),
-            Paragraph("________________________<br/><b>Guide's Signature</b><br/>Dr. A. K. Sharma (Assistant Professor)", table_cell)
+            Paragraph("________________________<br/><b>Student's Signature</b>", table_cell),
+            Paragraph("________________________<br/><b>Guide's Signature</b>", table_cell)
         ]
     ]
     t_sig = Table(sig_data, colWidths=[250, 254])
@@ -232,7 +154,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 3: SECTION 01 - INTRODUCTION (PART 1)
+    # PAGE 2: SECTION 01 - INTRODUCTION (PART 1)
     # =========================================================================
     story.append(Paragraph("01. INTRODUCTION", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
@@ -273,7 +195,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 4: SECTION 01 - INTRODUCTION (PART 2: ARCHITECTURE DIAGRAM)
+    # PAGE 3: SECTION 01 - INTRODUCTION (PART 2: ARCHITECTURE DIAGRAM)
     # =========================================================================
     story.append(Paragraph("1.4 System Architecture & Component Topology", h2_style))
     story.append(Paragraph(
@@ -363,7 +285,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 5: SECTION 01 - INTRODUCTION (PART 3: AI INTEGRATION)
+    # PAGE 4: SECTION 01 - INTRODUCTION (PART 3: AI INTEGRATION)
     # =========================================================================
     story.append(Paragraph("1.6 Deep Generative AI Features & Capabilities", h2_style))
     story.append(Paragraph(
@@ -422,7 +344,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 6: SECTION 02 - STATEMENT OF PROBLEM WITH OBJECTIVE (PART 1)
+    # PAGE 5: SECTION 02 - STATEMENT OF PROBLEM WITH OBJECTIVE (PART 1)
     # =========================================================================
     story.append(Paragraph("02. STATEMENT OF PROBLEM WITH OBJECTIVE", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
@@ -468,7 +390,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 7: SECTION 02 - STATEMENT OF PROBLEM WITH OBJECTIVE (PART 2)
+    # PAGE 6: SECTION 02 - STATEMENT OF PROBLEM WITH OBJECTIVE (PART 2)
     # =========================================================================
     story.append(Paragraph("2.2 Core Objectives of NoirHire Platform", h2_style))
     story.append(Paragraph(
@@ -525,7 +447,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 8: SECTION 03 - LITERATURE SURVEY (PART 1)
+    # PAGE 7: SECTION 03 - LITERATURE SURVEY (PART 1)
     # =========================================================================
     story.append(Paragraph("03. LITERATURE SURVEY", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
@@ -605,7 +527,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 9: SECTION 03 - LITERATURE SURVEY (PART 2: RESEARCH MATRIX)
+    # PAGE 8: SECTION 03 - LITERATURE SURVEY (PART 2: RESEARCH MATRIX)
     # =========================================================================
     story.append(Paragraph("3.3 Academic Research & Technical Literature Matrix", h2_style))
     story.append(Paragraph(
@@ -661,7 +583,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 10: SECTION 04 - EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 1)
+    # PAGE 9: SECTION 04 - EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 1)
     # =========================================================================
     story.append(Paragraph("04. EXPECTED OUTCOME / SCOPE OF THE PROJECT", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
@@ -722,7 +644,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 11: SECTION 04 - EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 2)
+    # PAGE 10: SECTION 04 - EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 2)
     # =========================================================================
     story.append(Paragraph("4.3 Natural Language Search Sequence Diagram", h2_style))
     story.append(Paragraph(
@@ -786,7 +708,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 12: SECTION 05 - TENTATIVE WORK PLAN (PART 1: ROADMAP)
+    # PAGE 11: SECTION 05 - TENTATIVE WORK PLAN (PART 1: ROADMAP)
     # =========================================================================
     story.append(Paragraph("05. TENTATIVE WORK PLAN (MAPPED TO 10-WEEK TIMELINE)", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
@@ -846,7 +768,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 13: SECTION 05 (PART 2: GANTT CHART) & SECTION 06 - REQUIREMENTS
+    # PAGE 12: SECTION 05 (PART 2: GANTT CHART) & SECTION 06 - REQUIREMENTS
     # =========================================================================
     story.append(Paragraph("5.2 10-Week Milestone Gantt Chart", h2_style))
     story.append(Paragraph(
@@ -935,7 +857,7 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 14: SECTION 07 - REFERENCES
+    # PAGE 13: SECTION 07 - REFERENCES
     # =========================================================================
     story.append(Paragraph("07. REFERENCES", h1_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
@@ -969,21 +891,19 @@ def create_14page_synopsis():
         canvas.saveState()
         page_num = canvas.getPageNumber()
         
-        # We only add header/footer from page 2 onwards
-        if page_num > 1:
-            # Header text
-            canvas.setFont("Helvetica", 8)
-            canvas.setFillColor(TEXT_MUTED)
-            canvas.drawString(54, 750, "Lloyd Institute of Engineering & Technology | Department of CSE")
-            canvas.drawRightString(558, 750, "AI-Powered Job Portal Synopsis")
-            canvas.setStrokeColor(BORDER_COLOR)
-            canvas.setLineWidth(0.5)
-            canvas.line(54, 744, 558, 744)
+        # Header text
+        canvas.setFont("Helvetica", 8)
+        canvas.setFillColor(TEXT_MUTED)
+        canvas.drawString(54, 750, "Lloyd Institute of Engineering & Technology | Department of CSE")
+        canvas.drawRightString(558, 750, "AI-Powered Job Portal Synopsis")
+        canvas.setStrokeColor(BORDER_COLOR)
+        canvas.setLineWidth(0.5)
+        canvas.line(54, 744, 558, 744)
 
-            # Footer
-            canvas.line(54, 45, 558, 45)
-            canvas.drawString(54, 32, "Session: 2026–27")
-            canvas.drawRightString(558, 32, f"Page {page_num} of 14")
+        # Footer
+        canvas.line(54, 45, 558, 45)
+        canvas.drawString(54, 32, "Session: 2026–27")
+        canvas.drawRightString(558, 32, f"Page {page_num} of 13")
         
         canvas.restoreState()
 
