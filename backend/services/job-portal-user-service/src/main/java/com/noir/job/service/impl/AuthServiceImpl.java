@@ -204,12 +204,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private Authentication authenticate(String email, String password) throws UserException {
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
+        UserDetails userDetails;
+        try {
+            userDetails = customUserDetailsService.loadUserByUsername(email);
+        } catch (org.springframework.security.core.userdetails.UsernameNotFoundException e) {
+            throw new UserException("User not found with email: " + email);
+        }
         if (userDetails == null) {
             throw new UserException("User not found with email: " + email);
         }
         if (!passwordEncoder.matches(password, userDetails.getPassword())) {
-            throw new UserException("Invalid password");
+            throw new UserException("Invalid email or password");
         }
         return new UsernamePasswordAuthenticationToken(email,
                 null, userDetails.getAuthorities());
