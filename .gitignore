@@ -15,5 +15,8 @@ Thumbs.db
 # Log files
 *.log
 
-# Frontend local directory
-frontend/
+# Frontend build artifacts & dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local

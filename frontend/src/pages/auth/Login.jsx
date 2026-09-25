@@ -1,4 +1,4 @@
-﻿import { useEffect } from "react"
+import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { useForm } from "react-hook-form"
@@ -13,7 +13,7 @@ import { PasswordInput } from "../../components/ui/password-input"
 import { Label } from "../../components/ui/label"
 import { AlertCircle, Loader2, Mail, Lock, ArrowRight } from "lucide-react"
 import { resetError } from "../../store/user/userAuth"
-import { loginUser } from "../../store/user/userThunk"
+import { loginUser, fetchCurrentUser } from "../../store/user/userThunk"
 import { getRoleBasedRedirect } from "../../utils/roleRedirect"
 
 export default function Login() {
@@ -32,6 +32,17 @@ export default function Login() {
       password: "",
     },
   })
+
+  // Parse Google OAuth tokens from redirect URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    if (token) {
+      localStorage.setItem("accessToken", token);
+      dispatch(fetchCurrentUser());
+      navigate("/jobs", { replace: true });
+    }
+  }, [dispatch, navigate])
 
   // Redirect based on role if already authenticated
   useEffect(() => {

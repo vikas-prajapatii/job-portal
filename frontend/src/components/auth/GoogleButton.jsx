@@ -1,10 +1,14 @@
-﻿import { Button } from "../ui/button"
+import { Button } from "../ui/button"
 
 export default function GoogleButton({ children = "Continue with Google", onClick }) {
   const handleClick = () => {
-    // Placeholder for OAuth logic
     console.log("Google OAuth clicked")
-    if (onClick) onClick()
+    if (onClick) {
+      onClick()
+    } else {
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:9000";
+      window.location.href = `${apiBaseUrl}/oauth2/authorization/google`;
+    }
   }
 
   return (

@@ -1,4 +1,4 @@
-﻿import {
+import {
   BrowserRouter as Router,
   Routes,
   Route,
@@ -16,6 +16,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import VerifyOtp from "./pages/auth/VerifyOtp";
 
 // User/Job Seeker Pages
 import UserLayout from "./components/user/layout/UserLayout";
@@ -86,6 +87,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
 
           {/* Job Seeker Routes - Protected and Role-Based */}
           <Route element={<ProtectedRoute />}>

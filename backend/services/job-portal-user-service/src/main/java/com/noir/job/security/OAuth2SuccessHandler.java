@@ -45,7 +45,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 Otp otp = otpService.generateAndSaveOtp(user);
                 mailService.sendOtp(user.getEmail(), otp.getCode());
             } catch (Exception e) {
-                // Allow flow to continue
+                e.printStackTrace();
             }
             response.sendRedirect("http://localhost:5173/verify-otp?email=" + user.getEmail());
             return;

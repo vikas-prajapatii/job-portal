@@ -12,8 +12,6 @@ spring:
           search-paths: backend/config-repo
           default-label: main
           clone-on-start: true
-
-
 eureka:
   client:
     service-url:
