@@ -1,4 +1,4 @@
-﻿import { useState } from "react"
+import { useState } from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { Input } from "@/components/ui/input"
@@ -47,7 +47,7 @@ export default function UserNavbar() {
               <Briefcase className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold text-slate-900">
-              ZOSHIRE</span>
+              NOIRHIRE</span>
           </Link>
 
           {/* Search Bar */}

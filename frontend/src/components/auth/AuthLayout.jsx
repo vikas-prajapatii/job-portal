@@ -1,50 +1,48 @@
-﻿import { Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Sparkles } from "lucide-react"
 
-const AUTH_IMAGE = "https://res.cloudinary.com/dcpesbd8q/image/upload/v1772374334/zosh%20hire/auth_side_image_so2r2w.png"
+const AUTH_IMAGE = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80"
 
 export default function AuthLayout({ title, description, children, footerText, footerLink, footerLinkText }) {
   return (
     <div className="min-h-screen flex">
 
       {/* ── Left panel — image (hidden on mobile) ─────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative overflow-hidden shrink-0">
+      <div className="hidden lg:flex lg:w-[52%] xl:w-[55%] relative overflow-hidden shrink-0 bg-slate-900">
         <img
           src={AUTH_IMAGE}
-          alt="JobPortal.AI"
-          className="w-full h-full object-cover object-center"
+          alt="NoirHire AI"
+          className="w-full h-full object-cover object-center opacity-50"
         />
         {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-linear-to-t from-slate-900/70 via-slate-900/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-slate-900/20" />
 
         {/* Branding overlay — bottom left */}
-        <div className="absolute bottom-10 left-10 right-10 text-white">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg p-1.5">
-              <Sparkles className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-sm font-semibold text-white/90 tracking-wide uppercase">
-              JobPortal.AI
+        <div className="absolute bottom-12 left-12 right-12 text-white z-10">
+          <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+            <Sparkles className="h-4 w-4 text-indigo-400" />
+            <span className="text-xs font-semibold tracking-wider text-indigo-200 uppercase">
+              NoirHire AI Platform
             </span>
           </div>
-          <h2 className="text-3xl font-bold leading-snug">
-            Your next career move <br /> starts here.
+          <h2 className="text-3xl xl:text-4xl font-extrabold text-white leading-tight">
+            Connecting Talent with <br /> Exceptional Opportunities.
           </h2>
-          <p className="text-white/70 mt-3 text-sm leading-relaxed max-w-sm">
-            AI-powered job matching, smart resume builder, and real-time insights — all in one place.
+          <p className="text-slate-300 mt-3 text-sm leading-relaxed max-w-md">
+            Smart AI job matching, automated resume parsing, real-time application tracking, and seamless interview workflows.
           </p>
 
           {/* Trust indicators */}
-          <div className="flex items-center gap-5 mt-6">
+          <div className="flex items-center gap-6 mt-8">
             {[
-              { dot: "bg-emerald-400", text: "100K+ Jobs" },
-              { dot: "bg-blue-400", text: "50K+ Companies" },
-              { dot: "bg-violet-400", text: "AI-Powered" },
+              { dot: "bg-emerald-400", text: "100K+ Jobs Posted" },
+              { dot: "bg-indigo-400", text: "50K+ Top Employers" },
+              { dot: "bg-amber-400", text: "AI Resume Matcher" },
             ].map(({ dot, text }) => (
-              <div key={text} className="flex items-center gap-1.5">
-                <div className={`w-1.5 h-1.5 rounded-full ${dot}`} />
-                <span className="text-xs text-white/80 font-medium">{text}</span>
+              <div key={text} className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${dot}`} />
+                <span className="text-xs text-slate-200 font-medium">{text}</span>
               </div>
             ))}
           </div>
