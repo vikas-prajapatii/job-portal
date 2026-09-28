@@ -236,7 +236,7 @@ def create_specification_synopsis():
         [Paragraph("4", table_cell_bold), Paragraph("<b>Expected Outcome / Scope of the Project</b><br/>• Measurable System Outcomes<br/>• Natural Language Search Sequence Flow", table_cell), Paragraph("10 – 11", table_cell_bold)],
         [Paragraph("5", table_cell_bold), Paragraph("<b>Tentative Work Plan (10-Week Timeline)</b><br/>• Week-by-Week Development Roadmap<br/>• Milestone Gantt Chart Timeline", table_cell), Paragraph("12 – 13", table_cell_bold)],
         [Paragraph("6", table_cell_bold), Paragraph("<b>Software / Hardware Requirements</b><br/>• Backend, Database, AI Engine & Frontend Stack", table_cell), Paragraph("14", table_cell_bold)],
-        [Paragraph("7", table_cell_bold), Paragraph("<b>References</b><br/>• Formal IEEE & Industry Standard References", table_cell), Paragraph("14", table_cell_bold)]
+        [Paragraph("7", table_cell_bold), Paragraph("<b>References</b><br/>• Formal IEEE & Industry Standard References", table_cell), Paragraph("15", table_cell_bold)]
     ]
 
     t_index = Table(index_data, colWidths=[50, 350, 89])
@@ -996,7 +996,9 @@ def create_specification_synopsis():
         ('BOTTOMPADDING', (0,0), (-1,-1), 4),
     ]))
     story.append(t_req)
-    story.append(Spacer(1, 10))
+    
+    # User Instruction: Move References to a new page
+    story.append(PageBreak())
 
     # SECTION 7: REFERENCES
     story.append(Paragraph("7. REFERENCES", large_heading_style))
@@ -1018,22 +1020,10 @@ def create_specification_synopsis():
     for ref in references_list:
         story.append(Paragraph(ref, ParagraphStyle('RefStyle', parent=normal_text_style, fontSize=9.5, leading=13.5, spaceAfter=4, leftIndent=18, firstLineIndent=-18)))
 
-    # User Instruction: "remove the text end of synopsis from ss 4" -> Line omitted!
-
     # SPECIFICATION: Page numbers should be given on each page.
     def add_page_decorations(canvas, doc):
         canvas.saveState()
         page_num = canvas.getPageNumber()
-        
-        # Header text (from page 2 onwards)
-        if page_num > 1:
-            canvas.setFont("Times-Roman", 8.5)
-            canvas.setFillColor(TEXT_MUTED)
-            canvas.drawString(left_m, 841.89 - top_m + 15, "Lloyd Institute of Engineering & Technology | Department of CSE")
-            canvas.drawRightString(595.27 - right_m, 841.89 - top_m + 15, "AI-Powered Job Portal Synopsis")
-            canvas.setStrokeColor(BORDER_COLOR)
-            canvas.setLineWidth(0.5)
-            canvas.line(left_m, 841.89 - top_m + 10, 595.27 - right_m, 841.89 - top_m + 10)
 
         # Footer (On all pages according to Specification Rule 5)
         canvas.setFont("Times-Roman", 9)
@@ -1042,7 +1032,7 @@ def create_specification_synopsis():
         canvas.setLineWidth(0.5)
         canvas.line(left_m, bottom_m + 15, 595.27 - right_m, bottom_m + 15)
         canvas.drawString(left_m, bottom_m, "Academic Session: 2026–27")
-        canvas.drawRightString(595.27 - right_m, bottom_m, f"Page {page_num} of 14")
+        canvas.drawRightString(595.27 - right_m, bottom_m, f"Page {page_num} of 15")
         
         canvas.restoreState()
 
