@@ -1,149 +1,264 @@
 import os
 import sys
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
-from reportlab.lib.units import inch
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, HRFlowable
 )
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.graphics.shapes import Drawing, Rect, String, Line, Group, Polygon
+from reportlab.graphics.shapes import Drawing, Rect, String, Line, Group
 
-def create_14page_synopsis():
+def create_specification_synopsis():
     pdf_filename = "AI_Powered_Job_Portal_14Page_Synopsis.pdf"
+    
+    # A4 Dimensions: 595.27 x 841.89 points
+    # Margins: Left=2.5cm (70.87pt), Right=1.25cm (35.43pt), Top=2.5cm (70.87pt), Bottom=1.25cm (35.43pt)
+    left_m = 70.87
+    right_m = 35.43
+    top_m = 70.87
+    bottom_m = 35.43
+    printable_width = 595.27 - left_m - right_m  # 488.97 pt (~489 pt)
+
     doc = SimpleDocTemplate(
         pdf_filename,
-        pagesize=letter,
-        leftMargin=54,
-        rightMargin=54,
-        topMargin=54,
-        bottomMargin=54
+        pagesize=A4,
+        leftMargin=left_m,
+        rightMargin=right_m,
+        topMargin=top_m,
+        bottomMargin=bottom_m
     )
 
     styles = getSampleStyleSheet()
 
-    # Custom Color Palette
-    PRIMARY = colors.HexColor("#0F172A")    # Slate 900
-    SECONDARY = colors.HexColor("#2563EB")  # Royal Blue 600
-    ACCENT = colors.HexColor("#38BDF8")     # Sky Blue 400
-    TEXT_DARK = colors.HexColor("#1E293B")  # Slate 800
-    TEXT_MUTED = colors.HexColor("#64748B") # Slate 500
-    BG_LIGHT = colors.HexColor("#F8FAFC")   # Slate 50
-    BORDER_COLOR = colors.HexColor("#E2E8F0") # Slate 200
+    # Color Palette (Academic & Modern)
+    PRIMARY = colors.HexColor("#0F172A")      # Slate 900
+    SECONDARY = colors.HexColor("#1E3A8A")    # Dark Navy Blue 900
+    TEXT_DARK = colors.HexColor("#1E293B")    # Slate 800
+    TEXT_MUTED = colors.HexColor("#475569")   # Slate 600
+    BG_LIGHT = colors.HexColor("#F8FAFC")     # Slate 50 (Light/White background for diagrams)
+    BORDER_COLOR = colors.HexColor("#CBD5E1") # Slate 300
 
-    # Typography Styles
-    h1_style = ParagraphStyle(
-        'Heading1_Custom',
+    # SPECIFICATION FONTS (Times New Roman, 1.5 Line Spacing):
+    # Large Heading: 15 pt (leading 22.5 pt)
+    # Small Heading: 13 pt (leading 19.5 pt)
+    # Normal Text: 11 pt (leading 16.5 pt)
+
+    large_heading_style = ParagraphStyle(
+        'LargeHeading',
         parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=18,
-        leading=22,
+        fontName='Times-Bold',
+        fontSize=15,
+        leading=22.5,
         textColor=PRIMARY,
-        spaceBefore=16,
-        spaceAfter=12,
+        spaceBefore=14,
+        spaceAfter=10,
         keepWithNext=True
     )
 
-    h2_style = ParagraphStyle(
-        'Heading2_Custom',
+    small_heading_style = ParagraphStyle(
+        'SmallHeading',
         parent=styles['Normal'],
-        fontName='Helvetica-Bold',
+        fontName='Times-Bold',
         fontSize=13,
-        leading=17,
+        leading=19.5,
         textColor=SECONDARY,
         spaceBefore=12,
         spaceAfter=6,
         keepWithNext=True
     )
 
-    body_style = ParagraphStyle(
-        'Body_Custom',
+    normal_text_style = ParagraphStyle(
+        'NormalText',
         parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=10,
-        leading=14.5,
+        fontName='Times-Roman',
+        fontSize=11,
+        leading=16.5,
         textColor=TEXT_DARK,
         spaceAfter=8
     )
 
     bullet_style = ParagraphStyle(
-        'Bullet_Custom',
+        'BulletText',
         parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=9.5,
-        leading=14,
+        fontName='Times-Roman',
+        fontSize=11,
+        leading=16.5,
         textColor=TEXT_DARK,
-        leftIndent=15,
+        leftIndent=18,
         spaceAfter=4
+    )
+
+    caption_above_table_style = ParagraphStyle(
+        'CaptionAboveTable',
+        parent=styles['Normal'],
+        fontName='Times-BoldItalic',
+        fontSize=10,
+        leading=14,
+        textColor=PRIMARY,
+        spaceAfter=5,
+        keepWithNext=True
+    )
+
+    caption_below_figure_style = ParagraphStyle(
+        'CaptionBelowFigure',
+        parent=styles['Normal'],
+        fontName='Times-BoldItalic',
+        fontSize=10,
+        leading=14,
+        textColor=PRIMARY,
+        alignment=1, # Center
+        spaceBefore=6,
+        spaceAfter=10
     )
 
     table_cell = ParagraphStyle(
         'TableCell',
         parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=9,
-        leading=12,
+        fontName='Times-Roman',
+        fontSize=10,
+        leading=14,
         textColor=TEXT_DARK
     )
 
     table_cell_bold = ParagraphStyle(
         'TableCellBold',
         parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=9,
-        leading=12,
+        fontName='Times-Bold',
+        fontSize=10,
+        leading=14,
         textColor=PRIMARY
     )
 
     table_cell_header = ParagraphStyle(
         'TableCellHeader',
         parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=9.5,
-        leading=13,
+        fontName='Times-Bold',
+        fontSize=10.5,
+        leading=14.5,
         textColor=colors.white
+    )
+
+    cover_title_style = ParagraphStyle(
+        'CoverTitle',
+        parent=styles['Normal'],
+        fontName='Times-Bold',
+        fontSize=20,
+        leading=26,
+        textColor=PRIMARY,
+        alignment=1,
+        spaceAfter=12
+    )
+
+    cover_subtitle_style = ParagraphStyle(
+        'CoverSubtitle',
+        parent=styles['Normal'],
+        fontName='Times-Italic',
+        fontSize=12,
+        leading=17,
+        textColor=SECONDARY,
+        alignment=1,
+        spaceAfter=15
     )
 
     story = []
 
     # =========================================================================
-    # PAGE 1: INDEX & CERTIFICATE (START DIRECTLY FROM TOC)
+    # PAGE 1: TITLE PAGE (COVER PAGE)
     # =========================================================================
-    story.append(Paragraph("TABLE OF CONTENTS", h1_style))
-    story.append(Paragraph("This document presents the detailed project synopsis for the AI-Powered Job Portal (NoirHire Platform), mapped across seven structured sections.", body_style))
     story.append(Spacer(1, 10))
+    
+    # Submissions Header Table
+    header_data = [
+        [
+            Paragraph("<b>Submitted by:</b><br/>Student Name: ________________<br/>Roll No: ____________________<br/>Section: ____________________", table_cell),
+            Paragraph("<b>Under the Supervision of:</b><br/>Guide Name: _________________<br/>Assistant Professor<br/>Dept. of Computer Science & Engineering", table_cell)
+        ]
+    ]
+    t_header = Table(header_data, colWidths=[240, 249])
+    t_header.setStyle(TableStyle([
+        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('LEFTPADDING', (0,0), (-1,-1), 0),
+        ('RIGHTPADDING', (0,0), (-1,-1), 0),
+    ]))
+    story.append(t_header)
+    story.append(Spacer(1, 40))
 
+    # College Badge / Logo (Light/White Background)
+    d_logo = Drawing(printable_width, 65)
+    d_logo.add(Rect(printable_width/2 - 50, 5, 100, 55, rx=6, ry=6, fillColor=colors.white, strokeColor=SECONDARY, strokeWidth=2))
+    d_logo.add(String(printable_width/2, 38, "LLOYD", textAnchor="middle", fontName="Times-Bold", fontSize=16, fillColor=PRIMARY))
+    d_logo.add(String(printable_width/2, 20, "LIET", textAnchor="middle", fontName="Times-Bold", fontSize=11, fillColor=SECONDARY))
+    story.append(d_logo)
+    story.append(Spacer(1, 15))
+
+    story.append(HRFlowable(width="100%", thickness=1.5, color=SECONDARY, spaceBefore=5, spaceAfter=20))
+
+    # Institution Details
+    dept_style = ParagraphStyle('Dept', parent=styles['Normal'], fontName='Times-Bold', fontSize=13, leading=18, alignment=1, textColor=PRIMARY)
+    inst_style = ParagraphStyle('Inst', parent=styles['Normal'], fontName='Times-Bold', fontSize=16, leading=22, alignment=1, textColor=SECONDARY)
+    addr_style = ParagraphStyle('Addr', parent=styles['Normal'], fontName='Times-Roman', fontSize=10, leading=14, alignment=1, textColor=TEXT_MUTED)
+
+    story.append(Paragraph("Department of Computer Science & Engineering", dept_style))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph("Lloyd Institute of Engineering & Technology", inst_style))
+    story.append(Spacer(1, 4))
+    story.append(Paragraph("Plot No. 3, Knowledge Park II, Greater Noida, Uttar Pradesh 201306", addr_style))
+    story.append(Spacer(1, 15))
+    story.append(Paragraph("Academic Session: 2026–27", dept_style))
+    story.append(Spacer(1, 35))
+
+    # Main Project Title Card
+    story.append(Paragraph("PROJECT SYNOPSIS", ParagraphStyle('SubHeading', parent=styles['Normal'], fontName='Times-Bold', fontSize=13, leading=17, alignment=1, textColor=TEXT_MUTED)))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph("AI-POWERED JOB PORTAL<br/>(NOIR HIRE PLATFORM)", cover_title_style))
+    story.append(Paragraph("A Cloud-Native Microservices Recruitment Ecosystem with Generative AI & Semantic Matching", cover_subtitle_style))
+
+    story.append(Spacer(1, 40))
+    story.append(HRFlowable(width="100%", thickness=1, color=BORDER_COLOR, spaceBefore=10, spaceAfter=10))
+
+    story.append(PageBreak())
+
+    # =========================================================================
+    # PAGE 2: INDEX
+    # =========================================================================
+    story.append(Paragraph("INDEX", large_heading_style))
+    story.append(Paragraph("This document presents the detailed project synopsis for the AI-Powered Job Portal (NoirHire Platform), mapped across seven structured sections.", normal_text_style))
+    story.append(Spacer(1, 8))
+
+    story.append(Paragraph("Table 2.1: Master Synopsis Topic Index", caption_above_table_style))
+
+    # Clean Page Numbers without "Pages" prefix (as requested in Screenshot 3)
     index_data = [
-        [Paragraph("Sr. No.", table_cell_header), Paragraph("Topic Description", table_cell_header), Paragraph("Page Allocation", table_cell_header)],
-        [Paragraph("01", table_cell_bold), Paragraph("<b>Introduction</b><br/>• System Overview & Domain Context<br/>• Microservices Architecture Topology<br/>• Generative AI Integration", table_cell), Paragraph("Pages 2 – 4<br/>(3 Pages)", table_cell_bold)],
-        [Paragraph("02", table_cell_bold), Paragraph("<b>Statement of Problem with Objective</b><br/>• Industry Pain Points & Limitations<br/>• Core Project Objectives & Key Pillars", table_cell), Paragraph("Pages 5 – 6<br/>(2 Pages)", table_cell_bold)],
-        [Paragraph("03", table_cell_bold), Paragraph("<b>Literature Survey</b><br/>• Comparative Platform Evaluation<br/>• Academic & Industry Research Analysis Matrix", table_cell), Paragraph("Pages 7 – 8<br/>(2 Pages)", table_cell_bold)],
-        [Paragraph("04", table_cell_bold), Paragraph("<b>Expected Outcome / Scope of the Project</b><br/>• Measurable System Outcomes<br/>• Functional Microservices Breakdown<br/>• Natural Language Search Flow", table_cell), Paragraph("Pages 9 – 10<br/>(2 Pages)", table_cell_bold)],
-        [Paragraph("05", table_cell_bold), Paragraph("<b>Tentative Work Plan (10-Week Timeline)</b><br/>• Week-by-Week Development Roadmap<br/>• Project Milestone Timeline Chart", table_cell), Paragraph("Pages 11 – 12<br/>(1.5 Pages)", table_cell_bold)],
-        [Paragraph("06", table_cell_bold), Paragraph("<b>Software / Hardware Requirements</b><br/>• Backend, Database, Cloud & Client Stack<br/>• Minimum Infrastructure Specifications", table_cell), Paragraph("Page 12<br/>(0.5 Page)", table_cell_bold)],
-        [Paragraph("07", table_cell_bold), Paragraph("<b>References</b><br/>• Formal IEEE & Industry Standard References", table_cell), Paragraph("Page 13<br/>(1 Page)", table_cell_bold)]
+        [Paragraph("Sr. No.", table_cell_header), Paragraph("Topic Description", table_cell_header), Paragraph("Page No.", table_cell_header)],
+        [Paragraph("01", table_cell_bold), Paragraph("<b>Introduction</b><br/>• System Overview & Domain Context<br/>• Microservices Architecture Topology<br/>• Generative AI Integration", table_cell), Paragraph("3 – 5", table_cell_bold)],
+        [Paragraph("02", table_cell_bold), Paragraph("<b>Statement of Problem with Objective</b><br/>• Industry Pain Points & Limitations<br/>• Core Project Objectives & Key Pillars", table_cell), Paragraph("6 – 7", table_cell_bold)],
+        [Paragraph("03", table_cell_bold), Paragraph("<b>Literature Survey</b><br/>• Comparative Platform Evaluation<br/>• Academic & Industry Research Analysis Matrix", table_cell), Paragraph("8 – 9", table_cell_bold)],
+        [Paragraph("04", table_cell_bold), Paragraph("<b>Expected Outcome / Scope of the Project</b><br/>• Measurable System Outcomes<br/>• Functional Microservices Breakdown<br/>• Natural Language Search Flow", table_cell), Paragraph("10 – 11", table_cell_bold)],
+        [Paragraph("05", table_cell_bold), Paragraph("<b>Tentative Work Plan (10-Week Timeline)</b><br/>• Week-by-Week Development Roadmap<br/>• Project Milestone Timeline Chart", table_cell), Paragraph("12 – 13", table_cell_bold)],
+        [Paragraph("06", table_cell_bold), Paragraph("<b>Software / Hardware Requirements</b><br/>• Backend, Database, Cloud & Client Stack<br/>• Minimum Infrastructure Specifications", table_cell), Paragraph("13 – 14", table_cell_bold)],
+        [Paragraph("07", table_cell_bold), Paragraph("<b>References</b><br/>• Formal IEEE & Industry Standard References", table_cell), Paragraph("14", table_cell_bold)]
     ]
 
-    t_index = Table(index_data, colWidths=[55, 345, 104])
+    t_index = Table(index_data, colWidths=[50, 350, 89])
     t_index.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, BG_LIGHT]),
-        ('TOPPADDING', (0,0), (-1,-1), 8),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 7),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 7),
     ]))
     story.append(t_index)
-    story.append(Spacer(1, 45))
+    story.append(Spacer(1, 40))
 
-    # Signatures Section (Clean lines without hardcoded names for manual entry)
+    # Signatures Section (Blank underline spaces for manual writing)
     sig_data = [
         [
             Paragraph("________________________<br/><b>Student's Signature</b>", table_cell),
             Paragraph("________________________<br/><b>Guide's Signature</b>", table_cell)
         ]
     ]
-    t_sig = Table(sig_data, colWidths=[250, 254])
+    t_sig = Table(sig_data, colWidths=[240, 249])
     t_sig.setStyle(TableStyle([
         ('VALIGN', (0,0), (-1,-1), 'BOTTOM'),
         ('LEFTPADDING', (0,0), (-1,-1), 0),
@@ -154,87 +269,86 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 2: SECTION 01 - INTRODUCTION (PART 1)
+    # PAGE 3: 01. INTRODUCTION (PART 1)
     # =========================================================================
-    story.append(Paragraph("01. INTRODUCTION", h1_style))
+    story.append(Paragraph("01. INTRODUCTION", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
 
-    story.append(Paragraph("1.1 Domain Context & Evolution of Recruitment Systems", h2_style))
+    story.append(Paragraph("1.1 Domain Context & Evolution of Recruitment Systems", small_heading_style))
     story.append(Paragraph(
         "The digital recruitment ecosystem has undergone significant transformations over the last two decades. "
         "First-generation job portals functioned primarily as electronic bulletin boards, allowing recruiters to post static position descriptions and candidates to upload standardized resumes. "
         "However, as online job applications exponentially increased, traditional platforms began suffering from massive candidate noise, keyword-stuffing exploits, and severe recruiter fatigue. "
         "Legacy architectures relying on monolithic backends and basic relational SQL queries struggle to deliver context-aware, personalized matching or dynamic resume evaluations.",
-        body_style
+        normal_text_style
     ))
     story.append(Paragraph(
         "Modern enterprise recruitment demands an intelligent, highly scalable, and context-driven approach. "
         "The <b>NoirHire AI-Powered Job Portal</b> is engineered to bridge the gap between job seekers and employers by leveraging a <b>cloud-native microservices architecture</b> combined with <b>Google Gemini Large Language Models (LLMs)</b>. "
         "By decentralizing core business capabilities into specialized autonomous services—such as User Authentication, Job Cataloging, Resume Management, Application Tracking, and AI Cognitive Analytics—the system delivers sub-second response times, elastic scaling, and automated candidate screening.",
-        body_style
+        normal_text_style
     ))
 
-    story.append(Spacer(1, 8))
-    story.append(Paragraph("1.2 System Overview & Key Functional Pillars", h2_style))
+    story.append(Spacer(1, 6))
+    story.append(Paragraph("1.2 System Overview & Key Functional Pillars", small_heading_style))
     story.append(Paragraph(
         "NoirHire serves two primary stakeholders through dedicated, tailored workflow experiences:",
-        body_style
+        normal_text_style
     ))
 
     story.append(Paragraph("<b>1. Job Seekers:</b> Candidates benefit from AI-powered semantic job searches, automatic resume parsing, personalized match scoring, AI-generated cover letters, and real-time application tracking.", bullet_style))
     story.append(Paragraph("<b>2. Employers & Recruiters:</b> Hiring managers gain access to automated job description generators, candidate compatibility ranking (0–100 match score), compensation benchmarking, and streamlined applicant pipeline management.", bullet_style))
 
-    story.append(Spacer(1, 10))
-    story.append(Paragraph("1.3 Microservices Architectural Paradigm", h2_style))
+    story.append(Spacer(1, 8))
+    story.append(Paragraph("1.3 Microservices Architectural Paradigm", small_heading_style))
     story.append(Paragraph(
         "Rather than deploying a single monolithic codebase, NoirHire adopts a modular Spring Cloud microservice topology. "
         "Each service is completely decoupled, maintains its own isolated database schema (Database-per-Service pattern), and communicates via lightweight REST APIs and asynchronous messaging pipelines.",
-        body_style
+        normal_text_style
     ))
 
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 3: SECTION 01 - INTRODUCTION (PART 2: ARCHITECTURE DIAGRAM)
+    # PAGE 4: 01. INTRODUCTION (PART 2: ARCHITECTURE DIAGRAM)
     # =========================================================================
-    story.append(Paragraph("1.4 System Architecture & Component Topology", h2_style))
+    story.append(Paragraph("1.4 System Architecture & Component Topology", small_heading_style))
     story.append(Paragraph(
         "The diagram below illustrates the high-level system architecture of NoirHire. Client requests from the React single-page application flow into an <b>API Gateway</b> running on port 9000, which handles unified JWT security verification, rate limiting, and dynamic routing to underlying microservices registered with <b>Netflix Eureka Service Discovery</b>.",
-        body_style
+        normal_text_style
     ))
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
-    # Architecture Diagram (Drawing)
-    d_arch = Drawing(504, 250)
-    # Outer Border
-    d_arch.add(Rect(0, 0, 504, 250, rx=6, ry=6, fillColor=BG_LIGHT, strokeColor=BORDER_COLOR, strokeWidth=1))
+    # Architecture Diagram (Light/White Background according to Rule 4 of Specifications)
+    d_arch = Drawing(printable_width, 240)
+    d_arch.add(Rect(0, 0, printable_width, 240, rx=4, ry=4, fillColor=colors.white, strokeColor=BORDER_COLOR, strokeWidth=1))
     
     # Client
-    d_arch.add(Rect(20, 105, 90, 40, rx=4, ry=4, fillColor=PRIMARY, strokeColor=colors.black))
-    d_arch.add(String(65, 125, "React Frontend", textAnchor="middle", fontName="Helvetica-Bold", fontSize=9, fillColor=colors.white))
-    d_arch.add(String(65, 113, "(Vite / Tailwind)", textAnchor="middle", fontName="Helvetica", fontSize=7.5, fillColor=ACCENT))
+    d_arch.add(Rect(15, 100, 85, 40, rx=4, ry=4, fillColor=colors.HexColor("#F1F5F9"), strokeColor=PRIMARY, strokeWidth=1.5))
+    d_arch.add(String(57, 122, "React Client", textAnchor="middle", fontName="Times-Bold", fontSize=9.5, fillColor=PRIMARY))
+    d_arch.add(String(57, 110, "(Vite / Tailwind)", textAnchor="middle", fontName="Times-Italic", fontSize=8, fillColor=SECONDARY))
 
     # Arrow to Gateway
-    d_arch.add(Line(110, 125, 140, 125, strokeColor=SECONDARY, strokeWidth=1.5))
+    d_arch.add(Line(100, 120, 130, 120, strokeColor=SECONDARY, strokeWidth=1.5))
 
     # Gateway
-    d_arch.add(Rect(140, 95, 90, 60, rx=4, ry=4, fillColor=SECONDARY, strokeColor=colors.black))
-    d_arch.add(String(185, 133, "API Gateway", textAnchor="middle", fontName="Helvetica-Bold", fontSize=10, fillColor=colors.white))
-    d_arch.add(String(185, 120, "Port :9000", textAnchor="middle", fontName="Helvetica", fontSize=8, fillColor=colors.white))
-    d_arch.add(String(185, 107, "(JWT Security)", textAnchor="middle", fontName="Helvetica-Oblique", fontSize=7.5, fillColor=ACCENT))
+    d_arch.add(Rect(130, 90, 85, 60, rx=4, ry=4, fillColor=colors.HexColor("#EFF6FF"), strokeColor=SECONDARY, strokeWidth=1.5))
+    d_arch.add(String(172, 130, "API Gateway", textAnchor="middle", fontName="Times-Bold", fontSize=10, fillColor=SECONDARY))
+    d_arch.add(String(172, 116, "Port :9000", textAnchor="middle", fontName="Times-Roman", fontSize=8.5, fillColor=PRIMARY))
+    d_arch.add(String(172, 102, "(JWT Security)", textAnchor="middle", fontName="Times-Italic", fontSize=8, fillColor=TEXT_MUTED))
 
     # Discovery & Config
-    d_arch.add(Rect(140, 185, 90, 35, rx=4, ry=4, fillColor=colors.HexColor("#475569"), strokeColor=colors.black))
-    d_arch.add(String(185, 207, "Eureka Registry", textAnchor="middle", fontName="Helvetica-Bold", fontSize=8.5, fillColor=colors.white))
-    d_arch.add(String(185, 194, "Port :8761", textAnchor="middle", fontName="Helvetica", fontSize=7.5, fillColor=colors.HexColor("#CBD5E1")))
+    d_arch.add(Rect(130, 180, 85, 35, rx=4, ry=4, fillColor=colors.HexColor("#F8FAFC"), strokeColor=PRIMARY, strokeWidth=1))
+    d_arch.add(String(172, 201, "Eureka Registry", textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=PRIMARY))
+    d_arch.add(String(172, 189, "Port :8761", textAnchor="middle", fontName="Times-Roman", fontSize=7.5, fillColor=TEXT_MUTED))
 
-    d_arch.add(Rect(140, 30, 90, 35, rx=4, ry=4, fillColor=colors.HexColor("#475569"), strokeColor=colors.black))
-    d_arch.add(String(185, 52, "Config Server", textAnchor="middle", fontName="Helvetica-Bold", fontSize=8.5, fillColor=colors.white))
-    d_arch.add(String(185, 39, "Port :8888", textAnchor="middle", fontName="Helvetica", fontSize=7.5, fillColor=colors.HexColor("#CBD5E1")))
+    d_arch.add(Rect(130, 25, 85, 35, rx=4, ry=4, fillColor=colors.HexColor("#F8FAFC"), strokeColor=PRIMARY, strokeWidth=1))
+    d_arch.add(String(172, 46, "Config Server", textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=PRIMARY))
+    d_arch.add(String(172, 34, "Port :8888", textAnchor="middle", fontName="Times-Roman", fontSize=7.5, fillColor=TEXT_MUTED))
 
     # Dotted Discovery lines
-    d_arch.add(Line(185, 155, 185, 185, strokeColor=colors.HexColor("#94A3B8"), strokeWidth=1, strokeDashArray=[2,2]))
-    d_arch.add(Line(185, 95, 185, 65, strokeColor=colors.HexColor("#94A3B8"), strokeWidth=1, strokeDashArray=[2,2]))
+    d_arch.add(Line(172, 150, 172, 180, strokeColor=TEXT_MUTED, strokeWidth=1, strokeDashArray=[2,2]))
+    d_arch.add(Line(172, 90, 172, 60, strokeColor=TEXT_MUTED, strokeWidth=1, strokeDashArray=[2,2]))
 
     # Microservices Box
     services = [
@@ -247,36 +361,33 @@ def create_14page_synopsis():
     ]
 
     for sname, sport, ypos in services:
-        # Arrow from Gateway
-        d_arch.add(Line(230, 125, 270, ypos + 15, strokeColor=SECONDARY, strokeWidth=1))
-        # Service Box
-        d_arch.add(Rect(270, ypos, 105, 28, rx=3, ry=3, fillColor=colors.HexColor("#0284C7"), strokeColor=colors.black))
-        d_arch.add(String(322, ypos + 16, sname, textAnchor="middle", fontName="Helvetica-Bold", fontSize=8, fillColor=colors.white))
-        d_arch.add(String(322, ypos + 6, f"Port {sport}", textAnchor="middle", fontName="Helvetica", fontSize=7, fillColor=colors.HexColor("#E0F2FE")))
+        d_arch.add(Line(215, 120, 255, ypos + 15, strokeColor=SECONDARY, strokeWidth=1))
+        d_arch.add(Rect(255, ypos, 110, 28, rx=3, ry=3, fillColor=colors.HexColor("#F0F9FF"), strokeColor=SECONDARY, strokeWidth=1))
+        d_arch.add(String(310, ypos + 16, sname, textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=PRIMARY))
+        d_arch.add(String(310, ypos + 6, f"Port {sport}", textAnchor="middle", fontName="Times-Roman", fontSize=7.5, fillColor=TEXT_MUTED))
 
     # AI Engine Box (Highlighted)
-    d_arch.add(Line(230, 125, 410, 215, strokeColor=colors.HexColor("#7C3AED"), strokeWidth=1.5))
-    d_arch.add(Rect(410, 195, 84, 40, rx=4, ry=4, fillColor=colors.HexColor("#7C3AED"), strokeColor=colors.black))
-    d_arch.add(String(452, 222, "AI Service", textAnchor="middle", fontName="Helvetica-Bold", fontSize=9, fillColor=colors.white))
-    d_arch.add(String(452, 209, "Port :9010", textAnchor="middle", fontName="Helvetica", fontSize=7.5, fillColor=colors.HexColor("#DDD6FE")))
+    d_arch.add(Line(215, 120, 395, 205, strokeColor=colors.HexColor("#7C3AED"), strokeWidth=1.5))
+    d_arch.add(Rect(395, 185, 80, 40, rx=4, ry=4, fillColor=colors.HexColor("#F3E8FF"), strokeColor=colors.HexColor("#7C3AED"), strokeWidth=1.5))
+    d_arch.add(String(435, 210, "AI Service", textAnchor="middle", fontName="Times-Bold", fontSize=9, fillColor=colors.HexColor("#6B21A8")))
+    d_arch.add(String(435, 197, "Port :9010", textAnchor="middle", fontName="Times-Roman", fontSize=8, fillColor=PRIMARY))
 
     # Gemini Cloud
-    d_arch.add(Rect(410, 125, 84, 35, rx=4, ry=4, fillColor=colors.HexColor("#DB2777"), strokeColor=colors.black))
-    d_arch.add(String(452, 147, "Google Gemini", textAnchor="middle", fontName="Helvetica-Bold", fontSize=8.5, fillColor=colors.white))
-    d_arch.add(String(452, 134, "LLM Engine", textAnchor="middle", fontName="Helvetica-Oblique", fontSize=7.5, fillColor=colors.white))
+    d_arch.add(Rect(395, 115, 80, 35, rx=4, ry=4, fillColor=colors.HexColor("#FCE7F3"), strokeColor=colors.HexColor("#DB2777"), strokeWidth=1.5))
+    d_arch.add(String(435, 136, "Google Gemini", textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=colors.HexColor("#9D174D")))
+    d_arch.add(String(435, 124, "LLM Engine", textAnchor="middle", fontName="Times-Italic", fontSize=7.5, fillColor=PRIMARY))
 
-    # Connect AI to Gemini
-    d_arch.add(Line(452, 195, 452, 160, strokeColor=colors.HexColor("#DB2777"), strokeWidth=1.5))
+    d_arch.add(Line(435, 185, 435, 150, strokeColor=colors.HexColor("#DB2777"), strokeWidth=1.5))
 
     # Kafka Broker
-    d_arch.add(Rect(410, 10, 84, 40, rx=4, ry=4, fillColor=colors.HexColor("#D97706"), strokeColor=colors.black))
-    d_arch.add(String(452, 32, "Apache Kafka", textAnchor="middle", fontName="Helvetica-Bold", fontSize=8.5, fillColor=colors.white))
-    d_arch.add(String(452, 20, "Port :29092", textAnchor="middle", fontName="Helvetica", fontSize=7.5, fillColor=colors.HexColor("#FEF3C7")))
+    d_arch.add(Rect(395, 10, 80, 40, rx=4, ry=4, fillColor=colors.HexColor("#FEF3C7"), strokeColor=colors.HexColor("#D97706"), strokeWidth=1.5))
+    d_arch.add(String(435, 32, "Apache Kafka", textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=colors.HexColor("#92400E")))
+    d_arch.add(String(435, 20, "Port :29092", textAnchor="middle", fontName="Times-Roman", fontSize=7.5, fillColor=PRIMARY))
 
     story.append(d_arch)
-    story.append(Spacer(1, 10))
+    story.append(Paragraph("Figure 1.1: NoirHire Cloud-Native Microservices Architecture & Topology Diagram", caption_below_figure_style))
 
-    story.append(Paragraph("1.5 Detailed Service Responsibilities", h2_style))
+    story.append(Paragraph("1.5 Detailed Service Responsibilities", small_heading_style))
     story.append(Paragraph("<b>• User Service (9001):</b> Manages candidate/employer profiles, password encryption (BCrypt), and Google OAuth2 integration with OTP email verification.", bullet_style))
     story.append(Paragraph("<b>• Job Service (9003):</b> Handles job postings, categories, salary indexing, and recruiter management.", bullet_style))
     story.append(Paragraph("<b>• Application Service (9004):</b> Processes job applications, state transitions (APPLIED, SHORTLISTED, REJECTED), and Feign client inter-service orchestrations.", bullet_style))
@@ -285,13 +396,15 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 4: SECTION 01 - INTRODUCTION (PART 3: AI INTEGRATION)
+    # PAGE 5: 01. INTRODUCTION (PART 3: AI INTEGRATION)
     # =========================================================================
-    story.append(Paragraph("1.6 Deep Generative AI Features & Capabilities", h2_style))
+    story.append(Paragraph("1.6 Deep Generative AI Features & Capabilities", small_heading_style))
     story.append(Paragraph(
         "NoirHire embeds generative AI capabilities across five distinct modules to automate tedious recruitment tasks:",
-        body_style
+        normal_text_style
     ))
+
+    story.append(Paragraph("Table 1.1: Functional Breakdown of Integrated AI Modules", caption_above_table_style))
 
     ai_features_table = [
         [Paragraph("AI Module", table_cell_header), Paragraph("Key Functional Capability", table_cell_header), Paragraph("Impact & Business Benefit", table_cell_header)],
@@ -322,7 +435,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_ai = Table(ai_features_table, colWidths=[110, 240, 154])
+    t_ai = Table(ai_features_table, colWidths=[115, 230, 144])
     t_ai.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), SECONDARY),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -334,69 +447,71 @@ def create_14page_synopsis():
     story.append(t_ai)
     story.append(Spacer(1, 15))
 
-    story.append(Paragraph("1.7 Summary of Technological Innovation", h2_style))
+    story.append(Paragraph("1.7 Summary of Technological Innovation", small_heading_style))
     story.append(Paragraph(
         "By synthesizing modern reactive microservice patterns with state-of-the-art generative AI, NoirHire establishes a robust framework for high-throughput, intelligent recruitment. "
         "The decoupled architecture ensures that high-volume operations (such as browsing job listings) run independently of computationally heavy tasks (such as AI resume analysis), guaranteeing zero system bottlenecks.",
-        body_style
+        normal_text_style
     ))
 
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 5: SECTION 02 - STATEMENT OF PROBLEM WITH OBJECTIVE (PART 1)
+    # PAGE 6: 02. STATEMENT OF PROBLEM WITH OBJECTIVE (PART 1)
     # =========================================================================
-    story.append(Paragraph("02. STATEMENT OF PROBLEM WITH OBJECTIVE", h1_style))
+    story.append(Paragraph("02. STATEMENT OF PROBLEM WITH OBJECTIVE", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
 
-    story.append(Paragraph("2.1 Detailed Problem Statement", h2_style))
+    story.append(Paragraph("2.1 Detailed Problem Statement", small_heading_style))
     story.append(Paragraph(
         "Despite the proliferation of digital job boards, contemporary online recruitment suffers from critical operational inefficiency, structural rigidity, and cognitive overload on both sides of the hiring equation. "
         "The fundamental deficiencies of existing job portals are categorized below:",
-        body_style
+        normal_text_style
     ))
 
-    story.append(Paragraph("<b>1. The Exact Keyword Matching Trap (Semantic Blindness):</b>", ParagraphStyle('Sub', parent=body_style, fontName='Helvetica-Bold')))
+    story.append(Paragraph("<b>1. The Exact Keyword Matching Trap (Semantic Blindness):</b>", ParagraphStyle('Sub', parent=normal_text_style, fontName='Times-Bold')))
     story.append(Paragraph(
         "Traditional search engines rely heavily on exact string matching. "
         "If a candidate searches for <i>'Frontend Developer'</i>, existing portals frequently miss relevant postings titled <i>'UI Engineer'</i> or <i>'React Specialist'</i>. "
         "Conversely, candidates who write <i>'Node.js Expert'</i> on their resume might be filtered out by ATS algorithms searching strictly for <i>'Backend JavaScript Developer'</i>. "
         "This semantic disconnect results in qualified candidates being ignored and high job bounce rates.",
-        body_style
+        normal_text_style
     ))
 
-    story.append(Paragraph("<b>2. Recruiter Fatigue & Application Flooding:</b>", ParagraphStyle('Sub', parent=body_style, fontName='Helvetica-Bold')))
+    story.append(Paragraph("<b>2. Recruiter Fatigue & Application Flooding:</b>", ParagraphStyle('Sub', parent=normal_text_style, fontName='Times-Bold')))
     story.append(Paragraph(
         "With one-click apply mechanisms, popular job postings frequently receive 1,000+ resumes within 48 hours. "
         "Recruiters spend an average of only 6 to 8 seconds manually scanning each resume. "
         "Human fatigue leads to biased, inconsistent candidate evaluations, causing employers to miss top-tier talent buried in massive application piles.",
-        body_style
+        normal_text_style
     ))
 
-    story.append(Paragraph("<b>3. Monolithic Infrastructure Bottlenecks:</b>", ParagraphStyle('Sub', parent=body_style, fontName='Helvetica-Bold')))
+    story.append(Paragraph("<b>3. Monolithic Infrastructure Bottlenecks:</b>", ParagraphStyle('Sub', parent=normal_text_style, fontName='Times-Bold')))
     story.append(Paragraph(
         "Legacy job portals are built on single monolithic codebases sharing a single database. "
         "When traffic spikes during peak hiring hours or viral job announcements, database lock contention degrades the entire platform, rendering searching, login, and application submissions extremely slow or completely unavailable.",
-        body_style
+        normal_text_style
     ))
 
-    story.append(Paragraph("<b>4. Lack of Actionable Candidate Feedback:</b>", ParagraphStyle('Sub', parent=body_style, fontName='Helvetica-Bold')))
+    story.append(Paragraph("<b>4. Lack of Actionable Candidate Feedback:</b>", ParagraphStyle('Sub', parent=normal_text_style, fontName='Times-Bold')))
     story.append(Paragraph(
         "Job seekers submit hundreds of applications into an electronic 'black hole' without knowing why they were rejected. "
         "Traditional portals offer zero insight regarding missing skills, resume quality gaps, or market salary alignment.",
-        body_style
+        normal_text_style
     ))
 
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 6: SECTION 02 - STATEMENT OF PROBLEM WITH OBJECTIVE (PART 2)
+    # PAGE 7: 02. STATEMENT OF PROBLEM WITH OBJECTIVE (PART 2)
     # =========================================================================
-    story.append(Paragraph("2.2 Core Objectives of NoirHire Platform", h2_style))
+    story.append(Paragraph("2.2 Core Objectives of NoirHire Platform", small_heading_style))
     story.append(Paragraph(
         "To address the limitations of existing job portals, the primary objective of this project is to design, implement, and evaluate <b>NoirHire</b>—an enterprise-grade, microservices-based job portal powered by Google Gemini AI.",
-        body_style
+        normal_text_style
     ))
+
+    story.append(Paragraph("Table 2.1: Key Objectives and Technical Validation Targets", caption_above_table_style))
 
     objectives_data = [
         [Paragraph("Objective Area", table_cell_header), Paragraph("Technical Target & Deliverable", table_cell_header), Paragraph("Validation Metric", table_cell_header)],
@@ -427,7 +542,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_obj = Table(objectives_data, colWidths=[120, 230, 154])
+    t_obj = Table(objectives_data, colWidths=[120, 225, 144])
     t_obj.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -439,7 +554,7 @@ def create_14page_synopsis():
     story.append(t_obj)
     story.append(Spacer(1, 15))
 
-    story.append(Paragraph("2.3 Key Technical Innovations", h2_style))
+    story.append(Paragraph("2.3 Key Technical Innovations", small_heading_style))
     story.append(Paragraph("<b>• Zero-Coupling Architecture:</b> Microservices share no database tables; communication relies strictly on Feign clients and REST interfaces.", bullet_style))
     story.append(Paragraph("<b>• Resilience & Security:</b> Centralized JWT authorization filter at API Gateway level ensures secure stateless request propagation.", bullet_style))
     story.append(Paragraph("<b>• Cognitive Assistant:</b> Embedded conversational AI for interactive career counseling and automated resume critique.", bullet_style))
@@ -447,16 +562,18 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 7: SECTION 03 - LITERATURE SURVEY (PART 1)
+    # PAGE 8: 03. LITERATURE SURVEY (PART 1)
     # =========================================================================
-    story.append(Paragraph("03. LITERATURE SURVEY", h1_style))
+    story.append(Paragraph("03. LITERATURE SURVEY", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
 
-    story.append(Paragraph("3.1 Comparative Analysis of Existing Platforms", h2_style))
+    story.append(Paragraph("3.1 Comparative Analysis of Existing Platforms", small_heading_style))
     story.append(Paragraph(
         "To ground NoirHire in existing academic and industrial literature, we performed a thorough comparative evaluation of major legacy and modern recruitment solutions across six key technological parameters:",
-        body_style
+        normal_text_style
     ))
+
+    story.append(Paragraph("Table 3.1: Comparative Analysis Matrix of Recruitment Platforms", caption_above_table_style))
 
     comp_table_data = [
         [Paragraph("Feature / Metric", table_cell_header), Paragraph("LinkedIn", table_cell_header), Paragraph("Indeed", table_cell_header), Paragraph("Naukri.com", table_cell_header), Paragraph("NoirHire AI (Ours)", table_cell_header)],
@@ -504,7 +621,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_comp = Table(comp_table_data, colWidths=[104, 100, 100, 100, 100])
+    t_comp = Table(comp_table_data, colWidths=[95, 95, 95, 95, 109])
     t_comp.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
@@ -516,24 +633,26 @@ def create_14page_synopsis():
     story.append(t_comp)
     story.append(Spacer(1, 15))
 
-    story.append(Paragraph("3.2 Summary of Literature Survey Insights", h2_style))
+    story.append(Paragraph("3.2 Summary of Literature Survey Insights", small_heading_style))
     story.append(Paragraph(
         "Existing commercial platforms rely heavily on proprietary static algorithms that lack semantic understanding. "
         "While platforms like LinkedIn incorporate AI for enterprise recruiters, job seekers are left without automated assistance for resume optimization or gap analysis. "
         "NoirHire democratizes advanced generative AI tools for both applicants and employers while maintaining an open, cloud-native architecture.",
-        body_style
+        normal_text_style
     ))
 
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 8: SECTION 03 - LITERATURE SURVEY (PART 2: RESEARCH MATRIX)
+    # PAGE 9: 03. LITERATURE SURVEY (PART 2: RESEARCH MATRIX)
     # =========================================================================
-    story.append(Paragraph("3.3 Academic Research & Technical Literature Matrix", h2_style))
+    story.append(Paragraph("3.3 Academic Research & Technical Literature Matrix", small_heading_style))
     story.append(Paragraph(
         "Our system design is backed by findings from recent peer-reviewed computer science literature focusing on microservices, natural language processing, and distributed database isolation:",
-        body_style
+        normal_text_style
     ))
+
+    story.append(Paragraph("Table 3.2: Synthesis of Peer-Reviewed Literature Findings", caption_above_table_style))
 
     lit_matrix_data = [
         [Paragraph("Author & Year", table_cell_header), Paragraph("Focus Area & Research Title", table_cell_header), Paragraph("Identified Limitation", table_cell_header), Paragraph("NoirHire Architectural Solution", table_cell_header)],
@@ -563,7 +682,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_lit = Table(lit_matrix_data, colWidths=[85, 135, 140, 144])
+    t_lit = Table(lit_matrix_data, colWidths=[85, 130, 135, 139])
     t_lit.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), SECONDARY),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -575,7 +694,7 @@ def create_14page_synopsis():
     story.append(t_lit)
     story.append(Spacer(1, 15))
 
-    story.append(Paragraph("3.4 Key Takeaways from Literature", h2_style))
+    story.append(Paragraph("3.4 Key Takeaways from Literature", small_heading_style))
     story.append(Paragraph("1. **Decoupled Isolation:** Database-per-service isolates failure domains and permits targeted database scaling.", bullet_style))
     story.append(Paragraph("2. **LLM Superiority:** Generative transformers drastically outperform legacy regex parsing for unstructured resume documents.", bullet_style))
     story.append(Paragraph("3. **Asynchronous Resilience:** Event queues safeguard HTTP request-response cycles during transaction spikes.", bullet_style))
@@ -583,16 +702,18 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 9: SECTION 04 - EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 1)
+    # PAGE 10: 04. EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 1)
     # =========================================================================
-    story.append(Paragraph("04. EXPECTED OUTCOME / SCOPE OF THE PROJECT", h1_style))
+    story.append(Paragraph("04. EXPECTED OUTCOME / SCOPE OF THE PROJECT", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
 
-    story.append(Paragraph("4.1 Measurable Expected Outcomes", h2_style))
+    story.append(Paragraph("4.1 Measurable Expected Outcomes", small_heading_style))
     story.append(Paragraph(
         "Upon full deployment and validation of the NoirHire AI-Powered Job Portal, the system is engineered to achieve the following quantitative performance and business outcomes:",
-        body_style
+        normal_text_style
     ))
+
+    story.append(Paragraph("Table 4.1: Quantitative Performance Benchmarks & Targets", caption_above_table_style))
 
     outcomes_table_data = [
         [Paragraph("Metric / Benchmark Target", table_cell_header), Paragraph("Legacy System Baseline", table_cell_header), Paragraph("Expected NoirHire Outcome", table_cell_header)],
@@ -623,7 +744,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_out = Table(outcomes_table_data, colWidths=[150, 174, 180])
+    t_out = Table(outcomes_table_data, colWidths=[145, 170, 174])
     t_out.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
@@ -635,90 +756,92 @@ def create_14page_synopsis():
     story.append(t_out)
     story.append(Spacer(1, 15))
 
-    story.append(Paragraph("4.2 AI Search Enhancement Data Flow", h2_style))
+    story.append(Paragraph("4.2 AI Search Enhancement Data Flow", small_heading_style))
     story.append(Paragraph(
-        "The diagram on the next page details the sequence of data transformations when a job seeker inputs a natural language search query.",
-        body_style
+        "The sequence diagram on the following page illustrates the step-by-step data transformations when a job seeker inputs a natural language search query.",
+        normal_text_style
     ))
 
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 10: SECTION 04 - EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 2)
+    # PAGE 11: 04. EXPECTED OUTCOME / SCOPE OF THE PROJECT (PART 2)
     # =========================================================================
-    story.append(Paragraph("4.3 Natural Language Search Sequence Diagram", h2_style))
+    story.append(Paragraph("4.3 Natural Language Search Sequence Diagram", small_heading_style))
     story.append(Paragraph(
         "The diagram below traces the end-to-end request lifecycle from the React client through the API Gateway, AI Microservice, Google Gemini LLM Engine, and Job Microservice.",
-        body_style
+        normal_text_style
     ))
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
-    # Sequence Diagram (Drawing)
-    d_seq = Drawing(504, 220)
-    d_seq.add(Rect(0, 0, 504, 220, rx=6, ry=6, fillColor=BG_LIGHT, strokeColor=BORDER_COLOR, strokeWidth=1))
+    # Sequence Diagram (Light/White Background according to Rule 4 of Specifications)
+    d_seq = Drawing(printable_width, 220)
+    d_seq.add(Rect(0, 0, printable_width, 220, rx=4, ry=4, fillColor=colors.white, strokeColor=BORDER_COLOR, strokeWidth=1))
 
     lifelines = [
-        ("React Client", 60),
-        ("API Gateway", 170),
-        ("AI Service", 280),
-        ("Google Gemini", 380),
-        ("Job Service", 460)
+        ("React Client", 50),
+        ("API Gateway", 160),
+        ("AI Service", 270),
+        ("Google Gemini", 370),
+        ("Job Service", 450)
     ]
 
     for name, x in lifelines:
-        d_seq.add(Rect(x-40, 185, 80, 25, rx=3, ry=3, fillColor=PRIMARY, strokeColor=colors.black))
-        d_seq.add(String(x, 196, name, textAnchor="middle", fontName="Helvetica-Bold", fontSize=8, fillColor=colors.white))
-        d_seq.add(Line(x, 185, x, 15, strokeColor=colors.HexColor("#94A3B8"), strokeWidth=1, strokeDashArray=[3,3]))
+        d_seq.add(Rect(x-35, 185, 70, 25, rx=3, ry=3, fillColor=colors.HexColor("#F1F5F9"), strokeColor=PRIMARY, strokeWidth=1))
+        d_seq.add(String(x, 196, name, textAnchor="middle", fontName="Times-Bold", fontSize=8, fillColor=PRIMARY))
+        d_seq.add(Line(x, 185, x, 15, strokeColor=TEXT_MUTED, strokeWidth=1, strokeDashArray=[3,3]))
 
     # Step 1: Frontend -> Gateway
-    d_seq.add(Line(60, 160, 170, 160, strokeColor=SECONDARY, strokeWidth=1.5))
-    d_seq.add(String(115, 164, "1. POST /api/ai/search/enhance", textAnchor="middle", fontName="Helvetica-Bold", fontSize=7.5, fillColor=SECONDARY))
+    d_seq.add(Line(50, 160, 160, 160, strokeColor=SECONDARY, strokeWidth=1.5))
+    d_seq.add(String(105, 164, "1. POST /api/ai/search/enhance", textAnchor="middle", fontName="Times-Bold", fontSize=7.5, fillColor=SECONDARY))
 
     # Step 2: Gateway -> AI Service
-    d_seq.add(Line(170, 140, 280, 140, strokeColor=SECONDARY, strokeWidth=1.5))
-    d_seq.add(String(225, 144, "2. Forward { query: 'React remote...' }", textAnchor="middle", fontName="Helvetica", fontSize=7, fillColor=TEXT_DARK))
+    d_seq.add(Line(160, 140, 270, 140, strokeColor=SECONDARY, strokeWidth=1.5))
+    d_seq.add(String(215, 144, "2. Forward { query: 'React remote...' }", textAnchor="middle", fontName="Times-Roman", fontSize=7, fillColor=TEXT_DARK))
 
     # Step 3: AI Service -> Gemini
-    d_seq.add(Line(280, 120, 380, 120, strokeColor=colors.HexColor("#7C3AED"), strokeWidth=1.5))
-    d_seq.add(String(330, 124, "3. Generate Structured JSON", textAnchor="middle", fontName="Helvetica-Bold", fontSize=7, fillColor=colors.HexColor("#7C3AED")))
+    d_seq.add(Line(270, 120, 370, 120, strokeColor=colors.HexColor("#7C3AED"), strokeWidth=1.5))
+    d_seq.add(String(320, 124, "3. Generate Structured JSON", textAnchor="middle", fontName="Times-Bold", fontSize=7, fillColor=colors.HexColor("#7C3AED")))
 
     # Step 4: Gemini -> AI Service
-    d_seq.add(Line(380, 100, 280, 100, strokeColor=colors.HexColor("#DB2777"), strokeWidth=1, strokeDashArray=[2,2]))
-    d_seq.add(String(330, 104, "4. Return { skills, location, minSalary }", textAnchor="middle", fontName="Helvetica", fontSize=7, fillColor=colors.HexColor("#DB2777")))
+    d_seq.add(Line(370, 100, 270, 100, strokeColor=colors.HexColor("#DB2777"), strokeWidth=1, strokeDashArray=[2,2]))
+    d_seq.add(String(320, 104, "4. Return { skills, location, minSalary }", textAnchor="middle", fontName="Times-Roman", fontSize=7, fillColor=colors.HexColor("#DB2777")))
 
     # Step 5: AI Service -> Gateway -> React
-    d_seq.add(Line(280, 80, 60, 80, strokeColor=colors.HexColor("#059669"), strokeWidth=1, strokeDashArray=[2,2]))
-    d_seq.add(String(170, 84, "5. Return Enhanced Search Filters JSON", textAnchor="middle", fontName="Helvetica-Bold", fontSize=7.5, fillColor=colors.HexColor("#059669")))
+    d_seq.add(Line(270, 80, 50, 80, strokeColor=colors.HexColor("#059669"), strokeWidth=1, strokeDashArray=[2,2]))
+    d_seq.add(String(160, 84, "5. Return Enhanced Search Filters JSON", textAnchor="middle", fontName="Times-Bold", fontSize=7.5, fillColor=colors.HexColor("#059669")))
 
     # Step 6: React -> Gateway -> Job Service
-    d_seq.add(Line(60, 50, 460, 50, strokeColor=PRIMARY, strokeWidth=1.5))
-    d_seq.add(String(260, 54, "6. GET /api/jobs?location=Remote&skills=React&minSalary=1200000", textAnchor="middle", fontName="Helvetica-Bold", fontSize=7.5, fillColor=PRIMARY))
+    d_seq.add(Line(50, 50, 450, 50, strokeColor=PRIMARY, strokeWidth=1.5))
+    d_seq.add(String(250, 54, "6. GET /api/jobs?location=Remote&skills=React&minSalary=1200000", textAnchor="middle", fontName="Times-Bold", fontSize=7.5, fillColor=PRIMARY))
 
     # Step 7: Job Service -> React
-    d_seq.add(Line(460, 30, 60, 30, strokeColor=colors.HexColor("#059669"), strokeWidth=1, strokeDashArray=[2,2]))
-    d_seq.add(String(260, 34, "7. Return Filtered Matching Job Listings", textAnchor="middle", fontName="Helvetica", fontSize=7.5, fillColor=colors.HexColor("#059669")))
+    d_seq.add(Line(450, 30, 50, 30, strokeColor=colors.HexColor("#059669"), strokeWidth=1, strokeDashArray=[2,2]))
+    d_seq.add(String(250, 34, "7. Return Filtered Matching Job Listings", textAnchor="middle", fontName="Times-Roman", fontSize=7.5, fillColor=colors.HexColor("#059669")))
 
     story.append(d_seq)
-    story.append(Spacer(1, 15))
+    story.append(Paragraph("Figure 4.1: Natural Language AI Search Processing Sequence Diagram", caption_below_figure_style))
 
-    story.append(Paragraph("4.4 Project Scope & Boundaries", h2_style))
+    story.append(Paragraph("4.4 Project Scope & Boundaries", small_heading_style))
     story.append(Paragraph("<b>In-Scope:</b> End-to-end user authentication with OTP, microservice API gateway, PostgreSQL database per service, Google Gemini AI integration, resume parsing, ATS scoring, candidate screening, application state tracking, and responsive React frontend.", bullet_style))
     story.append(Paragraph("<b>Out-of-Scope (Future Enhancements):</b> Native mobile iOS/Android apps, automated video interview emotion analysis, and third-party payroll software integration.", bullet_style))
 
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 11: SECTION 05 - TENTATIVE WORK PLAN (PART 1: ROADMAP)
+    # PAGE 12: 05. TENTATIVE WORK PLAN (PART 1: ROADMAP)
     # =========================================================================
-    story.append(Paragraph("05. TENTATIVE WORK PLAN (MAPPED TO 10-WEEK TIMELINE)", h1_style))
+    story.append(Paragraph("05. TENTATIVE WORK PLAN (MAPPED TO 10-WEEK TIMELINE)", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
 
-    story.append(Paragraph("5.1 Week-by-Week Execution Plan", h2_style))
+    story.append(Paragraph("5.1 Week-by-Week Execution Plan", small_heading_style))
     story.append(Paragraph(
         "The project development cycle is structured over a 10-week intensive engineering timeline. "
         "Each phase includes clear technical deliverables and validation criteria:",
-        body_style
+        normal_text_style
     ))
+
+    story.append(Paragraph("Table 5.1: 10-Week Development Milestone Allocation", caption_above_table_style))
 
     plan_table_data = [
         [Paragraph("Phase / Week", table_cell_header), Paragraph("Engineering Tasks & Deliverables", table_cell_header), Paragraph("Key Milestone Output", table_cell_header)],
@@ -754,7 +877,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_plan = Table(plan_table_data, colWidths=[110, 240, 154])
+    t_plan = Table(plan_table_data, colWidths=[110, 235, 144])
     t_plan.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -768,28 +891,28 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 12: SECTION 05 (PART 2: GANTT CHART) & SECTION 06 - REQUIREMENTS
+    # PAGE 13: 05 (PART 2: GANTT CHART) & 06. SOFTWARE / HARDWARE REQUIREMENTS
     # =========================================================================
-    story.append(Paragraph("5.2 10-Week Milestone Gantt Chart", h2_style))
+    story.append(Paragraph("5.2 10-Week Milestone Gantt Chart", small_heading_style))
     story.append(Paragraph(
         "The timeline chart below illustrates the overlapping execution phases across the 10-week schedule.",
-        body_style
+        normal_text_style
     ))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 4))
 
-    # Gantt Chart (Drawing)
-    d_gantt = Drawing(504, 150)
-    d_gantt.add(Rect(0, 0, 504, 150, rx=4, ry=4, fillColor=BG_LIGHT, strokeColor=BORDER_COLOR, strokeWidth=1))
+    # Gantt Chart (Light/White Background according to Rule 4 of Specifications)
+    d_gantt = Drawing(printable_width, 140)
+    d_gantt.add(Rect(0, 0, printable_width, 140, rx=4, ry=4, fillColor=colors.white, strokeColor=BORDER_COLOR, strokeWidth=1))
 
     # Headers (Weeks 1 to 10)
-    d_gantt.add(Rect(0, 125, 120, 25, fillColor=PRIMARY, strokeColor=colors.black))
-    d_gantt.add(String(60, 134, "Phase / Task", textAnchor="middle", fontName="Helvetica-Bold", fontSize=8, fillColor=colors.white))
+    d_gantt.add(Rect(0, 115, 120, 25, fillColor=PRIMARY, strokeColor=colors.black))
+    d_gantt.add(String(60, 124, "Phase / Task", textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=colors.white))
 
-    col_w = 38.4
+    col_w = 36.8
     for w in range(1, 11):
         x = 120 + (w - 1) * col_w
-        d_gantt.add(Rect(x, 125, col_w, 25, fillColor=SECONDARY, strokeColor=colors.black))
-        d_gantt.add(String(x + col_w/2, 134, f"W{w}", textAnchor="middle", fontName="Helvetica-Bold", fontSize=8, fillColor=colors.white))
+        d_gantt.add(Rect(x, 115, col_w, 25, fillColor=SECONDARY, strokeColor=colors.black))
+        d_gantt.add(String(x + col_w/2, 124, f"W{w}", textAnchor="middle", fontName="Times-Bold", fontSize=8.5, fillColor=colors.white))
 
     tasks = [
         ("Requirements & DB Design", 1, 2, colors.HexColor("#0284C7")),
@@ -801,18 +924,20 @@ def create_14page_synopsis():
     ]
 
     for idx, (tname, wstart, wend, color) in enumerate(tasks):
-        y = 100 - idx * 20
-        d_gantt.add(String(5, y + 5, tname, fontName="Helvetica-Bold", fontSize=7.5, fillColor=TEXT_DARK))
+        y = 90 - idx * 18
+        d_gantt.add(String(5, y + 4, tname, fontName="Times-Bold", fontSize=7.5, fillColor=TEXT_DARK))
         x_start = 120 + (wstart - 1) * col_w
         bar_w = (wend - wstart + 1) * col_w
-        d_gantt.add(Rect(x_start + 2, y + 2, bar_w - 4, 14, rx=3, ry=3, fillColor=color, strokeColor=colors.black))
+        d_gantt.add(Rect(x_start + 2, y + 2, bar_w - 4, 12, rx=2, ry=2, fillColor=color, strokeColor=colors.black))
 
     story.append(d_gantt)
-    story.append(Spacer(1, 15))
+    story.append(Paragraph("Figure 5.1: 10-Week Project Development Milestone Gantt Chart", caption_below_figure_style))
 
     # SECTION 06: SOFTWARE/HARDWARE REQUIREMENTS
-    story.append(Paragraph("06. SOFTWARE / HARDWARE REQUIRED FOR DEVELOPMENT", h1_style))
-    story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=10))
+    story.append(Paragraph("06. SOFTWARE / HARDWARE REQUIRED FOR DEVELOPMENT", large_heading_style))
+    story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=8))
+
+    story.append(Paragraph("Table 6.1: Technical Stack and Hardware Infrastructure Specifications", caption_above_table_style))
 
     req_data = [
         [Paragraph("Category", table_cell_header), Paragraph("Technology / Specifications", table_cell_header), Paragraph("Purpose in NoirHire Project", table_cell_header)],
@@ -843,7 +968,7 @@ def create_14page_synopsis():
         ]
     ]
 
-    t_req = Table(req_data, colWidths=[110, 210, 184])
+    t_req = Table(req_data, colWidths=[110, 205, 174])
     t_req.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
         ('VALIGN', (0,0), (-1,-1), 'TOP'),
@@ -857,13 +982,13 @@ def create_14page_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 13: SECTION 07 - REFERENCES
+    # PAGE 14: 07. REFERENCES
     # =========================================================================
-    story.append(Paragraph("07. REFERENCES", h1_style))
+    story.append(Paragraph("07. REFERENCES", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=12))
 
-    story.append(Paragraph("The design, architecture, and implementation of NoirHire are informed by the following academic research papers, software engineering books, and official technical documentations:", body_style))
-    story.append(Spacer(1, 10))
+    story.append(Paragraph("The design, architecture, and implementation of NoirHire are informed by the following academic research papers, software engineering books, and official technical documentations:", normal_text_style))
+    story.append(Spacer(1, 8))
 
     references_list = [
         "<b>[1] Newman, S. (2021).</b> <i>Building Microservices: Designing Fine-Grained Systems (2nd ed.).</i> O'Reilly Media. [Focus on Database-per-Service patterns and API Gateway routing].",
@@ -879,31 +1004,36 @@ def create_14page_synopsis():
     ]
 
     for ref in references_list:
-        story.append(Paragraph(ref, ParagraphStyle('RefStyle', parent=body_style, fontSize=9.5, leading=14, spaceAfter=10, leftIndent=20, firstLineIndent=-20)))
+        story.append(Paragraph(ref, ParagraphStyle('RefStyle', parent=normal_text_style, fontSize=10.5, leading=15.5, spaceAfter=8, leftIndent=20, firstLineIndent=-20)))
 
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 15))
     story.append(HRFlowable(width="100%", thickness=1, color=BORDER_COLOR, spaceBefore=10, spaceAfter=15))
 
-    story.append(Paragraph("<b>End of Synopsis Document</b>", ParagraphStyle('EndDoc', parent=styles['Normal'], fontName='Helvetica-Bold', fontSize=10, leading=14, alignment=1, textColor=TEXT_MUTED)))
+    story.append(Paragraph("<b>End of Synopsis Document</b>", ParagraphStyle('EndDoc', parent=styles['Normal'], fontName='Times-Bold', fontSize=10.5, leading=15, alignment=1, textColor=TEXT_MUTED)))
 
-    # Page Number Canvas Callback
+    # SPECIFICATION: Page numbers should be given on each page.
     def add_page_decorations(canvas, doc):
         canvas.saveState()
         page_num = canvas.getPageNumber()
         
-        # Header text
-        canvas.setFont("Helvetica", 8)
+        # Header text (from page 2 onwards)
+        if page_num > 1:
+            canvas.setFont("Times-Roman", 8.5)
+            canvas.setFillColor(TEXT_MUTED)
+            canvas.drawString(left_m, 841.89 - top_m + 15, "Lloyd Institute of Engineering & Technology | Department of CSE")
+            canvas.drawRightString(595.27 - right_m, 841.89 - top_m + 15, "AI-Powered Job Portal Synopsis")
+            canvas.setStrokeColor(BORDER_COLOR)
+            canvas.setLineWidth(0.5)
+            canvas.line(left_m, 841.89 - top_m + 10, 595.27 - right_m, 841.89 - top_m + 10)
+
+        # Footer (On all pages according to Specification Rule 5)
+        canvas.setFont("Times-Roman", 9)
         canvas.setFillColor(TEXT_MUTED)
-        canvas.drawString(54, 750, "Lloyd Institute of Engineering & Technology | Department of CSE")
-        canvas.drawRightString(558, 750, "AI-Powered Job Portal Synopsis")
         canvas.setStrokeColor(BORDER_COLOR)
         canvas.setLineWidth(0.5)
-        canvas.line(54, 744, 558, 744)
-
-        # Footer
-        canvas.line(54, 45, 558, 45)
-        canvas.drawString(54, 32, "Session: 2026–27")
-        canvas.drawRightString(558, 32, f"Page {page_num} of 13")
+        canvas.line(left_m, bottom_m + 15, 595.27 - right_m, bottom_m + 15)
+        canvas.drawString(left_m, bottom_m, "Academic Session: 2026–27")
+        canvas.drawRightString(595.27 - right_m, bottom_m, f"Page {page_num} of 14")
         
         canvas.restoreState()
 
@@ -911,4 +1041,4 @@ def create_14page_synopsis():
     print(f"Successfully generated {pdf_filename}")
 
 if __name__ == "__main__":
-    create_14page_synopsis()
+    create_specification_synopsis()
