@@ -950,19 +950,31 @@ def create_specification_synopsis():
     story.append(PageBreak())
 
     # =========================================================================
-    # PAGE 14: 6. SOFTWARE / HARDWARE REQUIREMENTS & 7. REFERENCES
+    # PAGE 14: 6. SOFTWARE / HARDWARE REQUIRED FOR DEVELOPMENT
     # =========================================================================
     story.append(Paragraph("6. SOFTWARE / HARDWARE REQUIRED FOR DEVELOPMENT", large_heading_style))
     story.append(HRFlowable(width="100%", thickness=1, color=SECONDARY, spaceBefore=2, spaceAfter=8))
 
-    story.append(Paragraph("Table 6.1: Technical Stack and Hardware Infrastructure Specifications", caption_above_table_style))
+    story.append(Paragraph(
+        "The NoirHire AI-Powered Job Portal is engineered using an enterprise-grade cloud-native stack. "
+        "The software architecture, database management, cognitive AI engines, development tooling, containerization frameworks, and hardware infrastructure requirements are detailed below:",
+        normal_text_style
+    ))
+    story.append(Spacer(1, 4))
+
+    story.append(Paragraph("Table 6.1: Technical Stack, Development Tools & Hardware Infrastructure", caption_above_table_style))
 
     req_data = [
-        [Paragraph("Category", table_cell_header), Paragraph("Technology / Specifications", table_cell_header), Paragraph("Purpose in NoirHire Project", table_cell_header)],
+        [Paragraph("Category", table_cell_header), Paragraph("Technology / Specification", table_cell_header), Paragraph("Purpose in NoirHire Project", table_cell_header)],
         [
-            Paragraph("<b>Backend Framework</b>", table_cell_bold),
-            Paragraph("Java 17 / 21, Spring Boot 3.x, Spring Cloud", table_cell),
-            Paragraph("Core microservices backend engine & API routing.", table_cell)
+            Paragraph("<b>Backend Microservices</b>", table_cell_bold),
+            Paragraph("Java 21 / 17, Spring Boot 3.x, Spring Cloud", table_cell),
+            Paragraph("Core microservices engine & REST API routing.", table_cell)
+        ],
+        [
+            Paragraph("<b>Cloud Infrastructure</b>", table_cell_bold),
+            Paragraph("Spring Cloud Gateway, Eureka, Config Server", table_cell),
+            Paragraph("JWT routing (:5000), registry (:8761), config (:8888).", table_cell)
         ],
         [
             Paragraph("<b>Artificial Intelligence</b>", table_cell_bold),
@@ -970,32 +982,68 @@ def create_specification_synopsis():
             Paragraph("LLM natural language parser, match score & cover letters.", table_cell)
         ],
         [
-            Paragraph("<b>Database & Messaging</b>", table_cell_bold),
-            Paragraph("PostgreSQL 16, Apache Kafka, Zookeeper", table_cell),
-            Paragraph("Isolated SQL datasources & async event notifications.", table_cell)
+            Paragraph("<b>Relational Database</b>", table_cell_bold),
+            Paragraph("PostgreSQL 16, Spring Data JPA / Hibernate", table_cell),
+            Paragraph("Database-per-service isolated SQL datasources.", table_cell)
         ],
         [
-            Paragraph("<b>Frontend Stack</b>", table_cell_bold),
-            Paragraph("React.js 18, Vite, Tailwind CSS, Redux Toolkit", table_cell),
+            Paragraph("<b>Event Streaming & Async</b>", table_cell_bold),
+            Paragraph("Apache Kafka, Apache Zookeeper", table_cell),
+            Paragraph("Async event pipeline for real-time OTPs & status updates.", table_cell)
+        ],
+        [
+            Paragraph("<b>Inter-Service REST</b>", table_cell_bold),
+            Paragraph("Spring Cloud OpenFeign Templates", table_cell),
+            Paragraph("Declarative REST calls between microservices.", table_cell)
+        ],
+        [
+            Paragraph("<b>Frontend SPA Client</b>", table_cell_bold),
+            Paragraph("React.js 18, Vite 5, Tailwind CSS, Redux", table_cell),
             Paragraph("Responsive single-page web user application.", table_cell)
         ],
         [
-            Paragraph("<b>Minimum Hardware</b>", table_cell_bold),
-            Paragraph("Intel Core i5/i7 (10th Gen+), 16 GB RAM, SSD", table_cell),
+            Paragraph("<b>DevOps & Containers</b>", table_cell_bold),
+            Paragraph("Docker Engine, Docker Compose", table_cell),
+            Paragraph("Multi-container isolation & orchestration.", table_cell)
+        ],
+        [
+            Paragraph("<b>API Testing Tooling</b>", table_cell_bold),
+            Paragraph("Postman Suite (`job-portal-endpoints.json`)", table_cell),
+            Paragraph("End-to-end API testing & pre-configured collections.", table_cell)
+        ],
+        [
+            Paragraph("<b>Version Control / CI</b>", table_cell_bold),
+            Paragraph("Git, GitHub Repository, GitHub Actions", table_cell),
+            Paragraph("Distributed version control & continuous integration.", table_cell)
+        ],
+        [
+            Paragraph("<b>Build Systems</b>", table_cell_bold),
+            Paragraph("Apache Maven 3.9+, Node.js (v20+), npm", table_cell),
+            Paragraph("Multi-module Java compilation & React asset bundling.", table_cell)
+        ],
+        [
+            Paragraph("<b>Minimum Hardware Spec</b>", table_cell_bold),
+            Paragraph("Intel Core i5/i7, 16 GB RAM, 512 GB SSD", table_cell),
             Paragraph("Developer workstation for running multi-container stack.", table_cell)
         ]
     ]
 
-    t_req = Table(req_data, colWidths=[110, 205, 174])
+    t_req = Table(req_data, colWidths=[115, 195, 179])
     t_req.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), PRIMARY),
-        ('VALIGN', (0,0), (-1,-1), 'TOP'),
+        ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
         ('GRID', (0,0), (-1,-1), 0.5, BORDER_COLOR),
         ('ROWBACKGROUNDS', (0,1), (-1,-1), [colors.white, BG_LIGHT]),
-        ('TOPPADDING', (0,0), (-1,-1), 4),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 4),
+        ('TOPPADDING', (0,0), (-1,-1), 2),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 2),
     ]))
     story.append(t_req)
+    story.append(Spacer(1, 8))
+
+    story.append(Paragraph("6.1 Development Tooling & Environment Highlights", small_heading_style))
+    story.append(Paragraph("<b>• Docker & Docker Compose:</b> Enables rapid containerized deployment of all microservices, PostgreSQL databases, Kafka brokers, and Zookeeper nodes with single-command startup.", bullet_style))
+    story.append(Paragraph("<b>• Postman Endpoint Suite:</b> Includes pre-configured collections for testing JWT authentication, job postings, resume parsing, and Gemini AI endpoints through API Gateway port 5000.", bullet_style))
+    story.append(Paragraph("<b>• GitHub Version Control:</b> Manages multi-module project structure with dedicated directories for cloud services, business modules, shared libraries, and React frontend.", bullet_style))
     
     # User Instruction: Move References to a new page
     story.append(PageBreak())
